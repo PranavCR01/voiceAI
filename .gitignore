@@ -1,0 +1,26 @@
+# Audio never enters the repo (see CLAUDE.md rule 1)
+*.wav
+*.mp3
+*.flac
+*.webm
+*.opus
+*.ogg
+*.mulaw
+*.ulaw
+data/raw/
+data/cache/
+results/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Secrets
+.env
+.env.*
+!.env.example
