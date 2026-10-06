@@ -58,9 +58,9 @@ def test_equivalence_layer_never_separates_what_whisper_equates() -> None:
     [
         ("03/04/1980", "mdy", "march 4 1980"),
         ("03/04/1980", "dmy", "april 3 1980"),
-        ("13/04/1980", "mdy", "13 4 1980"),  # invalid month: left alone
+        ("13/04/1980", "mdy", "13041980"),  # invalid month: not a date, digits joined as an id
         ("13/04/1980", "dmy", "april 13 1980"),
-        ("03/04-1980", "mdy", "3 4 1980"),  # mixed separators: not a date
+        ("03/04-1980", "mdy", "03041980"),  # mixed separators: not a date
     ],
 )
 def test_numeric_dates(text: str, date_order: str, expected: str) -> None:

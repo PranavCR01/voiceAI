@@ -2,6 +2,13 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — Equivalence layer v2: work around Whisper's digit handling
+Found while designing entity tagging: Whisper's normalizer rewrites the digit 1 as "one" (`1.5` → `one.5`, `5 1 5` → `5 one 5`, `2.1` → `2 one`), drops leading zeros (`07700` → `7700`, while spoken "oh seven seven…" keeps them), turns "zero point five" into `.5`, and deletes parenthesized text (the `(555)` area code). Each would corrupt dosage and phone-number scoring. v2 adds, each with a fixture:
+- Before Whisper: digits in parentheses are unwrapped; numbers with a leading zero are spelled digit by digit so Whisper rebuilds them with the zero.
+- After Whisper: `one.N` → `1.N`, `.N` → `0.N`, `one` next to a digit group → `1`; runs of digit groups totalling ≥7 digits, or ≥3 single digits, are joined into one token (grouping of phone/account numbers is formatting). Two-token runs under 7 digits are not joined (`10 1` could be "10, 1").
+Known remaining: `2.1` loses its decimal point inside Whisper (`2 1`) identically on both sides, so it is still equal; "half a" is not 0.5.
+Replaces: equivalence layer v1 (entry below); normalizer id changes from `equiv-v1` to `equiv-v2`.
+
 ## 2026-10-06 — Statistics conventions
 - Pooled-WER intervals: paired percentile bootstrap (default 10,000 resamples, 95%). All systems share the same resample weights, so differences are paired. With `cluster_ids` (speakers), whole clusters are resampled; use it whenever a speaker contributes many utterances, since iid resampling understates uncertainty when difficulty clusters by speaker (a test shows the clustered interval is >1.5x wider on such data).
 - Bootstrap p-value: two-sided, 2 x min(share of resampled differences <= 0, share >= 0), with the +1 correction ((count + 1)/(B + 1)) so it is never reported as 0; capped at 1. Identical systems give p = 1.
