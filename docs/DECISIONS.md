@@ -2,6 +2,14 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — Statistics conventions
+- Pooled-WER intervals: paired percentile bootstrap (default 10,000 resamples, 95%). All systems share the same resample weights, so differences are paired. With `cluster_ids` (speakers), whole clusters are resampled; use it whenever a speaker contributes many utterances, since iid resampling understates uncertainty when difficulty clusters by speaker (a test shows the clustered interval is >1.5x wider on such data).
+- Bootstrap p-value: two-sided, 2 x min(share of resampled differences <= 0, share >= 0), with the +1 correction ((count + 1)/(B + 1)) so it is never reported as 0; capped at 1. Identical systems give p = 1.
+- Resamples that draw only empty references (possible only when some references are empty) are dropped and counted in `dropped_resamples`.
+- "Distinguishable" means the difference interval strictly excludes 0; touching 0 is a tie.
+- Proportions use the Wilson score interval; the normal quantile comes from the stdlib (`statistics.NormalDist`), so no SciPy dependency.
+- Holm step-down adjusts p-values when many pairwise claims are made at once.
+
 ## 2026-10-06 — Equivalence layer on top of Whisper normalization
 Headline WER uses Whisper normalization **plus** a small, versioned equivalence layer (`EQUIVALENCE_VERSION`, id from `normalizer_id()`); plain-Whisper WER is kept as a second column for comparability with public leaderboards. Reason: a provider that formats "10 mg" should not lose to one that writes "ten milligrams" against a spoken reference. Rules (all domain-neutral, each with a fixture):
 - Unit abbreviations ↔ spelled units (mg, mcg/µg, ml, kg, km; US and UK spellings).
