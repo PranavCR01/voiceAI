@@ -26,6 +26,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from harness.audio import AudioClip, AudioError, load_clip
 from harness.datasets.manifest import Utterance, read_manifest
 from harness.providers.base import BatchAdapter, PermanentError, RetryableError, Transcript
 from harness.providers.registry import Mode, ProviderConfig, load_registry
@@ -235,8 +236,16 @@ async def run_batch(
     )
 
 
-async def _no_audio_loader(utt: Utterance) -> Any:
-    raise PermanentError("audio loading arrives with #12 (harness/audio.py)")
+def audio_loader(data_root: Path) -> ClipLoader:
+    """Clip loader for real runs: decodes off the event loop (ffmpeg is blocking)."""
+
+    async def load(utt: Utterance) -> AudioClip:
+        try:
+            return await asyncio.to_thread(load_clip, utt, data_root)
+        except (FileNotFoundError, AudioError) as e:
+            raise PermanentError(f"audio: {e}") from e
+
+    return load
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -269,7 +278,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             config,
             factory(config),
             manifest,
-            load_clip=_no_audio_loader,
+            load_clip=audio_loader(args.data_root),
             results_dir=args.results,
             manifest_label=args.manifest.as_posix(),
             run_id=args.run_id,

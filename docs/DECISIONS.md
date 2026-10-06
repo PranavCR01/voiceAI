@@ -2,6 +2,13 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — Audio I/O
+- One decoding path (`harness/audio.py`) for adapters, augmentation and VAD, so every provider hears identical audio. Whole files are decoded once (ffmpeg → mono int16 at the target rate, cached) and segments are cut in NumPy: sample-exact for every format, where ffmpeg's own seeking isn't (MP3).
+- The decoded file's real sample rate is recorded on every clip; a mismatch with the manifest warns (Common Voice's 48 kHz is an assumption until decoded).
+- µ-law encoding is byte-identical to ffmpeg's `pcm_mulaw` over all 65,536 inputs (tested exhaustively). ffmpeg builds its encoder as a nearest-level lookup table rather than the Sun/ITU arithmetic; the two differ by one code at segment boundaries on 512 inputs. We match ffmpeg because the augmentation pipeline's telephony codec is ffmpeg, and two µ-law paths that disagree would make "telephony" mean two things.
+- `pace()` schedules chunk k at t0 + k·chunk_ms on the monotonic clock (absolute deadlines), so a late chunk never shifts later ones; each chunk records scheduled and actual time, which the latency metrics use (#14). Wall-clock tests carry a `timing` marker (`pytest -m "not timing"` on a loaded machine).
+- CI installs ffmpeg explicitly.
+
 ## 2026-10-06 — Provider registry and batch runner
 - `configs/providers.yaml` holds one entry per *configuration* (provider + pinned model id + mode + settings). Prices carry `billing_basis` (audio vs session duration vs per channel), `source` and `as_of`, because the basis changes cost per conversation minute more than the headline rate. BAA status defaults to `unknown` and needs a source to be `yes`/`no`.
 - Everything is `verify: true` until checked against vendor docs on the owner's machine; a verified entry must have a price. The CLI warns when running an unverified config.

@@ -262,3 +262,22 @@ def test_git_sha_reads_this_repo() -> None:
 
     assert re.fullmatch(r"[0-9a-f]{40}(-dirty)?", git_sha(Path(__file__).parent))
     assert git_sha(Path("/")) == "unknown"
+
+
+def test_audio_loader_maps_missing_files_to_permanent_errors(tmp_path: Path) -> None:
+    from harness.providers.runner import audio_loader
+
+    summary = asyncio.run(
+        run_batch(
+            CONFIG,
+            FakeAdapter(),
+            utts(1),
+            load_clip=audio_loader(tmp_path),
+            results_dir=tmp_path / "r",
+            manifest_label="t",
+            sleep=no_sleep,
+            sha="abcdef0",
+        )
+    )
+    row = read_run(summary.run_dir).rows[0]
+    assert row.error is not None and row.error.startswith("PermanentError: audio:")
