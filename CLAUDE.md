@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Voice-stack recommender: takes a use-case profile (constraints, domain terms, optional customer audio) and recommends the full cascaded stack (STT, turn detection, LLM, TTS, and their settings), with confidence intervals. Healthcare intake is the first reference use case and the demo agent — nothing outside `configs/profiles/healthcare_*` and `data/lexicons/` may assume healthcare.
+Voice-stack recommender: takes a use-case profile (constraints, domain terms, optional customer audio) and recommends the full cascaded stack (STT, turn detection, LLM, TTS, and their settings), with confidence intervals. Healthcare intake is the first reference use case and the demo agent — nothing outside `configs/profiles/healthcare_*`, `data/lexicons/` and the suite registry in `recommender/suites.py` may assume healthcare.
 Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anything it covers.
 
 ## Stack

@@ -7,11 +7,11 @@ A voice-stack recommender for forward deployed engineers: describe the use case 
 Public leaderboards (Artificial Analysis, Open ASR, Coval, Pipecat stt-benchmark) rank STT providers on generic audio, and their filters amount to "sort by price/latency". A real deployment cares about different things: are the domain's critical entities (drug names, account numbers, SKUs, dates) transcribed correctly, does the agent cut callers off mid-sentence, how long until the agent answers, what does a call minute cost *on this vendor's billing basis*, does the vendor meet compliance needs. None of the public boards answers those for a specific use case, on the customer's audio, with confidence intervals.
 
 ## How it works
-**Input: a use-case profile** (`configs/profiles/*.yaml`):
-- Use case: domain, channel (telephony 8 kHz / web or app 16 kHz), language(s), expected accents, call length, agent talk ratio.
-- Constraints: max p95 time-to-first-audio, minimum entity recall per category, max cost per minute, compliance (BAA required, data residency), deployment (managed API vs self-hosted), concurrency.
-- Domain terms: entity categories and term lists (used for scoring and for keyterm boosting).
-- Optional: path to a manifest of the customer's own audio + reference transcripts.
+**Input: a use-case profile** (`configs/profiles/*.yaml`; field reference in `configs/profiles/README.md`):
+- `use_case`: domain, channel (`telephony_8k` / `wideband_16k`), languages, expected accents, call length, agent talk ratio.
+- `constraints`, per layer: `stack` (p95 TTFA, cost per minute, task success, BAA, data residency, managed vs self-hosted, concurrency), `stt` (entity recall per category, WER), `turn_taking` (premature-endpoint rate, endpoint delay), `llm` (pass rate per behavior check, TTFT, tool calling), `tts` (TTFB, round-trip WER, entity pronunciation, voice tags).
+- `entities`: categories that matter (lexicon, regex or builtin), used for STT scoring, keyterm boosting and TTS pronunciation checks.
+- Optional: `audio.manifest_path` (customer audio + transcripts), `conversation_scripts`, `keyterms`, `reference_suite`.
 
 **Two modes:**
 1. **Customer audio (high confidence).** Every candidate configuration is run on the supplied audio, plus channel-matched augmentation (e.g. 8 kHz mu-law, noise).

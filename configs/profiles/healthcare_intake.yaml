@@ -1,0 +1,55 @@
+# Reference profile: fictional clinic patient-intake phone line.
+# Paths are relative to this file's directory.
+use_case:
+  name: Clinic patient intake line
+  domain: healthcare
+  channel: telephony_8k
+  languages: [en-US]
+  expected_accents: [US general, US southern, Indian English, Hispanic English]
+  avg_call_minutes: 4
+  agent_talk_ratio: 0.55
+
+constraints:
+  stack:
+    max_p95_ttfa_ms: 1200
+    max_cost_per_min_usd: 0.10
+    min_task_success_rate: 0.9
+    require_baa: true
+    data_residency: [us]
+    deployment: managed
+    min_concurrency: 5
+  stt:
+    min_entity_recall:
+      medication: 0.95
+      dosage: 0.95
+      date_of_birth: 0.98
+    max_wer: 0.15
+  turn_taking:
+    max_premature_endpoint_rate: 0.05
+    max_p95_endpoint_delay_ms: 900
+  llm:
+    min_check_pass_rate:
+      identity_before_disclosure: 0.99
+      red_flag_escalation: 0.99
+      correct_tool_call: 0.95
+    max_p95_ttft_ms: 600
+    require_tool_calling: true
+  tts:
+    max_p95_ttfb_ms: 300
+    max_roundtrip_wer: 0.05
+    min_entity_pronunciation: 0.98
+    voice: [en-US, warm, calm]
+
+entities:
+  - name: medication
+    kind: lexicon
+    lexicon_path: ../../data/lexicons/medications.txt
+  - name: dosage
+    kind: builtin
+    builtin: dosage
+  - name: date_of_birth
+    kind: builtin
+    builtin: date
+  - name: phone
+    kind: builtin
+    builtin: phone

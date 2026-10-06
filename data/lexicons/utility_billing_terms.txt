@@ -1,0 +1,7 @@
+# Seed list of billing terms for the utility_billing_support example profile.
+autopay
+late fee
+meter reading
+payment plan
+budget billing
+service disconnection

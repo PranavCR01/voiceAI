@@ -1,0 +1,12 @@
+# Seed list of generic medication names for the healthcare_intake profile.
+# Placeholder until #7 builds the real lexicon (PriMock57 terms + a public-domain source).
+amlodipine
+atorvastatin
+ibuprofen
+lisinopril
+metformin
+omeprazole
+paracetamol
+salbutamol
+sertraline
+levothyroxine

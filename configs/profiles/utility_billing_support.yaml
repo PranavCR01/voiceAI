@@ -1,0 +1,39 @@
+# Example profile: utility company billing support line.
+# Exists to prove the profile format isn't healthcare-shaped. Paths are relative to this file.
+use_case:
+  name: Utility billing support line
+  domain: utilities / customer service
+  channel: telephony_8k
+  languages: [en-US, es-US]
+  avg_call_minutes: 6
+  agent_talk_ratio: 0.5
+
+constraints:
+  stack:
+    max_p95_ttfa_ms: 1500
+    max_cost_per_min_usd: 0.06
+    require_baa: false
+    deployment: either
+    min_concurrency: 20
+  stt:
+    min_entity_recall:
+      account_number: 0.97
+      amount: 0.95
+  llm:
+    min_check_pass_rate:
+      verify_account_before_balance: 0.99
+    require_tool_calling: true
+
+entities:
+  - name: account_number
+    kind: regex
+    pattern: '\b\d{10}\b'
+  - name: amount
+    kind: builtin
+    builtin: number
+  - name: due_date
+    kind: builtin
+    builtin: date
+  - name: billing_term
+    kind: lexicon
+    lexicon_path: ../../data/lexicons/utility_billing_terms.txt
