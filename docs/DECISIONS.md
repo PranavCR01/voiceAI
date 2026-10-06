@@ -2,6 +2,14 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — LibriSpeech and Common Voice loaders
+- `audio_path` is computed relative to an explicit `--data-root`, so manifests stay portable regardless of where a dataset is unpacked.
+- Common Voice is sampled, not loaded whole: 400 clips from the held-out `test.tsv` by default. Accents take turns (round robin) so the set measures *spread across accents*, not Common Voice's skewed population; WER on it is not an estimate of WER on "typical" Common Voice audio, and the report must not present it as one.
+- The accent field has been free text since v8, so accents with fewer than 5 clips are pooled into one "other" stratum; otherwise hundreds of one-off strings would crowd out the main accents. Labels on clips are unchanged.
+- At most 10 clips per speaker (`client_id`), so speaker clustering in the bootstrap has many clusters.
+- Neither dataset can be fetched from the cloud environment (openslr.org blocked; Common Voice needs a terms acceptance), so both loaders are verified on fixtures that mirror the real layouts, including the pre-v8 `accent` column. The first real run on the owner's machine is the end-to-end check; expected counts are in `data/README.md`.
+- Language tags: both `en` (no region), so numeric dates read month-first. LibriSpeech references contain no numeric dates; Common Voice sentences are rarely numeric.
+
 ## 2026-10-06 — Results format and offline report rules
 - One run = one configuration. `<results>/<run_id>/run.json` (RunMeta: config, pinned model id, settings, date, git SHA) + `results.parquet` (one row per utterance: raw hypothesis, raw-response path, timestamps, error). Rows store the *raw* hypothesis; the normalizer id lives in the report header because normalization happens at scoring time (the issue asked for it per row; that would record a choice not yet made).
 - Paired comparison: within each table, only utterances every run covers are scored; the number dropped is reported. A failed request is scored as an empty transcript (all deletions), never skipped, so unreliable providers aren't flattered.

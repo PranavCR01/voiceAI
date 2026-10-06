@@ -1,0 +1,17 @@
+client_id	path	sentence_id	sentence	sentence_domain	up_votes	down_votes	age	gender	accents	variant	locale	segment
+spk_us1	common_voice_en_100.mp3	sid100	US speaker one sentence 0.		2	0			United States English		en	
+spk_us1	common_voice_en_101.mp3	sid101	US speaker one sentence 1.		2	0			United States English		en	
+spk_us1	common_voice_en_102.mp3	sid102	US speaker one sentence 2.		2	0			United States English		en	
+spk_us1	common_voice_en_103.mp3	sid103	US speaker one sentence 3.		2	0			United States English		en	
+spk_us1	common_voice_en_104.mp3	sid104	US speaker one sentence 4.		2	0			United States English		en	
+spk_us1	common_voice_en_105.mp3	sid105	US speaker one sentence 5.		2	0			United States English		en	
+spk_us2	common_voice_en_110.mp3	sid110	US speaker two sentence 0.		2	0			United States English		en	
+spk_us2	common_voice_en_111.mp3	sid111	US speaker two sentence 1.		2	0			United States English		en	
+spk_uk1	common_voice_en_200.mp3	sid200	England sentence 0.		2	0			England English		en	
+spk_uk1	common_voice_en_201.mp3	sid201	England sentence 1.		2	0			England English		en	
+spk_uk1	common_voice_en_202.mp3	sid202	England sentence 2.		2	0			England English		en	
+spk_in1	common_voice_en_300.mp3	sid300	India sentence 0.		2	0			India and South Asia (India, Pakistan, Sri Lanka)		en	
+spk_in1	common_voice_en_301.mp3	sid301	India sentence 1.		2	0			India and South Asia (India, Pakistan, Sri Lanka)		en	
+spk_x1	common_voice_en_400.mp3	sid400	No accent given.		2	0					en	
+spk_x2	common_voice_en_401.mp3	sid401	Also no accent.		2	0			  		en	
+spk_x3	common_voice_en_402.mp3	sid402			2	0					en	

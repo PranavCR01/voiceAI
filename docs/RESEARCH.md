@@ -9,8 +9,8 @@ Coval (open-source benchmarks, perturbation sets incl. phone codec), Pipecat stt
 | Dataset | License | Notes |
 |---|---|---|
 | PriMock57 | **CC BY 4.0 (verified 2026-10-06, repo LICENSE.md)** | 57 mock GP consultations, 8h38m, 7 clinicians + 57 actors. WAV 16-bit/16 kHz, doctor and patient on **separate channels** (source was Opus video). Transcripts: Praat TextGrid, utterance-level intervals (`xmin`, `xmax`, `text`). Tags `<UNSURE>…`, `<UNIN/>` must be handled (exclude utterances or tagged spans from scoring). Fetched via Git LFS from `github.com/babylonhealth/primock57`. UK accents. ACL 2022 paper: Google Cloud STT 30.9% WER, Azure 31.3%. Pinned commit `cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5`, fetched by `data/fetch_primock57.sh` (`SKIP_AUDIO=1` for transcripts only; they are plain git, only audio is LFS). Manifest committed at `data/manifests/primock57.jsonl`: 7,108 utterances, 5,255 scorable (5.5 h, ~57k words; 2,640 patient / 2,615 doctor), 1,147 excluded `<UNIN/>`, 706 excluded `<INAUDIBLE_SPEECH/>` (an undocumented tag). Clinician identities are not published (57 consultations, 7 clinicians), so doctor speaker IDs are per consultation. |
-| LibriSpeech test-clean | CC BY 4.0 | Clean control; too easy for 2026 models. |
-| Common Voice English | CC0 | Accent spread; check current download portal/terms. |
+| LibriSpeech test-clean | CC BY 4.0 | Clean control; too easy for 2026 models. 2,620 utterances, 40 speakers, 16 kHz FLAC. Loader: `harness/datasets/librispeech.py`; fetch steps in `data/README.md` (openslr.org is blocked from the cloud environment). |
+| Common Voice English | CC0 | Accent spread; check current download portal/terms. Loader samples the held-out `test.tsv`: accent round robin, ≤10 clips per speaker, accents with <5 clips pooled. MP3 clips assumed 48 kHz (verify on decode). The `accents` column is free text since v8 (`accent` before). |
 | Pipecat smart-turn-data v3.x | Open per HF card (verify) | Complete/incomplete turn labels; endpointing eval. |
 | Afrispeech-Dialog | CC BY-NC-SA 4.0 | v2 candidate: accented medical dialogue; non-commercial. |
 
