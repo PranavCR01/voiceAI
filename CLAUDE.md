@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Voice AI STT bake-off harness with a healthcare intake voice agent as its in-pipeline scenario.
+Voice-stack recommender: takes a use-case profile (constraints, domain terms, optional customer audio) and recommends an STT model, settings and turn-detection policy, with confidence intervals. Healthcare intake is the first reference use case and the demo agent — nothing outside `configs/profiles/healthcare_*` and `data/lexicons/` may assume healthcare.
 Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anything it covers.
 
 ## Stack
@@ -28,7 +28,7 @@ Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anythin
 
 ## Layout
 ```
-configs/      providers.yaml, scenarios/*.yaml, augment.yaml
+configs/      providers.yaml, profiles/*.yaml (use case + constraints), augment.yaml
 data/         manifests + fetch scripts only
 harness/      datasets/ augment/ providers/ metrics/ load/
 agent/        pipeline.py, turn_controller/, tools/

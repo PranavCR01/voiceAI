@@ -1,7 +1,7 @@
 # voiceAI
 
-Which speech-to-text setup should a healthcare voice agent use, where does it break, and how sure are we?
+Describe a voice-agent use case and its constraints, ideally with sample audio, and get back which speech-to-text model, settings and turn-detection approach to use, where that choice breaks, and how sure the recommendation is.
 
-An STT bake-off harness plus a patient-intake voice agent (Pipecat, hand-built turn-taking/barge-in controller) that measures accuracy on medical entities, endpointing errors and time-to-first-audio on the customer's own audio, with confidence intervals and a deterministic recommendation.
+Under the hood: an STT bake-off harness scoring entity accuracy, endpointing errors, time-to-first-audio and cost per minute with confidence intervals, plus a reference voice agent (Pipecat, hand-built turn-taking/barge-in controller) for in-pipeline measurement. The first reference use case is healthcare patient intake.
 
 Status: scaffolding. See `docs/PROJECT.md` for scope and `docs/DECISIONS.md` for the decision log.
