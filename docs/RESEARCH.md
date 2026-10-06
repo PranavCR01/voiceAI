@@ -16,6 +16,10 @@ Coval (open-source benchmarks, perturbation sets incl. phone codec), Pipecat stt
 
 Augmentation sources: MUSAN (CC BY 4.0, verify), DEMAND (CC BY-SA 3.0, verify), OpenSLR SLR28 RIRs. Augmenting a CC BY-SA source makes share-alike derivatives; ND/NC-ND sources can't be published augmented. Publish recipe + manifest only.
 
+**Medication lexicon (built 2026-10-06):** `data/lexicons/medications.txt`, 49 names observed in PriMock57 transcripts/notes at commit `cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5`, hand-checked. openFDA (public domain) could not be fetched from the cloud environment (api.fda.gov blocked by its network policy); `data/lexicons/fetch_openfda_generics.py` fetches candidates on a machine that can reach it. Reference misspellings found in PriMock57 transcripts (fix in the loader, #5): paracetemol, paracetmol → paracetamol; lisonopril → lisinopril; clinil → clenil; stemitil → stemetil; thyrocsin → thyroxine; fexofenatidine → fexofenadine.
+
+**Entity counts in PriMock57** (healthcare profile, 5,961 scorable utterances): medication 166, date 21, dosage 18, phone 2 (false positives). Too few dosages/dates/phones for useful intervals; synthetic intake scripts must supply them.
+
 **Medical entities:** MedWER (arXiv 2609.05728, single author, verify) reports medical-term WER 7.8–10.3 pts above overall WER on jargon-heavy audio, 4.2–5.0 pts on PriMock57. Use as motivation, not as a claim to reproduce. Build the medication lexicon from a public-domain source (openFDA / FDA drug label names, verify licensing) plus terms observed in PriMock57 transcripts; publish the lexicon and tagging rules.
 
 **Synthetic audio:** valid for targeted entity stress tests only, reported in a separate table. Use ≥2 TTS vendors; don't synthesize with ElevenLabs and score only ElevenLabs Scribe (family-advantage risk).

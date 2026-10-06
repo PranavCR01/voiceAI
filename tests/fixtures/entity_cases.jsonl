@@ -1,0 +1,12 @@
+{"profile": "healthcare_intake", "text": "I take 500 milligrams of paracetamol twice a day", "spans": [["dosage", "500 mg"], ["medication", "paracetamol"]]}
+{"profile": "healthcare_intake", "text": "My date of birth is the third of March nineteen eighty", "spans": [["date_of_birth", "3 of march 1980"]]}
+{"profile": "healthcare_intake", "text": "You can reach me on oh seven seven double oh nine double oh one two three", "spans": [["phone", "07700900123"]]}
+{"profile": "healthcare_intake", "text": "Two puffs of Ventolin and some co-codamol", "spans": [["dosage", "2 puffs"], ["medication", "ventolin"], ["medication", "co codamol"]]}
+{"profile": "healthcare_intake", "text": "I've had it for three days", "spans": []}
+{"profile": "healthcare_intake", "text": "I take one tablet of metformin and 1.5 mg of something else", "spans": [["dosage", "one tablet"], ["medication", "metformin"], ["dosage", "1.5 mg"]]}
+{"profile": "healthcare_intake", "text": "Born 03/04/1980, call (555) 123-4567", "spans": [["date_of_birth", "march 4 1980"], ["phone", "5551234567"]]}
+{"profile": "healthcare_intake", "text": "No medication, just water.", "spans": []}
+{"profile": "utility_billing_support", "text": "My account number is 1234567890 and I owe $45.20", "spans": [["account_number", "1234567890"], ["amount", "$45.20"]]}
+{"profile": "utility_billing_support", "text": "The late fee is due on June twelfth", "spans": [["billing_term", "late fee"], ["due_date", "june 12"]]}
+{"profile": "utility_billing_support", "text": "Can I set up autopay?", "spans": [["billing_term", "autopay"]]}
+{"profile": "utility_billing_support", "text": "I paid forty five dollars on the third of May", "spans": [["amount", "$45"], ["due_date", "3 of may"]]}

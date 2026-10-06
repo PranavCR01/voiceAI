@@ -2,6 +2,14 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — Entity scoring rules
+- Tagging runs on the normalized reference so spans line up with the WER alignment. Recovery is strict (every token correct); a per-entity character error rate sits beside it so one wrong digit in a phone number isn't scored like a missing phone number.
+- "Formatted" = recovered and the raw hypothesis carries the entity's numbers as digits. It measures downstream usability, separate from accuracy.
+- The `number` builtin yields to every other category (drops overlapping spans), so a billing "amount" doesn't also count account numbers or the day in a date.
+- Medication lexicon built from names observed in PriMock57 (49, hand-checked); openFDA merge deferred to the owner's machine because the cloud environment can't reach api.fda.gov. Reference misspellings (paracetemol, lisonopril…) are not lexicon terms; the PriMock57 loader (#5) should correct them, otherwise a provider that spells correctly is scored as wrong.
+- PriMock57 alone has too few dosages (18), dates (21) and phones (0 real) for intervals. Synthetic intake scripts are required for those categories, not optional.
+Rules in `harness/metrics/ENTITIES.md`.
+
 ## 2026-10-06 — Equivalence layer v2: work around Whisper's digit handling
 Found while designing entity tagging: Whisper's normalizer rewrites the digit 1 as "one" (`1.5` → `one.5`, `5 1 5` → `5 one 5`, `2.1` → `2 one`), drops leading zeros (`07700` → `7700`, while spoken "oh seven seven…" keeps them), turns "zero point five" into `.5`, and deletes parenthesized text (the `(555)` area code). Each would corrupt dosage and phone-number scoring. v2 adds, each with a fixture:
 - Before Whisper: digits in parentheses are unwrapped; numbers with a leading zero are spelled digit by digit so Whisper rebuilds them with the zero.
@@ -36,7 +44,7 @@ Still not equated (recorded as KNOWN MISMATCH): hyphenated vs closed compounds, 
 - Entity categories are compared by **signature**: builtin type for builtins, name for lexicon/regex. So `date_of_birth` and `due_date` both count as `date`.
 - Matching rule: rank suites by (channel supported, languages shared, entity signatures covered), highest first; ties go to the alphabetically first `suite_id`. A match is a proxy unless the suite supports the channel, *every* profile language and *every* entity signature — partial language coverage (e.g. en-US + es-US against an English-only suite) is a proxy.
 - `min_entity_recall` keys must name defined entities (catches typos that would silently drop a constraint). `min_check_pass_rate` keys are not checked yet; they're validated against conversation scripts in M3.
-- Seed lexicons (`data/lexicons/*.txt`) are placeholders so the example profiles load; #7 builds the real medication lexicon.
+- Seed lexicons (`data/lexicons/*.txt`) were placeholders so the example profiles load; #7 replaced the medication one with a list built from PriMock57 (the billing one remains a seed).
 
 ## 2026-10-06 — Manifest schema is strict
 `Utterance` rejects unknown fields and is immutable; `start_s`/`end_s` are both set or both None; `parent_utt_id` is required exactly when `augmentation` is non-empty; `audio_path` must be relative to the data root. Reason: every loader, augmenter and provider adapter shares this format, so silent shape drift would corrupt comparisons; failing at load time is cheaper than a wrong WER table. Schema doc: `harness/datasets/README.md`.

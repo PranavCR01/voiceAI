@@ -1,12 +1,58 @@
-# Seed list of generic medication names for the healthcare_intake profile.
-# Placeholder until #7 builds the real lexicon (PriMock57 terms + a public-domain source).
+# Medication names for the healthcare_intake reference profile.
+# Source: names observed in PriMock57 (CC BY 4.0) transcripts or clinician notes at commit
+# cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5, matched against a hand-written list of common
+# UK/US generic and brand names, then hand-checked (2026-10-06). Excluded: drug classes
+# ("antihistamines"), everyday words ("iron"), and misspellings found in the references
+# (paracetemol, lisonopril, clinil, stemitil, thyrocsin); those are reference errors to fix in
+# the PriMock57 loader, not terms to tag.
+# Extending from openFDA (public domain): run data/lexicons/fetch_openfda_generics.py on a
+# machine with access to api.fda.gov and review its output before merging.
+acetaminophen
 amlodipine
-atorvastatin
+amoxicillin
+amoxycillin
+aspirin
+bactroban
+betnovate
+bisoprolol
+cerazette
+cetirizine
+cetraben
+chlorphenamine
+clenil
+clindamycin
+co-codamol
+codeine
+dermol
+dioralyte
+diprobase
+e45
+epipen
+fexofenadine
+furosemide
+hydrocortisone
 ibuprofen
+lemsip
 lisinopril
+loratadine
+losartan
+mebeverine
+melatonin
 metformin
-omeprazole
+methotrexate
+metoprolol
+microgynon
+morphine
+naproxen
+nitrofurantoin
+nurofen
 paracetamol
+penicillin
+piriton
+rennie
 salbutamol
 sertraline
-levothyroxine
+simvastatin
+thyroxine
+trimethoprim
+ventolin

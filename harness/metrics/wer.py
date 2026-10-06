@@ -51,6 +51,14 @@ class UttScore:
         """None for an empty reference: WER is undefined there."""
         return self.errors / self.n_ref if self.n_ref else None
 
+    def hyp_token_hits(self) -> tuple[bool, ...]:
+        """For each hypothesis token, whether it matches the reference at that position."""
+        hits = [False] * len(self.hyp_tokens)
+        for c in self.alignment:
+            if c.op == "equal":
+                hits[c.hyp_start : c.hyp_end] = [True] * (c.hyp_end - c.hyp_start)
+        return tuple(hits)
+
     def ref_token_hits(self) -> tuple[bool, ...]:
         """For each reference token, whether it was recognized correctly."""
         hits = [False] * self.n_ref
