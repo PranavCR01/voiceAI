@@ -28,15 +28,24 @@ from typing import Any
 
 from harness.audio import AudioClip, AudioError, load_clip
 from harness.datasets.manifest import Utterance, read_manifest
+from harness.providers.assemblyai_batch import AssemblyAIBatch
 from harness.providers.base import BatchAdapter, PermanentError, RetryableError, Transcript
+from harness.providers.deepgram_batch import DeepgramBatch
+from harness.providers.elevenlabs_batch import ElevenLabsBatch
 from harness.providers.registry import Mode, ProviderConfig, load_registry
 from harness.results import RUN_META, ResultRow, RunMeta, read_run, write_run
+from recommender.profile import load_profile
 
 ClipLoader = Callable[[Utterance], Awaitable[Any]]
 Sleep = Callable[[float], Awaitable[None]]
 
-# Adapter factories by provider, filled in by #13. Kept here so the CLI can resolve a config.
-BATCH_ADAPTERS: dict[str, Callable[[ProviderConfig], BatchAdapter]] = {}
+# (config, api_key, profile keyterms) -> adapter, by provider.
+BatchFactory = Callable[[ProviderConfig, str, list[str] | None], BatchAdapter]
+BATCH_ADAPTERS: dict[str, BatchFactory] = {
+    "deepgram": lambda c, key, kt: DeepgramBatch(c, key, keyterms=kt),
+    "assemblyai": lambda c, key, kt: AssemblyAIBatch(c, key, keyterms=kt),
+    "elevenlabs": lambda c, key, kt: ElevenLabsBatch(c, key, keyterms=kt),
+}
 
 
 class RunConflictError(ValueError):
@@ -260,6 +269,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--limit", type=int, help="only the first N utterances (trial runs)")
     parser.add_argument("--include-excluded", action="store_true")
     parser.add_argument("--retry-failed", action="store_true")
+    parser.add_argument("--profile", type=Path, help="profile whose keyterms 'profile' refers to")
     args = parser.parse_args(argv)
 
     config = load_registry(args.registry).get(args.config)
@@ -267,16 +277,22 @@ def main(argv: Sequence[str] | None = None) -> None:
         print(f"warning: {config.config_id} has unverified model id/pricing (verify: true)")
     factory = BATCH_ADAPTERS.get(config.provider)
     if factory is None:
-        raise SystemExit(f"no batch adapter for provider {config.provider!r} yet (#13)")
-    if not os.environ.get(config.env_key):
+        raise SystemExit(f"no batch adapter for provider {config.provider!r}")
+    api_key = os.environ.get(config.env_key)
+    if not api_key:
         raise SystemExit(f"set {config.env_key} (see .env.example)")
+    keyterms = load_profile(args.profile).keyterm_list() if args.profile else None
+    try:
+        adapter = factory(config, api_key, keyterms)
+    except ValueError as e:
+        raise SystemExit(str(e)) from e
     manifest = read_manifest(args.manifest)
     if args.limit:
         manifest = manifest[: args.limit]
     summary = asyncio.run(
         run_batch(
             config,
-            factory(config),
+            adapter,
             manifest,
             load_clip=audio_loader(args.data_root),
             results_dir=args.results,

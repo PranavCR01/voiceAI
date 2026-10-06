@@ -21,6 +21,21 @@ configs:
     env_key: DEEPGRAM_API_KEY
     verify: true
 
+  - config_id: deepgram_nova3_batch_keyterms
+    provider: deepgram
+    model_id: nova-3
+    mode: batch
+    settings: {smart_format: true, punctuate: true, keyterms: profile}
+    pricing:
+      amount: 0.0043
+      unit: minute
+      billing_basis: audio_duration
+      source: https://dynalord.com/blog/deepgram-pricing
+      as_of: 2026-10-06
+    env_key: DEEPGRAM_API_KEY
+    verify: true
+    notes: Same as deepgram_nova3_batch plus the profile's keyterms (keyterm prompting may cost extra; verify).
+
   - config_id: assemblyai_batch
     provider: assemblyai
     model_id: universal  # research didn't cover AssemblyAI batch model names; verify

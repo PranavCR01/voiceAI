@@ -2,6 +2,14 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — Batch adapters
+- Plain `httpx`, no vendor SDKs: every request is visible and testable with a mock transport; no SDK version drift.
+- Every provider receives the same 16 kHz mono WAV produced by `harness/audio.py`.
+- Adapters reject settings they don't map (a typo can't become a silent default). Keyterm boosting is its own configuration (`*_keyterms`, `keyterms: profile` + `--profile`), so boosting is measured, never a hidden default.
+- ElevenLabs audio-event tags are forced off (`tag_audio_events=false`).
+- AssemblyAI is asynchronous (upload → create → poll); a poll timeout is retryable, a transcript `error` status is permanent.
+- Written from recollection: vendor docs are blocked from the cloud environment. Request shapes and response fixtures are unverified; `harness/providers/README.md` holds the checklist, and the first live run must replace the fixtures with captured responses before results are trusted.
+
 ## 2026-10-06 — Audio I/O
 - One decoding path (`harness/audio.py`) for adapters, augmentation and VAD, so every provider hears identical audio. Whole files are decoded once (ffmpeg → mono int16 at the target rate, cached) and segments are cut in NumPy: sample-exact for every format, where ffmpeg's own seeking isn't (MP3).
 - The decoded file's real sample rate is recorded on every clip; a mismatch with the manifest warns (Common Voice's 48 kHz is an assumption until decoded).
