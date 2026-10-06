@@ -6,7 +6,11 @@ Newest first. Each entry: date, decision, reason, what it replaced (if anything)
 The tool recommends STT, turn detection, LLM and TTS (plus settings), and the assembled stack is re-checked end to end. There is no v1/v2 split; previously deferred items become "stretch, after M7". LLM is scored by deterministic rule checks on scripted conversations (the LLM is tested, never the judge); TTS by TTFB, round-trip WER through a fixed different-vendor STT, entity pronunciation and UTMOS, with a small human listening test used only to validate UTMOS. Speech-to-speech models are excluded (a third architecture). Reason: owner wants a full-stack recommendation. Cost: estimate grows from ~5 to ~8–10 weeks; mitigated by milestones that each end in a demo.
 Replaces: "v1 recommends STT/turn detection only" (in the entry below) and the "v1 scope cut" deferral list.
 
-## 2026-10-06 — Branch per issue, squash-merge to main
+## 2026-10-06 — Commit directly to main
+Solo project, one session at a time: a PR adds a click without adding review. CI runs on push to `main`; checks are run locally before every push. Branch + PR only when sessions run in parallel. Cloud sessions are assigned their own branch, so start each with "push to main when done".
+Replaces: "Branch per issue, squash-merge to main" (below).
+
+## 2026-10-06 — Branch per issue, squash-merge to main *(superseded above)*
 Owner is the only contributor, but parallel Claude Code sessions, CI-before-merge and a reviewable diff per issue justify one branch + PR per issue. Owner merges (squash) and deletes the branch. `main` is the default branch.
 
 ## 2026-10-06 — The tool is a general recommender; healthcare is the first reference use case

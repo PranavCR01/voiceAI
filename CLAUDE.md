@@ -39,7 +39,7 @@ docs/         PROJECT.md, DECISIONS.md, RESEARCH.md
 ```
 
 ## Git
-One branch + PR per issue, targeting `main`. Owner squash-merges.
+Commit straight to `main` and push; CI runs on every push to `main`. Run all checks in Commands before pushing. If CI goes red, fix forward immediately. Use a branch + PR only when two sessions run in parallel. Reference the issue in the commit (`Closes #N`) so pushing to `main` closes it.
 
 ## Where work runs
 - Cloud sessions: pure code with fixture tests (scaffold, loaders, metrics, stats, recommender, reports).
