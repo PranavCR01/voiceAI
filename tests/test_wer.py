@@ -43,6 +43,11 @@ def test_tokenization_matches_alignment_with_odd_whitespace() -> None:
     assert score.ref_tokens == ("a", "b", "c") and score.errors == 0
 
 
+def test_equivalence_layer_on_by_default_and_switchable() -> None:
+    assert score_utterance("take 10 mg", "take ten milligrams").errors == 0
+    assert score_utterance("take 10 mg", "take ten milligrams", equivalences=False).errors == 1
+
+
 def test_empty_reference_counts_insertions() -> None:
     score = score_utterance("", "hello there", normalized=True)
     assert (score.n_ref, score.insertions, score.wer) == (0, 2, None)

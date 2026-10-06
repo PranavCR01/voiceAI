@@ -2,11 +2,19 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — Equivalence layer on top of Whisper normalization
+Headline WER uses Whisper normalization **plus** a small, versioned equivalence layer (`EQUIVALENCE_VERSION`, id from `normalizer_id()`); plain-Whisper WER is kept as a second column for comparability with public leaderboards. Reason: a provider that formats "10 mg" should not lose to one that writes "ten milligrams" against a spoken reference. Rules (all domain-neutral, each with a fixture):
+- Unit abbreviations ↔ spelled units (mg, mcg/µg, ml, kg, km; US and UK spellings).
+- Numeric dates (`03/04/1980`, `03-04-1980`; same separator twice, `/` or `-` only) → month name. Day/month order is a parameter (`mdy` default, `dmy` for UK-style references); it is part of the normalizer id. The runner should derive it from the profile/dataset locale.
+- Ordinal suffixes dropped (`3rd` → `3`), so "march 3rd" equals "03/03".
+- `O.K.` / `ok` → `okay` (Whisper alone turns `O.K.` into `0 k`).
+Rejected: joining hyphenated words to equate `co-pay`/`copay`. It broke the more common hyphen-vs-space case (`follow-up`/`follow up`), which Whisper already equates. A test enforces that the layer never separates a pair Whisper equates.
+Still not equated (recorded as KNOWN MISMATCH): hyphenated vs closed compounds, day-first dates under `mdy`, word-order differences (correctly), synonyms (correctly). Digit-by-digit speech collapsing to one token (`one two three four` → `1234`) is handled in entity scoring (#7) with a character-level rate, not here.
+
 ## 2026-10-06 — WER normalization and empty references
-- Normalizer: `whisper-normalizer` (standalone port of OpenAI Whisper's `EnglishTextNormalizer`; avoids pulling in torch). Version pinned in `uv.lock` and exposed as `NORMALIZER_ID` for results metadata. Being a third-party port, it could diverge from OpenAI's; the fixture table pins its behavior.
+- Normalizer: `whisper-normalizer` (standalone port of OpenAI Whisper's `EnglishTextNormalizer`; avoids pulling in torch). Version pinned in `uv.lock`; exposed as `WHISPER_ID`, and the full id including the equivalence layer comes from `normalizer_id()`. Being a third-party port, it could diverge from OpenAI's; the fixture table pins its behavior.
 - Transcriber markup (`<TAG>…</TAG>`, `<TAG/>`) is stripped generically before normalization: paired tags keep their inner text, self-closing tags are dropped. Utterances that shouldn't be scored at all are excluded by the loader (`exclude_reason`), not by the normalizer.
 - Empty reference: excluded from mean per-utterance WER (undefined), but its insertions count in pooled WER (hallucinated speech on silence is a real error). Pooled/mean raise if nothing is scorable.
-- Known normalizer mismatches are recorded, not patched (see `tests/fixtures/normalization_cases.jsonl`): unit abbreviations (`mg` vs `milligrams`), hyphenated vs closed compounds (`co-pay`/`copay`), numeric dates (`03/03/1980` → `3 3 1980`), `O.K.` → `0 k`, and digit-by-digit speech collapsing to one token (`one two three four` → `1234`). Whether to add a domain equivalence layer on top is an open decision.
 
 ## 2026-10-06 — Profile schema and reference-suite matching
 - Relative paths in a profile resolve against the profile file's directory (portable: a customer profile folder can carry its own lexicons and manifests).

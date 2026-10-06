@@ -1,20 +1,31 @@
-{"a": "twenty five", "b": "25", "a_norm": "25", "b_norm": "25", "note": "spelled vs digit numbers"}
-{"a": "$1,250", "b": "1250 dollars", "a_norm": "$1250", "b_norm": "$1250", "note": "currency symbol vs word"}
-{"a": "$1,250.00", "b": "one thousand two hundred fifty dollars", "a_norm": "$1250", "b_norm": "$1250", "note": "currency with cents vs fully spelled"}
-{"a": "don't", "b": "do not", "a_norm": "do not", "b_norm": "do not", "note": "contraction"}
-{"a": "co-pay", "b": "copay", "a_norm": "co pay", "b_norm": "copay", "note": "KNOWN MISMATCH: hyphen splits into two tokens, closed compound stays one"}
-{"a": "anaesthetic", "b": "anesthetic", "a_norm": "anesthetic", "b_norm": "anesthetic", "note": "UK vs US spelling"}
-{"a": "haemoglobin", "b": "hemoglobin", "a_norm": "hemoglobin", "b_norm": "hemoglobin", "note": "UK vs US spelling (medical)"}
-{"a": "um I think so", "b": "I think so", "a_norm": "i think so", "b_norm": "i think so", "note": "filler removal"}
-{"a": "Hello, World!", "b": "hello world", "a_norm": "hello world", "b_norm": "hello world", "note": "casing and punctuation"}
-{"a": "10mg", "b": "10 mg", "a_norm": "10 mg", "b_norm": "10 mg", "note": "unit spacing"}
-{"a": "10 mg", "b": "ten milligrams", "a_norm": "10 mg", "b_norm": "10 milligrams", "note": "KNOWN MISMATCH: unit abbreviations are not expanded (mg vs milligrams)"}
-{"a": "five hundred milligrams", "b": "500 mg", "a_norm": "500 milligrams", "b_norm": "500 mg", "note": "KNOWN MISMATCH: unit abbreviations are not expanded (milligrams vs mg)"}
-{"a": "50%", "b": "fifty percent", "a_norm": "50%", "b_norm": "50%", "note": "percent"}
-{"a": "03/03/1980", "b": "march third 1980", "a_norm": "3 3 1980", "b_norm": "march 3rd 1980", "note": "KNOWN MISMATCH: numeric dates become '3 3 1980', not month names"}
-{"a": "March 3rd, 1980", "b": "the third of March nineteen eighty", "a_norm": "march 3rd 1980", "b_norm": "the 3rd of march 1980", "note": "different word order is a real difference, not a normalization bug"}
-{"a": "one two three four", "b": "1234", "a_norm": "1234", "b_norm": "1234", "note": "digit-by-digit speech collapses to a number"}
-{"a": "O.K.", "b": "okay", "a_norm": "0 k", "b_norm": "okay", "note": "KNOWN MISMATCH: 'O.K.' becomes '0 k' (letter O read as zero)"}
-{"a": "Dr. Smith", "b": "doctor smith", "a_norm": "doctor smith", "b_norm": "doctor smith", "note": "title abbreviation"}
-{"a": "paracetamol", "b": "acetaminophen", "a_norm": "paracetamol", "b_norm": "acetaminophen", "note": "synonyms are NOT equivalent (correct: different words)"}
-{"a": "I <UNSURE>take</UNSURE> it <UNIN/>", "b": "i take it", "a_norm": "i take it", "b_norm": "i take it", "note": "transcriber markup: paired tags unwrapped, self-closing dropped"}
+{"a": "twenty five", "b": "25", "a_whisper": "25", "b_whisper": "25", "a_norm": "25", "b_norm": "25", "note": "spelled vs digit numbers"}
+{"a": "$1,250", "b": "1250 dollars", "a_whisper": "$1250", "b_whisper": "$1250", "a_norm": "$1250", "b_norm": "$1250", "note": "currency symbol vs word"}
+{"a": "$1,250.00", "b": "one thousand two hundred fifty dollars", "a_whisper": "$1250", "b_whisper": "$1250", "a_norm": "$1250", "b_norm": "$1250", "note": "currency with cents vs fully spelled"}
+{"a": "don't", "b": "do not", "a_whisper": "do not", "b_whisper": "do not", "a_norm": "do not", "b_norm": "do not", "note": "contraction"}
+{"a": "co-pay", "b": "copay", "a_whisper": "co pay", "b_whisper": "copay", "a_norm": "co pay", "b_norm": "copay", "note": "KNOWN MISMATCH: hyphenated vs closed compound; joining hyphens would break the more common hyphen-vs-space case (follow-up)"}
+{"a": "x-ray", "b": "xray", "a_whisper": "x ray", "b_whisper": "xray", "a_norm": "x ray", "b_norm": "xray", "note": "KNOWN MISMATCH: hyphenated vs closed compound (same reason as co-pay)"}
+{"a": "twenty-five", "b": "25", "a_whisper": "25", "b_whisper": "25", "a_norm": "25", "b_norm": "25", "note": "hyphenated number words convert to digits"}
+{"a": "follow-up", "b": "follow up", "a_whisper": "follow up", "b_whisper": "follow up", "a_norm": "follow up", "b_norm": "follow up", "note": "hyphen vs space: Whisper already equates these"}
+{"a": "anaesthetic", "b": "anesthetic", "a_whisper": "anesthetic", "b_whisper": "anesthetic", "a_norm": "anesthetic", "b_norm": "anesthetic", "note": "UK vs US spelling"}
+{"a": "haemoglobin", "b": "hemoglobin", "a_whisper": "hemoglobin", "b_whisper": "hemoglobin", "a_norm": "hemoglobin", "b_norm": "hemoglobin", "note": "UK vs US spelling (medical)"}
+{"a": "um I think so", "b": "I think so", "a_whisper": "i think so", "b_whisper": "i think so", "a_norm": "i think so", "b_norm": "i think so", "note": "filler removal"}
+{"a": "Hello, World!", "b": "hello world", "a_whisper": "hello world", "b_whisper": "hello world", "a_norm": "hello world", "b_norm": "hello world", "note": "casing and punctuation"}
+{"a": "10mg", "b": "10 mg", "a_whisper": "10 mg", "b_whisper": "10 mg", "a_norm": "10 mg", "b_norm": "10 mg", "note": "unit spacing"}
+{"a": "10 mg", "b": "ten milligrams", "a_whisper": "10 mg", "b_whisper": "10 milligrams", "a_norm": "10 mg", "b_norm": "10 mg", "note": "EQUIVALENCE: unit abbreviation vs spelled unit"}
+{"a": "five hundred milligrams", "b": "500 mg", "a_whisper": "500 milligrams", "b_whisper": "500 mg", "a_norm": "500 mg", "b_norm": "500 mg", "note": "EQUIVALENCE: unit abbreviation vs spelled unit"}
+{"a": "250 µg", "b": "250 micrograms", "a_whisper": "250 μg", "b_whisper": "250 micrograms", "a_norm": "250 mcg", "b_norm": "250 mcg", "note": "EQUIVALENCE: micro sign vs spelled unit"}
+{"a": "5 ml", "b": "five millilitres", "a_whisper": "5 ml", "b_whisper": "5 milliliters", "a_norm": "5 ml", "b_norm": "5 ml", "note": "EQUIVALENCE: unit abbreviation vs UK spelling"}
+{"a": "50%", "b": "fifty percent", "a_whisper": "50%", "b_whisper": "50%", "a_norm": "50%", "b_norm": "50%", "note": "percent"}
+{"a": "03/04/1980", "b": "march fourth 1980", "a_whisper": "3 4 1980", "b_whisper": "march 4th 1980", "a_norm": "march 4 1980", "b_norm": "march 4 1980", "note": "EQUIVALENCE: numeric date (mdy default) vs spoken date"}
+{"a": "1st floor", "b": "first floor", "a_whisper": "1st floor", "b_whisper": "1st floor", "a_norm": "1 floor", "b_norm": "1 floor", "note": "ordinal digits vs words"}
+{"a": "the 21st", "b": "the twenty first", "a_whisper": "the 21st", "b_whisper": "the 21st", "a_norm": "the 21", "b_norm": "the 21", "note": "ordinal digits vs words"}
+{"a": "March 3rd, 1980", "b": "the third of March nineteen eighty", "a_whisper": "march 3rd 1980", "b_whisper": "the 3rd of march 1980", "a_norm": "march 3 1980", "b_norm": "the 3 of march 1980", "note": "different word order is a real difference, not a normalization bug"}
+{"a": "one two three four", "b": "1234", "a_whisper": "1234", "b_whisper": "1234", "a_norm": "1234", "b_norm": "1234", "note": "digit-by-digit speech collapses to a number"}
+{"a": "O.K.", "b": "okay", "a_whisper": "0 k", "b_whisper": "okay", "a_norm": "okay", "b_norm": "okay", "note": "EQUIVALENCE: O.K. (Whisper alone reads it as '0 k')"}
+{"a": "OK", "b": "okay", "a_whisper": "ok", "b_whisper": "okay", "a_norm": "okay", "b_norm": "okay", "note": "EQUIVALENCE: ok vs okay"}
+{"a": "Dr. Smith", "b": "doctor smith", "a_whisper": "doctor smith", "b_whisper": "doctor smith", "a_norm": "doctor smith", "b_norm": "doctor smith", "note": "title abbreviation"}
+{"a": "paracetamol", "b": "acetaminophen", "a_whisper": "paracetamol", "b_whisper": "acetaminophen", "a_norm": "paracetamol", "b_norm": "acetaminophen", "note": "synonyms are NOT equivalent (correct: different words)"}
+{"a": "I <UNSURE>take</UNSURE> it <UNIN/>", "b": "i take it", "a_whisper": "i take it", "b_whisper": "i take it", "a_norm": "i take it", "b_norm": "i take it", "note": "transcriber markup: paired tags unwrapped, self-closing dropped"}
+{"a": "version 1.2.2026", "b": "version 1.2.2026", "a_whisper": "version one.2.2026", "b_whisper": "version one.2.2026", "a_norm": "version one.2.2026", "b_norm": "version one.2.2026", "note": "dotted numbers are not read as dates (Whisper itself turns '1.2' into 'one.2', identically on both sides)"}
+{"a": "03-04-1980", "b": "03/04/1980", "a_whisper": "3 4 1980", "b_whisper": "3 4 1980", "a_norm": "march 4 1980", "b_norm": "march 4 1980", "note": "dash and slash numeric dates read the same"}
+{"a": "13/04/1980", "b": "april thirteenth 1980", "a_whisper": "13 4 1980", "b_whisper": "april 13th 1980", "a_norm": "13 4 1980", "b_norm": "april 13 1980", "note": "KNOWN MISMATCH: with mdy order, day-first dates are left as digits (set date_order='dmy' for UK-style references)"}

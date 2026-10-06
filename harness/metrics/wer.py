@@ -12,7 +12,7 @@ from typing import Literal, cast
 
 import jiwer
 
-from harness.metrics.normalize import normalize
+from harness.metrics.normalize import DateOrder, normalize
 
 Op = Literal["equal", "substitute", "delete", "insert"]
 
@@ -60,10 +60,22 @@ class UttScore:
         return tuple(hits)
 
 
-def score_utterance(ref: str, hyp: str, *, normalized: bool = False) -> UttScore:
-    """Align ref and hyp. Both are normalized first unless `normalized=True`."""
+def score_utterance(
+    ref: str,
+    hyp: str,
+    *,
+    normalized: bool = False,
+    equivalences: bool = True,
+    date_order: DateOrder = "mdy",
+) -> UttScore:
+    """Align ref and hyp.
+
+    Both are normalized first (Whisper + equivalence layer) unless `normalized=True`.
+    `equivalences=False` gives plain-Whisper WER, comparable with public leaderboards.
+    """
     if not normalized:
-        ref, hyp = normalize(ref), normalize(hyp)
+        ref = normalize(ref, equivalences=equivalences, date_order=date_order)
+        hyp = normalize(hyp, equivalences=equivalences, date_order=date_order)
     ref_tokens, hyp_tokens = tuple(ref.split()), tuple(hyp.split())
     if not ref_tokens and not hyp_tokens:
         return UttScore(ref_tokens, hyp_tokens, 0, 0, 0, 0, ())
