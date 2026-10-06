@@ -1,0 +1,38 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 20 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Speaker" 
+        xmin = 0 
+        xmax = 20 
+        intervals: size = 6 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.5 
+            text = "" 
+        intervals [2]:
+            xmin = 1.5 
+            xmax = 4.25 
+            text = "Morning. I <UNSURE>take</UNSURE> paracetemol, about 500 milligrams." 
+        intervals [3]:
+            xmin = 4.25 
+            xmax = 6 
+            text = "It was <UNIN/> last week." 
+        intervals [4]:
+            xmin = 6 
+            xmax = 6.2 
+            text = "Mm." 
+        intervals [5]:
+            xmin = 6.2 
+            xmax = 9 
+            text = "He said ""fine"" <INAUDIBLE_SPEECH/>" 
+        intervals [6]:
+            xmin = 9 
+            xmax = 20 
+            text = "   " 

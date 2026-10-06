@@ -2,6 +2,13 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — PriMock57 loader choices
+- Utterances containing `<UNIN/>` or the undocumented `<INAUDIBLE_SPEECH/>` are kept in the manifest but excluded from scoring: the reference is missing words there, so a provider that transcribes them would be charged insertions. This excludes 26% of utterances (1,853 of 7,108). They are likely the harder audio, so PriMock57 accuracy is optimistic relative to its full difficulty; the memo should say so. `<UNSURE>` spans are kept (inner text is the transcriber's best guess). No utterance is under the 0.3 s minimum.
+- Seven known drug-name misspellings are corrected in `ref_text`, with the original in the new `ref_text_original` manifest field (5 utterances affected).
+- New manifest field `language` (BCP-47). PriMock57 is `en-GB`, and `date_order_for(language)` turns that into day-first date reading, so the runner reads it from the data instead of having to remember it. Month-first: US-style regions and bare/missing tags; everything else day-first.
+- Speaker IDs are `{consultation}_{role}`. Clinician identities aren't published, so the same doctor appears as several speakers and doctor-side speaker clustering understates correlation. Patients are 57 distinct actors. For the intake scenario the patient side is the caller, and it is unaffected.
+- The generated manifest (3.7 MB of CC BY 4.0 text, no audio) is committed with attribution, so scoring and reports work without fetching the dataset; a test checks it stays valid and consistent with the correction map.
+
 ## 2026-10-06 — Entity scoring rules
 - Tagging runs on the normalized reference so spans line up with the WER alignment. Recovery is strict (every token correct); a per-entity character error rate sits beside it so one wrong digit in a phone number isn't scored like a missing phone number.
 - "Formatted" = recovered and the raw hypothesis carries the entity's numbers as digits. It measures downstream usability, separate from accuracy.

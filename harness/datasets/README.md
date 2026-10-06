@@ -19,6 +19,8 @@ Every dataset loader, augmentation step and provider run reads and writes one fo
 | `augmentation` | list[AugmentStep] | Empty for originals. Each step: `kind`, `params` (JSON values), `seed` (int \| None). |
 | `parent_utt_id` | str \| None | Required iff `augmentation` is non-empty; must differ from `utt_id`. |
 | `exclude_reason` | str \| None | Set to keep an utterance in the manifest but skip it in scoring (e.g. `unintelligible`, `too_short`). |
+| `language` | str \| None | BCP-47 tag of the reference text (`en-GB`). Decides how numeric dates are read when normalizing (`date_order_for`). |
+| `ref_text_original` | str \| None | The transcript before the loader corrected it (e.g. a misspelled drug name). Only set when `ref_text` differs. |
 
 Unknown fields are rejected, and utterances are immutable once loaded.
 

@@ -147,3 +147,12 @@ def test_read_rejects_malformed_json(tmp_path: Path) -> None:
     path.write_text("{not json\n")
     with pytest.raises(ManifestError, match=r"m\.jsonl:1:"):
         read_manifest(path)
+
+
+def test_language_and_correction_fields() -> None:
+    u = utt(language="en-GB", ref_text="paracetamol", ref_text_original="paracetemol")
+    assert u.language == "en-GB"
+    with pytest.raises(ValidationError, match="should match pattern"):
+        utt(language="English")
+    with pytest.raises(ValidationError, match="only set when ref_text was changed"):
+        utt(ref_text="same", ref_text_original="same")

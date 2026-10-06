@@ -7,6 +7,7 @@ import pytest
 from harness.metrics.normalize import (
     EQUIVALENCE_VERSION,
     WHISPER_ID,
+    date_order_for,
     normalize,
     normalizer_id,
     strip_markup,
@@ -81,3 +82,19 @@ def test_normalizer_ids() -> None:
     assert normalizer_id(equivalences=False) == WHISPER_ID
     assert normalizer_id() == f"{WHISPER_ID}+equiv-v{EQUIVALENCE_VERSION}/mdy"
     assert normalizer_id(date_order="dmy").endswith("/dmy")
+
+
+@pytest.mark.parametrize(
+    ("language", "order"),
+    [
+        (None, "mdy"),
+        ("en", "mdy"),
+        ("en-US", "mdy"),
+        ("en-GB", "dmy"),
+        ("en-IN", "dmy"),
+        ("es-US", "mdy"),
+        ("zh-Hant-TW", "dmy"),
+    ],
+)
+def test_date_order_for(language: str | None, order: str) -> None:
+    assert date_order_for(language) == order

@@ -12,6 +12,8 @@ from pathlib import Path, PurePosixPath
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, ValidationError, model_validator
 
 UTT_ID_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+# BCP-47-ish language tag of the reference text, e.g. "en-GB".
+LANGUAGE_PATTERN = r"^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$"
 
 
 class ManifestError(ValueError):
@@ -46,6 +48,10 @@ class Utterance(BaseModel):
     augmentation: list[AugmentStep] = Field(default_factory=list)
     parent_utt_id: str | None = Field(default=None, pattern=UTT_ID_PATTERN)
     exclude_reason: str | None = None
+    language: str | None = Field(default=None, pattern=LANGUAGE_PATTERN)
+    # Set when the loader corrected ref_text (e.g. a transcriber's misspelling); the original
+    # stays here so every correction is visible.
+    ref_text_original: str | None = None
 
     @model_validator(mode="after")
     def _check(self) -> Utterance:
@@ -63,6 +69,8 @@ class Utterance(BaseModel):
             raise ValueError("augmented utterances need parent_utt_id, and only they may have one")
         if self.parent_utt_id == self.utt_id:
             raise ValueError("parent_utt_id must differ from utt_id")
+        if self.ref_text_original is not None and self.ref_text_original == self.ref_text:
+            raise ValueError("ref_text_original is only set when ref_text was changed")
         return self
 
     def resolve_audio(self, data_root: Path) -> Path:

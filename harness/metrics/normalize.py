@@ -98,6 +98,19 @@ def normalizer_id(*, equivalences: bool = True, date_order: DateOrder = "mdy") -
     return f"{WHISPER_ID}+equiv-v{EQUIVALENCE_VERSION}/{date_order}"
 
 
+# Regions that write numeric dates month-first. Everything else is read day-first.
+_MDY_REGIONS = frozenset({"US", "PH", "FM", "MH", "PW"})
+
+
+def date_order_for(language: str | None) -> DateOrder:
+    """Day/month order for a BCP-47 tag: month-first for US-style regions and for a bare or
+    missing tag (the US default), day-first for every other region (en-GB, en-IN, ...)."""
+    if not language:
+        return "mdy"
+    region = next((p.upper() for p in language.split("-")[1:] if len(p) == 2), None)
+    return "mdy" if region is None or region in _MDY_REGIONS else "dmy"
+
+
 def strip_markup(text: str) -> str:
     return _TAG.sub(" ", text)
 
