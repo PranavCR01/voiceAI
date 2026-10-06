@@ -1,0 +1,81 @@
+# Offline STT accuracy report
+
+- **Generated:** {{ d.generated_at }}
+- **Manifest:** `{{ d.manifest_label }}` ({{ d.n_manifest }} utterances{% if d.excluded %}; excluded from scoring: {% for reason, n in d.excluded.items() %}{{ reason }} {{ n }}{{ ", " if not loop.last }}{% endfor %}{% endif %}{% if d.not_covered %}; {{ d.not_covered }} not covered by every run, so not scored{% endif %})
+- **Profile:** {{ ("`" ~ d.profile_label ~ "`") if d.profile_label else "none (no entity scoring)" }}
+- **Normalizer (headline WER):** {% for n in d.normalizer_ids %}`{{ n }}`{{ ", " if not loop.last }}{% endfor +%}
+- **Leaderboard-comparable WER:** `{{ d.whisper_id }}`
+- **Intervals:** 95% paired percentile bootstrap, {{ d.n_resamples }} resamples, seed {{ d.seed }}, {{ "resampling whole speakers" if d.cluster_by == "speaker" else "resampling utterances" }}. Pairwise p-values Holm-adjusted within each table. "Tie" = difference interval includes 0. No winner is called with fewer than {{ d.min_clusters }} {{ "speakers" if d.cluster_by == "speaker" else "utterances" }} in a table.
+- **Failed requests** are scored as empty transcripts (every reference word deleted).
+
+## Configurations
+
+| Config | Provider | Model | Mode | Settings | Run | Recorded | Git |
+|---|---|---|---|---|---|---|---|
+{% for r in d.runs %}
+| {{ r.meta.config_id }} | {{ r.meta.provider | md }} | `{{ r.meta.model_id }}` | {{ r.meta.mode }} | `{{ r.meta.settings | settings | md }}` | {{ r.meta.run_id }} | {{ r.meta.created_at.strftime("%Y-%m-%d") }} | `{{ r.meta.git_sha[:7] }}` |
+{% endfor %}
+{% for synthetic in [false, true] %}
+{% set groups = d.groups | selectattr("synthetic", "equalto", synthetic) | list %}
+{% if groups %}
+
+## {{ "Synthetic audio (TTS-generated; not comparable to real audio)" if synthetic else "Real audio" }}
+{% for g in groups %}
+
+### {{ g.title }}
+
+{{ g.n_clusters }} {{ "speakers" if d.cluster_by == "speaker" else "utterances" }}.
+
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
+|---|---|---|---|---|---|---|
+{% for c in g.configs %}
+| {{ c.config_id }} | {{ c.wer | interval }} | {{ c.wer_whisper | pct }} | {{ c.mean_utt_wer | pct }} | {{ c.n_utts }} | {{ c.n_words }} | {{ c.failed }} |
+{% endfor %}
+{% if g.pairs %}
+
+| Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
+|---|---|---|---|---|
+{% for p in g.pairs %}
+| {{ p.a }} − {{ p.b }} | {{ p.diff | pp }} | {{ "%.4f" | format(p.p_value) }} | {{ "%.4f" | format(p.p_holm) }} | {{ p.verdict }} |
+{% endfor %}
+{% endif %}
+{% if g.entity_categories %}
+
+Entities (recall = every word of the entity correct; CER = character error rate on the entity; formatted = recalled and written as digits):
+
+| Config | Category | Recall [95% CI] | n | CER | Formatted [95% CI] |
+|---|---|---|---|---|---|
+{% for c in g.configs %}
+{% for cat in g.entity_categories %}
+{% if cat in c.entities %}
+{% set e = c.entities[cat] %}
+| {{ c.config_id }} | {{ cat }} | {{ e.recall | interval }} | {{ e.recovered }}/{{ e.n }} | {{ e.cer | pct }} | {{ (e.formatted_accuracy | interval) if e.formatted_accuracy else "-" }} |
+{% else %}
+| {{ c.config_id }} | {{ cat }} | no instances | 0 | - | - |
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+Boosted keyterms written where the speaker didn't say them: {% for c in g.configs %}{{ c.config_id }} {{ c.keyterm_false }}{{ ", " if not loop.last }}{% endfor %}.
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+## Worst utterances
+
+Normalized alignment: `[ref→hyp]` substitution, `[-ref]` deletion, `[+hyp]` insertion. Top {{ d.worst_n }} by error count per config.
+{% for config, rows in d.worst.items() %}
+
+### {{ config }}
+
+{% if rows %}
+| Utterance | Subset | Errors / ref words | Alignment |
+|---|---|---|---|
+{% for w in rows %}
+| `{{ w.utt_id }}` | {{ w.subset }} | {{ w.errors }}/{{ w.n_ref }} | {{ w.diff | md }} |
+{% endfor %}
+{% else %}
+No errors.
+{% endif %}
+{% endfor %}

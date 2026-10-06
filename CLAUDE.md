@@ -14,6 +14,8 @@ Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anythin
 - Test: `uv run pytest`
 - Lint/format: `uv run ruff check . && uv run ruff format --check .`
 - Types: `uv run mypy harness recommender`
+- Offline report: `uv run python -m harness.report --results <runs dir> --manifest <manifest> [--profile <profile>] --out reports/generated/offline.md`
+- Regenerate the report golden file (only for intended output changes): `UPDATE_GOLDEN=1 uv run pytest tests/test_report.py`
 
 ## Hard rules
 1. Never commit audio (`*.wav`, `*.mp3`, `*.flac`, `*.webm`, `*.opus`, `*.ogg`). Commit manifests, recipes and scripts that fetch data.

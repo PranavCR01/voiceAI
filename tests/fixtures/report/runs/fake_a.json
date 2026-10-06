@@ -1,0 +1,14 @@
+{
+  "meta": {"run_id": "run-a", "config_id": "fake_a", "provider": "Fake Provider A", "model_id": "fake-a-2026-10", "mode": "batch", "settings": {"smart_format": true}, "created_at": "2026-10-06T10:00:00Z", "git_sha": "0123456789abcdef", "manifest": "tests/fixtures/report/manifest.jsonl"},
+  "rows": [
+    {"utt_id": "fixture:p1", "hyp_text": "I take 500mg of paracetamol twice a day."},
+    {"utt_id": "fixture:p2", "hyp_text": "My date of birth is 3rd March 1980."},
+    {"utt_id": "fixture:p3", "hyp_text": "2 puffs of Ventolin when I'm wheezy."},
+    {"utt_id": "fixture:p4", "hyp_text": "It started about 3 days ago."},
+    {"utt_id": "fixture:d1", "hyp_text": "Any allergies to penicillin?"},
+    {"utt_id": "fixture:d2", "hyp_text": "How long have you had the cough?"},
+    {"utt_id": "fixture:x1", "hyp_text": "It was something yesterday."},
+    {"utt_id": "fixture:s1", "hyp_text": "You can reach me on 07700 900123."},
+    {"utt_id": "fixture:s2", "hyp_text": "I take ibuprofen 400 mg as needed."}
+  ]
+}

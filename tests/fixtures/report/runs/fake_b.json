@@ -1,0 +1,14 @@
+{
+  "meta": {"run_id": "run-b", "config_id": "fake_b", "provider": "Fake Provider B", "model_id": "fake-b-v3", "mode": "batch", "settings": {"keyterms": "profile"}, "created_at": "2026-10-06T11:00:00Z", "git_sha": "fedcba9876543210", "manifest": "tests/fixtures/report/manifest.jsonl"},
+  "rows": [
+    {"utt_id": "fixture:p1", "hyp_text": "I take five hundred milligrams of paracetamol twice a day"},
+    {"utt_id": "fixture:p2", "hyp_text": "My date of birth is the third of March, nineteen eighty."},
+    {"utt_id": "fixture:p3", "hyp_text": "Two puffs of Ventolin when I'm weezy."},
+    {"utt_id": "fixture:p4", "hyp_text": "", "error": "timeout after 30s"},
+    {"utt_id": "fixture:d1", "hyp_text": "Any allergies to penny Selin?"},
+    {"utt_id": "fixture:d2", "hyp_text": "How long have you had the cough?"},
+    {"utt_id": "fixture:x1", "hyp_text": ""},
+    {"utt_id": "fixture:s1", "hyp_text": "You can reach me on oh seven seven double oh nine double oh one two four."},
+    {"utt_id": "fixture:s2", "hyp_text": "I take ibuprofen and metformin 400 milligrams as needed."}
+  ]
+}

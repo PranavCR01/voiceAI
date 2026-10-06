@@ -2,6 +2,15 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — Results format and offline report rules
+- One run = one configuration. `<results>/<run_id>/run.json` (RunMeta: config, pinned model id, settings, date, git SHA) + `results.parquet` (one row per utterance: raw hypothesis, raw-response path, timestamps, error). Rows store the *raw* hypothesis; the normalizer id lives in the report header because normalization happens at scoring time (the issue asked for it per row; that would record a choice not yet made).
+- Paired comparison: within each table, only utterances every run covers are scored; the number dropped is reported. A failed request is scored as an empty transcript (all deletions), never skipped, so unreliable providers aren't flattered.
+- Real and synthetic audio are separate sections, never pooled. Each section has an "All" table plus one per subset when there are several.
+- Intervals are speaker-clustered by default (`--cluster-by none` to resample utterances). Pairwise p-values are Holm-adjusted within each table.
+- **No winner is called with fewer than 10 clusters** in a table ("too few speakers (n) to call"): with 2 speakers the bootstrap reported p = 0.001 on the fixture, which is meaningless. Ties and intervals are still shown.
+- Headline WER (Whisper + equivalence layer) sits beside Whisper-only WER for leaderboard comparability; the per-utterance date order comes from the manifest `language`.
+- Golden-file test pins the rendered report; regenerate deliberately with `UPDATE_GOLDEN=1 uv run pytest tests/test_report.py`. Scale check: PriMock57 (5,255 utterances, 2 configs, profile) renders in ~35 s.
+
 ## 2026-10-06 — PriMock57 loader choices
 - Utterances containing `<UNIN/>` or the undocumented `<INAUDIBLE_SPEECH/>` are kept in the manifest but excluded from scoring: the reference is missing words there, so a provider that transcribes them would be charged insertions. This excludes 26% of utterances (1,853 of 7,108). They are likely the harder audio, so PriMock57 accuracy is optimistic relative to its full difficulty; the memo should say so. `<UNSURE>` spans are kept (inner text is the transcriber's best guess). No utterance is under the 0.3 s minimum.
 - Seven known drug-name misspellings are corrected in `ref_text`, with the original in the new `ref_text_original` manifest field (5 utterances affected).
