@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Voice-stack recommender: takes a use-case profile (constraints, domain terms, optional customer audio) and recommends an STT model, settings and turn-detection policy, with confidence intervals. Healthcare intake is the first reference use case and the demo agent — nothing outside `configs/profiles/healthcare_*` and `data/lexicons/` may assume healthcare.
+Voice-stack recommender: takes a use-case profile (constraints, domain terms, optional customer audio) and recommends the full cascaded stack (STT, turn detection, LLM, TTS, and their settings), with confidence intervals. Healthcare intake is the first reference use case and the demo agent — nothing outside `configs/profiles/healthcare_*` and `data/lexicons/` may assume healthcare.
 Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anything it covers.
 
 ## Stack
@@ -17,7 +17,7 @@ Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anythin
 
 ## Hard rules
 1. Never commit audio (`*.wav`, `*.mp3`, `*.flac`, `*.webm`, `*.opus`, `*.ogg`). Commit manifests, recipes and scripts that fetch data.
-2. Never use an LLM anywhere in scoring or in the recommender. Both must be deterministic.
+2. Never use an LLM as a judge anywhere in scoring or in the recommender. LLMs are systems under test only; scoring is rule-based and deterministic.
 3. Tests run on recorded fixtures (small JSON/text files in `tests/fixtures/`). No test may call a live provider API or need an API key.
 4. Augmentation is seeded; the manifest records seed, noise file, SNR and codec chain.
 5. Pin provider model IDs in `configs/providers.yaml`. Store raw provider responses next to every result.
@@ -37,6 +37,9 @@ reports/      templates + generated example memos
 tests/        unit tests, fixtures, recorded event traces
 docs/         PROJECT.md, DECISIONS.md, RESEARCH.md
 ```
+
+## Git
+One branch + PR per issue, targeting `main`. Owner squash-merges.
 
 ## Where work runs
 - Cloud sessions: pure code with fixture tests (scaffold, loaders, metrics, stats, recommender, reports).
