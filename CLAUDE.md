@@ -4,7 +4,7 @@ Voice-stack recommender: takes a use-case profile (constraints, domain terms, op
 Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anything it covers.
 
 ## Stack
-- Python 3.12, asyncio. Package manager: `uv`. Dependencies pinned in `pyproject.toml` + `uv.lock`.
+- Python 3.12 (`.python-version`), asyncio. Package manager: `uv`. Exact versions locked in `uv.lock` (committed); CI runs `uv sync --locked`, so update the lock with `uv lock` when changing deps.
 - Scoring: jiwer, Whisper `EnglishTextNormalizer` (pinned), NumPy/SciPy.
 - Agent (milestone 3+): Pipecat (pinned version, never float), Silero VAD, Smart Turn v3, ElevenLabs TTS.
 - Results: Parquet. Reports: Jinja2 → Markdown/HTML.
