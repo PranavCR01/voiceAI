@@ -5,8 +5,10 @@ description = "Voice-stack recommender: use-case profile in, recommended STT/tur
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "jiwer>=4.0.0",
     "pydantic>=2.13.5",
     "pyyaml>=6.0.3",
+    "whisper-normalizer>=0.1.15",
 ]
 
 [dependency-groups]
@@ -36,6 +38,11 @@ python_version = "3.12"
 strict = true
 files = ["harness", "recommender"]
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# Ships no type information.
+module = ["whisper_normalizer.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

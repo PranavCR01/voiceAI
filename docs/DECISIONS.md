@@ -2,6 +2,12 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — WER normalization and empty references
+- Normalizer: `whisper-normalizer` (standalone port of OpenAI Whisper's `EnglishTextNormalizer`; avoids pulling in torch). Version pinned in `uv.lock` and exposed as `NORMALIZER_ID` for results metadata. Being a third-party port, it could diverge from OpenAI's; the fixture table pins its behavior.
+- Transcriber markup (`<TAG>…</TAG>`, `<TAG/>`) is stripped generically before normalization: paired tags keep their inner text, self-closing tags are dropped. Utterances that shouldn't be scored at all are excluded by the loader (`exclude_reason`), not by the normalizer.
+- Empty reference: excluded from mean per-utterance WER (undefined), but its insertions count in pooled WER (hallucinated speech on silence is a real error). Pooled/mean raise if nothing is scorable.
+- Known normalizer mismatches are recorded, not patched (see `tests/fixtures/normalization_cases.jsonl`): unit abbreviations (`mg` vs `milligrams`), hyphenated vs closed compounds (`co-pay`/`copay`), numeric dates (`03/03/1980` → `3 3 1980`), `O.K.` → `0 k`, and digit-by-digit speech collapsing to one token (`one two three four` → `1234`). Whether to add a domain equivalence layer on top is an open decision.
+
 ## 2026-10-06 — Profile schema and reference-suite matching
 - Relative paths in a profile resolve against the profile file's directory (portable: a customer profile folder can carry its own lexicons and manifests).
 - Entity categories are compared by **signature**: builtin type for builtins, name for lexicon/regex. So `date_of_birth` and `due_date` both count as `date`.

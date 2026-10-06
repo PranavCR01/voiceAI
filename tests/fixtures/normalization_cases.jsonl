@@ -1,0 +1,20 @@
+{"a": "twenty five", "b": "25", "a_norm": "25", "b_norm": "25", "note": "spelled vs digit numbers"}
+{"a": "$1,250", "b": "1250 dollars", "a_norm": "$1250", "b_norm": "$1250", "note": "currency symbol vs word"}
+{"a": "$1,250.00", "b": "one thousand two hundred fifty dollars", "a_norm": "$1250", "b_norm": "$1250", "note": "currency with cents vs fully spelled"}
+{"a": "don't", "b": "do not", "a_norm": "do not", "b_norm": "do not", "note": "contraction"}
+{"a": "co-pay", "b": "copay", "a_norm": "co pay", "b_norm": "copay", "note": "KNOWN MISMATCH: hyphen splits into two tokens, closed compound stays one"}
+{"a": "anaesthetic", "b": "anesthetic", "a_norm": "anesthetic", "b_norm": "anesthetic", "note": "UK vs US spelling"}
+{"a": "haemoglobin", "b": "hemoglobin", "a_norm": "hemoglobin", "b_norm": "hemoglobin", "note": "UK vs US spelling (medical)"}
+{"a": "um I think so", "b": "I think so", "a_norm": "i think so", "b_norm": "i think so", "note": "filler removal"}
+{"a": "Hello, World!", "b": "hello world", "a_norm": "hello world", "b_norm": "hello world", "note": "casing and punctuation"}
+{"a": "10mg", "b": "10 mg", "a_norm": "10 mg", "b_norm": "10 mg", "note": "unit spacing"}
+{"a": "10 mg", "b": "ten milligrams", "a_norm": "10 mg", "b_norm": "10 milligrams", "note": "KNOWN MISMATCH: unit abbreviations are not expanded (mg vs milligrams)"}
+{"a": "five hundred milligrams", "b": "500 mg", "a_norm": "500 milligrams", "b_norm": "500 mg", "note": "KNOWN MISMATCH: unit abbreviations are not expanded (milligrams vs mg)"}
+{"a": "50%", "b": "fifty percent", "a_norm": "50%", "b_norm": "50%", "note": "percent"}
+{"a": "03/03/1980", "b": "march third 1980", "a_norm": "3 3 1980", "b_norm": "march 3rd 1980", "note": "KNOWN MISMATCH: numeric dates become '3 3 1980', not month names"}
+{"a": "March 3rd, 1980", "b": "the third of March nineteen eighty", "a_norm": "march 3rd 1980", "b_norm": "the 3rd of march 1980", "note": "different word order is a real difference, not a normalization bug"}
+{"a": "one two three four", "b": "1234", "a_norm": "1234", "b_norm": "1234", "note": "digit-by-digit speech collapses to a number"}
+{"a": "O.K.", "b": "okay", "a_norm": "0 k", "b_norm": "okay", "note": "KNOWN MISMATCH: 'O.K.' becomes '0 k' (letter O read as zero)"}
+{"a": "Dr. Smith", "b": "doctor smith", "a_norm": "doctor smith", "b_norm": "doctor smith", "note": "title abbreviation"}
+{"a": "paracetamol", "b": "acetaminophen", "a_norm": "paracetamol", "b_norm": "acetaminophen", "note": "synonyms are NOT equivalent (correct: different words)"}
+{"a": "I <UNSURE>take</UNSURE> it <UNIN/>", "b": "i take it", "a_norm": "i take it", "b_norm": "i take it", "note": "transcriber markup: paired tags unwrapped, self-closing dropped"}
