@@ -34,6 +34,8 @@ Augmentation sources: MUSAN (CC BY 4.0, verify), DEMAND (CC BY-SA 3.0, verify), 
 | AssemblyAI Universal-Streaming | $0.15/hr, **billed on session duration** | $50 | end-of-turn confidence, keyterms (+$0.04/hr) |
 | ElevenLabs Scribe v2 Realtime | ~$0.39/hr (third-party listing, verify) | plan-based | manual/VAD commit, silence threshold, keyterms, accepts 8 kHz mu-law; 10-min session cap (third-party, verify) |
 
+**Registry status (2026-10-06):** every entry in `configs/providers.yaml` is `verify: true`. Model ids, settings names and prices above were copied from this research (mostly third-party trackers) because vendor docs are unreachable from the cloud environment. `assemblyai_batch` has no price at all. Verify each against the vendor's own docs/pricing page before its first live run (#13, #18), then set `verify: false`.
+
 Billing basis matters more than headline rate: session-duration billing charges while the agent talks. Model cost per conversation minute with talk-ratio sensitivity. Healthcare constraint: record whether each vendor offers a BAA (verify per vendor; do not assert).
 
 Independent cross-check (Pipecat stt-benchmark, 1,000 smart-turn samples): AssemblyAI u3.5-pro 282 ms TTFS / 1.22% pooled WER; Cartesia ink-2 299 ms / 1.25%; Soniox rt-v5 260 ms / 1.09%; Azure ~1,016 ms; AWS ~1,136 ms.

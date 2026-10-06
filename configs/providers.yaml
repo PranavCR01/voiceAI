@@ -1,0 +1,112 @@
+# STT provider configurations. One entry per configuration being compared.
+# Every value below comes from docs/RESEARCH.md (research dated October 2026, mostly third-party
+# price trackers) and is marked `verify: true` until checked against the vendor's own docs and
+# pricing page on the owner's machine (vendor sites are blocked from the cloud environment).
+# When verifying: update model_id/settings/pricing, set pricing.source to the vendor page,
+# pricing.as_of to the check date, and verify: false. Field reference: harness/providers/registry.py
+
+configs:
+  # --- batch (pre-recorded) --------------------------------------------------------------
+  - config_id: deepgram_nova3_batch
+    provider: deepgram
+    model_id: nova-3
+    mode: batch
+    settings: {smart_format: true, punctuate: true}
+    pricing:
+      amount: 0.0043
+      unit: minute
+      billing_basis: audio_duration
+      source: https://dynalord.com/blog/deepgram-pricing
+      as_of: 2026-10-06
+    env_key: DEEPGRAM_API_KEY
+    verify: true
+
+  - config_id: assemblyai_batch
+    provider: assemblyai
+    model_id: universal  # research didn't cover AssemblyAI batch model names; verify
+    mode: batch
+    settings: {format_text: true, punctuate: true}
+    pricing:
+      amount: null  # not in the research; fill from the vendor pricing page
+      unit: hour
+      billing_basis: audio_duration
+      source: https://www.assemblyai.com/pricing
+      as_of: 2026-10-06
+    env_key: ASSEMBLYAI_API_KEY
+    verify: true
+
+  - config_id: elevenlabs_scribe_v2_batch
+    provider: elevenlabs
+    model_id: scribe_v2
+    mode: batch
+    settings: {}
+    pricing:
+      amount: 0.22
+      unit: hour
+      billing_basis: audio_duration
+      source: https://www.therundown.ai/tools/scribe-v2
+      as_of: 2026-10-06
+    env_key: ELEVENLABS_API_KEY
+    verify: true
+    notes: Keyterm boosting is a paid add-on (price not in research).
+
+  # --- streaming (the v1 comparison set) ---------------------------------------------------
+  - config_id: deepgram_nova3_stream
+    provider: deepgram
+    model_id: nova-3
+    mode: streaming
+    settings: {interim_results: true, smart_format: true, endpointing: 300}
+    pricing:
+      amount: 0.0077
+      unit: minute
+      billing_basis: audio_duration
+      source: https://flexprice.io/pricing-index/deepgram
+      as_of: 2026-10-06
+    env_key: DEEPGRAM_API_KEY
+    verify: true
+    notes: Regular rate; a promotional $0.0048/min was also listed. Model both in cost analysis.
+
+  - config_id: deepgram_flux_stream
+    provider: deepgram
+    model_id: flux-general-en
+    mode: streaming
+    settings: {}
+    pricing:
+      amount: 0.0065
+      unit: minute
+      billing_basis: audio_duration
+      source: https://www.happyrobot.ai/hub/deepgram-pricing
+      as_of: 2026-10-06
+    env_key: DEEPGRAM_API_KEY
+    verify: true
+    notes: Built-in end-of-turn detection; end-of-turn thresholds are the endpointing knobs.
+
+  - config_id: assemblyai_universal_stream
+    provider: assemblyai
+    model_id: universal-streaming
+    mode: streaming
+    settings: {}
+    pricing:
+      amount: 0.15
+      unit: hour
+      billing_basis: session_duration
+      source: https://www.assemblyai.com/blog/introducing-universal-streaming
+      as_of: 2026-10-06
+    env_key: ASSEMBLYAI_API_KEY
+    verify: true
+    notes: Billed while the session is open, including while the agent talks. Keyterms +$0.04/hr.
+
+  - config_id: elevenlabs_scribe_v2_rt_stream
+    provider: elevenlabs
+    model_id: scribe_v2_realtime
+    mode: streaming
+    settings: {}
+    pricing:
+      amount: 0.39
+      unit: hour
+      billing_basis: audio_duration
+      source: https://ominigate.ai/en/models/elevenlabs/scribe-v2-realtime
+      as_of: 2026-10-06
+    env_key: ELEVENLABS_API_KEY
+    verify: true
+    notes: Third-party listing reports billing on audio pushed and a 10-minute session cap; verify both.

@@ -2,6 +2,13 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-10-06 — Provider registry and batch runner
+- `configs/providers.yaml` holds one entry per *configuration* (provider + pinned model id + mode + settings). Prices carry `billing_basis` (audio vs session duration vs per channel), `source` and `as_of`, because the basis changes cost per conversation minute more than the headline rate. BAA status defaults to `unknown` and needs a source to be `yes`/`no`.
+- Everything is `verify: true` until checked against vendor docs on the owner's machine; a verified entry must have a price. The CLI warns when running an unverified config.
+- Batch and streaming configs are separate entries (`*_batch`, `*_stream`); batch exists to get a first real offline report quickly, and the report labels the mode.
+- Runner: run id defaults to the config id so re-running resumes; results flushed every 20 utterances; failed requests recorded with the error and an empty transcript (scored as all-deletions by the report), skipped on resume unless `--retry-failed`. Retries only for `RetryableError` (429/5xx/timeouts), exponential backoff, 3 attempts. A resume refuses a run directory made with a different provider/model/settings.
+- `git_sha` gets a `-dirty` suffix when the working tree has uncommitted changes, so a result can't silently claim a clean commit.
+
 ## 2026-10-06 — LibriSpeech and Common Voice loaders
 - `audio_path` is computed relative to an explicit `--data-root`, so manifests stay portable regardless of where a dataset is unpacked.
 - Common Voice is sampled, not loaded whole: 400 clips from the held-out `test.tsv` by default. Accents take turns (round robin) so the set measures *spread across accents*, not Common Voice's skewed population; WER on it is not an estimate of WER on "typical" Common Voice audio, and the report must not present it as one.
