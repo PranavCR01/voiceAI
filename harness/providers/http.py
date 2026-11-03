@@ -25,6 +25,12 @@ def check_settings(
         raise ValueError(f"{provider}: unsupported settings {unknown}; supported: {sorted(known)}")
 
 
+def no_base_url(provider: str, base_url: str | None) -> None:
+    """For adapters that only talk to their vendor's own host."""
+    if base_url is not None:
+        raise ValueError(f"{provider}: base_url is not supported by this adapter")
+
+
 def resolve_keyterms(
     provider: str, settings: Mapping[str, JsonValue], keyterms: list[str] | None
 ) -> list[str]:

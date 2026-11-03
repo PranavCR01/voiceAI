@@ -25,7 +25,8 @@ from harness.providers.http import (
 from harness.providers.registry import ProviderConfig
 
 PROVIDER = "deepgram"
-URL = "https://api.deepgram.com/v1/listen"
+DEFAULT_BASE_URL = "https://api.deepgram.com"
+PATH = "/v1/listen"
 # setting name -> query parameter (booleans are sent as "true"/"false")
 _PARAMS = {"smart_format": "smart_format", "punctuate": "punctuate", "language": "language"}
 SETTINGS = frozenset({*_PARAMS, "keyterms"})
@@ -46,6 +47,8 @@ class DeepgramBatch:
         self.keyterms = resolve_keyterms(PROVIDER, config.settings, keyterms)
         self.api_key = api_key
         self.client = client or httpx.AsyncClient(timeout=DEFAULT_TIMEOUT_S)
+        # Any Deepgram-protocol host (self-hosted, proxy, compatible vendor) via the registry.
+        self.url = (config.base_url or DEFAULT_BASE_URL).rstrip("/") + PATH
 
     def params(self, settings: Mapping[str, JsonValue]) -> Params:
         params: Params = [("model", self.model_id)]
@@ -61,7 +64,7 @@ class DeepgramBatch:
     async def transcribe(self, clip: AudioClip, settings: Mapping[str, JsonValue]) -> Transcript:
         request = self.client.build_request(
             "POST",
-            URL,
+            self.url,
             params=self.params(settings),
             headers={"Authorization": f"Token {self.api_key}", "Content-Type": "audio/wav"},
             content=to_wav_bytes(clip),

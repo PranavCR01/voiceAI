@@ -19,6 +19,7 @@ from harness.providers.base import PermanentError, RetryableError, Transcript
 from harness.providers.http import (
     DEFAULT_TIMEOUT_S,
     check_settings,
+    no_base_url,
     parse_json,
     raise_for_status,
     resolve_keyterms,
@@ -48,6 +49,7 @@ class AssemblyAIBatch:
         poll_timeout_s: float = POLL_TIMEOUT_S,
     ) -> None:
         check_settings(PROVIDER, config.settings, SETTINGS)
+        no_base_url(PROVIDER, config.base_url)
         self.model_id = config.model_id
         self.keyterms = resolve_keyterms(PROVIDER, config.settings, keyterms)
         self.headers = {"authorization": api_key}

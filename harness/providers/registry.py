@@ -81,6 +81,9 @@ class ProviderConfig(_Strict):
     pricing: Pricing
     baa: Baa = Field(default_factory=Baa)
     env_key: str = Field(pattern=r"^[A-Z][A-Z0-9_]*$")
+    # Override the provider's default host, e.g. a self-hosted or protocol-compatible endpoint.
+    # Only adapters that declare support accept it; compatibility is verified per setting.
+    base_url: str | None = Field(default=None, pattern=r"^https://[^/\s]+(/[^\s]*)?$")
     verify: bool = True  # model id / price / settings not yet checked against vendor docs
     notes: str = ""
 

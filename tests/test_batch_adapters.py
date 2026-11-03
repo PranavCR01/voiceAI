@@ -302,3 +302,22 @@ def test_end_to_end_runner_audio_adapter(tmp_path: Path) -> None:
     assert row.hyp_text == "I take 500 mg of paracetamol." and row.error is None
     assert json.loads((summary.run_dir / str(row.raw_response_path)).read_text())["results"]
     assert len(bodies[0]) == 44 + 16000  # WAV header + 0.5 s of 16 kHz PCM16
+
+
+def test_deepgram_base_url_overrides_host() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(200, json=fixture("deepgram/success.json"))
+
+    cfg = config("deepgram").model_copy(update={"base_url": "https://stt.example.com/"})
+    run(DeepgramBatch(cfg, "K", client=client(handler)).transcribe(CLIP, {}))
+    assert str(seen[0].url).startswith("https://stt.example.com/v1/listen?")
+
+
+@pytest.mark.parametrize("cls", [AssemblyAIBatch, ElevenLabsBatch])
+def test_adapters_without_host_override_reject_base_url(cls: Any) -> None:
+    cfg = config("x").model_copy(update={"base_url": "https://stt.example.com"})
+    with pytest.raises(ValueError, match="base_url is not supported"):
+        cls(cfg, "K")

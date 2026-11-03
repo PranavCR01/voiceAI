@@ -5,8 +5,8 @@ Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anythin
 
 ## Stack
 - Python 3.12 (`.python-version`), asyncio. Package manager: `uv`. Exact versions locked in `uv.lock` (committed); CI runs `uv sync --locked`, so update the lock with `uv lock` when changing deps.
-- Scoring: jiwer, Whisper `EnglishTextNormalizer` (pinned), NumPy/SciPy.
-- Agent (milestone 3+): Pipecat (pinned version, never float), Silero VAD, Smart Turn v3, ElevenLabs TTS.
+- Scoring: jiwer, Whisper `EnglishTextNormalizer` (pinned), NumPy (no SciPy: normal quantiles come from the stdlib).
+- Agent (milestone M5): Pipecat (pinned version, never float), Silero VAD, Smart Turn v3, ElevenLabs TTS.
 - Results: Parquet. Reports: Jinja2 → Markdown/HTML.
 
 ## Commands
@@ -26,7 +26,7 @@ Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anythin
 6. Hand-written modules — do not generate or rewrite these without explicit instruction in the issue:
    `agent/turn_controller/` and the raw-WebSocket STT client in `harness/providers/` (whichever one is marked `# hand-written`).
 7. Prices, model names and dataset licenses are perishable. Anything user-facing cites `docs/RESEARCH.md` and its date.
-8. Every PR updates the docs it invalidates. New decisions go in `docs/DECISIONS.md` (dated, with the reason and what it replaced).
+8. Every commit updates the docs it invalidates. New decisions go in `docs/DECISIONS.md` (dated, with the reason and what it replaced).
 
 ## Layout
 ```

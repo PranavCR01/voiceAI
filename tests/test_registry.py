@@ -83,6 +83,7 @@ def test_get_unknown_config() -> None:
         ([entry(env_key="lowercase")], "should match pattern"),
         ([entry(baa={"status": "yes"})], "needs a source"),
         ([entry(surprise=1)], "Extra inputs"),
+        ([entry(base_url="http://insecure.example.com")], "should match pattern"),
     ],
 )
 def test_validation_errors(tmp_path: Path, entries: list[dict[str, Any]], message: str) -> None:

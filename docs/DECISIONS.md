@@ -2,6 +2,12 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-03 — Forced finalization as a separate latency; configurable host
+- Prompted by an external comment on #20 (from someone who disclosed working for an STT vendor; the comment was later deleted). Judged on its merits:
+- **Adopted:** measure finalize latency separately. In `forced` mode the adapter sends the provider's explicit finalize when the paced audio reaches the true speech end, and we time finalize → final. TTFS mixes model + network speed with the provider's endpointing policy; an agent with its own turn detector (our M5 controller) only needs the former, and the recommender scores STT and turn detection as separate layers. Providers without an explicit finalize show "not supported". Added to #14 and #18.
+- **Adopted:** registry `base_url` (https only). The Deepgram adapter uses it, so any Deepgram-protocol endpoint (self-hosted, proxy, compatible vendor) is a registry entry; other adapters reject it. "Compatible" is checked per setting, never assumed.
+- **Not adopted:** adding the commenter's own service as a fifth provider. No public footprint could be found, and providers are chosen by relevance to customers and hiring teams, not by request.
+
 ## 2026-10-06 — Batch adapters
 - Plain `httpx`, no vendor SDKs: every request is visible and testable with a mock transport; no SDK version drift.
 - Every provider receives the same 16 kHz mono WAV produced by `harness/audio.py`.
