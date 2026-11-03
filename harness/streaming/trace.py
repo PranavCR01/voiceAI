@@ -39,12 +39,21 @@ class _Strict(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
+class Word(_Strict):
+    """A recognized word with its position in the *audio* (ms from the start of the clip)."""
+
+    text: str
+    start_ms: float = Field(ge=0)
+    end_ms: float = Field(ge=0)
+
+
 class Event(_Strict):
     kind: EventKind
     t_ns: int = Field(ge=0)
     chunk_index: int | None = Field(default=None, ge=0)  # audio_sent
     audio_offset_ms: float | None = Field(default=None, ge=0)  # audio_sent, finalize_sent
     text: str | None = None  # partial, final
+    words: tuple[Word, ...] | None = None  # final: word timings, when the provider sends them
     raw: JsonValue = None  # the provider message, for received events
 
     @model_validator(mode="after")

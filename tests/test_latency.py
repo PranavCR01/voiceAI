@@ -29,6 +29,10 @@ def ok(ms: float) -> Measurement:
     return Measurement("ok", ms)
 
 
+def ttfs_last_final(ms: float) -> Measurement:
+    return Measurement("ok", ms, "last_final")
+
+
 # --- per-session metrics on hand-specified traces -----------------------------------------
 # All fixtures: 100 ms chunks, chunk k sent at 50 + 100k ms; speech 150-750 ms of audio,
 # so speech onset is in chunk 1 (sent at 150 ms) and speech end in chunk 7 (sent at 750 ms).
@@ -38,14 +42,14 @@ def test_clean_session() -> None:
     s = session_latency(load("clean"))
     assert s.connection_setup == ok(50)
     assert s.first_partial == ok(250)  # partial at 400 - onset chunk sent at 150
-    assert s.ttfs == ok(250)  # last final at 1000 - 750
+    assert s.ttfs == ttfs_last_final(250)  # last final at 1000 - 750 (no word timings)
     assert s.endpoint_delay == ok(350)  # endpoint at 1100 - 750
     assert s.finalize_latency.status == "not_applicable"
     assert s.premature_endpoints == 0
 
 
 def test_late_final() -> None:
-    assert session_latency(load("late_final")).ttfs == ok(2000)
+    assert session_latency(load("late_final")).ttfs == ttfs_last_final(2000)
 
 
 def test_no_final_is_a_timeout_not_a_drop() -> None:
@@ -63,7 +67,7 @@ def test_early_endpoint_counted_as_premature() -> None:
 def test_forced_finalize() -> None:
     s = session_latency(load("forced"))
     assert s.finalize_latency == ok(148)  # final at 900 - finalize sent at 752
-    assert s.ttfs == ok(150)
+    assert s.ttfs == ttfs_last_final(150)
     assert s.endpoint_delay.status == "not_applicable"
 
 
@@ -87,7 +91,33 @@ def test_anchor_moves_with_a_late_chunk() -> None:
         for e in trace.events
     )
     late = trace.model_copy(update={"events": events})
-    assert session_latency(late).ttfs == ok(210)  # final at 1000 - chunk 7 actually sent at 790
+    assert session_latency(late).ttfs == ttfs_last_final(
+        210
+    )  # final at 1000 - chunk 7 actually sent at 790
+
+
+def test_ttfs_uses_word_timestamps_and_ignores_trailing_final() -> None:
+    # Final "hello there" (last word ends at 740 ms of audio) arrives at 1000; a trailing "um"
+    # transcribed from silence (ends at 2200 ms, far past the 750 ms speech end) arrives at 2500.
+    s = session_latency(load("trailing_final"))
+    assert s.ttfs == Measurement("ok", 250, "word_timestamps")
+
+
+def test_ttfs_without_words_falls_back_and_says_so() -> None:
+    trace = load("trailing_final")
+    events = tuple(e.model_copy(update={"words": None}) for e in trace.events)
+    s = session_latency(trace.model_copy(update={"events": events}))
+    assert s.ttfs == ttfs_last_final(1750)  # the weakness this replaces: 2500 - 750
+
+
+def test_ttfs_uses_the_first_final_containing_the_last_word() -> None:
+    # A provider that re-sends the same final later must not look slower.
+    trace = load("trailing_final")
+    first = next(e for e in trace.events if e.kind is EventKind.FINAL)
+    resent = first.model_copy(update={"t_ns": 1500 * MS})
+    events = tuple(sorted([*trace.events, resent], key=lambda e: e.t_ns))
+    s = session_latency(trace.model_copy(update={"events": events}))
+    assert s.ttfs == Measurement("ok", 250, "word_timestamps")
 
 
 def test_missing_ground_truth() -> None:
@@ -229,3 +259,67 @@ def test_recorder_orders_events_and_uses_supplied_times() -> None:
 
 def test_trace_filename() -> None:
     assert trace_filename("primock57:day1:patient:0001") == "primock57__day1__patient__0001.jsonl"
+
+
+# --- speaker clustering ------------------------------------------------------------------
+
+
+def fake_sessions(
+    per_speaker: dict[str, list[float]],
+) -> tuple[list[SessionLatency], dict[str, str]]:
+    sessions, clusters = [], {}
+    na = Measurement("not_applicable")
+    for spk, values in per_speaker.items():
+        for i, v in enumerate(values):
+            utt = f"{spk}:{i}"
+            clusters[utt] = spk
+            sessions.append(
+                SessionLatency("c", utt, na, na, Measurement("ok", v, "word_timestamps"), na, na, 0)
+            )
+    return sessions, clusters
+
+
+def test_clustered_intervals_widen_when_latency_depends_on_speaker() -> None:
+    rng = np.random.default_rng(0)
+    offsets = rng.normal(0, 150, size=12)  # some speakers are much slower (e.g. long pauses)
+    data = {f"s{k}": list(300 + offsets[k] + rng.normal(0, 20, 25)) for k in range(12)}
+    sessions, clusters = fake_sessions(data)
+    s = summarize(sessions, "ttfs", clusters=clusters, n_resamples=1500)
+    assert s.clustered and s.cluster_effect is not None and s.cluster_effect > 2
+    iid = summarize(sessions, "ttfs", n_resamples=1500)
+    assert not iid.clustered and iid.cluster_effect is None
+    assert s.p50 is not None and iid.p50 is not None
+    assert (s.p50.high - s.p50.low) > (iid.p50.high - iid.p50.low)
+
+
+def test_cluster_effect_near_one_when_speakers_do_not_matter() -> None:
+    rng = np.random.default_rng(1)
+    data = {f"s{k}": list(300 + rng.normal(0, 50, 25)) for k in range(12)}
+    sessions, clusters = fake_sessions(data)
+    s = summarize(sessions, "ttfs", clusters=clusters, n_resamples=1500)
+    assert s.cluster_effect is not None and 0.6 < s.cluster_effect < 1.5
+
+
+def test_every_session_needs_a_cluster() -> None:
+    sessions, clusters = fake_sessions({"a": [1.0, 2.0]})
+    del clusters["a:1"]
+    with pytest.raises(KeyError, match="no cluster for a:1"):
+        summarize(sessions, "ttfs", clusters=clusters)
+
+
+def test_ttfs_basis_is_counted() -> None:
+    sessions = [session_latency(load(n)) for n in ("clean", "trailing_final", "no_final")]
+    s = summarize(sessions, "ttfs", n_resamples=200)
+    assert s.ttfs_basis == {"last_final": 1, "word_timestamps": 1} and s.n_timeout == 1
+
+
+def test_clustered_percentile_validation_and_determinism() -> None:
+    with pytest.raises(ValueError, match="cluster_ids"):
+        percentile_bootstrap([1.0, 2.0], 50, seed=0, cluster_ids=["a"])
+    a = percentile_bootstrap(
+        [1.0, 2.0, 3.0, 4.0], 50, seed=3, n_resamples=300, cluster_ids=["x", "x", "y", "y"]
+    )
+    b = percentile_bootstrap(
+        [1.0, 2.0, 3.0, 4.0], 50, seed=3, n_resamples=300, cluster_ids=["x", "x", "y", "y"]
+    )
+    assert a == b

@@ -2,12 +2,17 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-03 — TTFS from word timestamps; speaker-clustered latency intervals
+Fixes two weaknesses of the first #14 implementation (entry below):
+- **TTFS used the last final as "the final covering the last word"**, so a short trailing final transcribed from silence, or a re-sent final, made a provider look slower (a fixture showed 1,750 ms instead of 250 ms). Finals now carry word timings in audio time; the last word is the latest-ending word that ends within 300 ms of the true speech end, and TTFS is the arrival of the first final containing it. Without word timings it falls back to the last final, labelled `basis: last_final`, and summaries count sessions per basis, so a report can't silently mix the two. #18 adapters must keep word timings.
+- **Latency intervals resampled sessions independently**, which was an untested assumption. `summarize(..., clusters=utt→speaker)` now resamples whole speakers (conservative; same rule as WER), and reports `cluster_effect`, the clustered/iid p50 interval-width ratio, so real data shows whether speaker clustering mattered. Simulated data with speaker effects gives a ratio > 2; independent data gives ≈ 1. Reports (#22) should cluster by default.
+
 ## 2026-11-03 — Streaming trace format and latency metrics
 - One trace per session, all metrics computed afterwards from traces, so they are tested on hand-specified traces without a live provider. Schema: `harness/streaming/README.md`.
 - Anchor: an audio moment (speech start/end from #15) maps to the time the chunk containing it was *sent*. A late chunk moves the anchor with it, so pacing jitter isn't charged to the provider.
-- TTFS uses the last final after speech end as "the final covering the last word" (no word timestamps yet). Endpoint delay is natural-mode only; finalize latency is forced-mode only; endpoints before the anchor are counted as premature for #20.
+- TTFS: see the entry above (word timestamps). Endpoint delay is natural-mode only; finalize latency is forced-mode only; endpoints before the anchor are counted as premature for #20.
 - Timeouts are +inf in percentile aggregates, with the timeout rate beside them: if >5% of sessions never finalize, p95 reads as the timeout rather than a number computed over survivors. Percentiles use the `inverted_cdf` method (an observed value, no interpolation) so inf doesn't turn into NaN.
-- Percentile intervals resample sessions iid, not by speaker: latency depends far more on network and provider load than on the speaker. Revisit if real data shows speaker-level clustering.
+- Percentile intervals: see the entry above (speaker clustering).
 
 ## 2026-11-03 — Forced finalization as a separate latency; configurable host
 - Prompted by an external comment on #20 (from someone who disclosed working for an STT vendor; the comment was later deleted). Judged on its merits:

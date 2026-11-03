@@ -24,7 +24,7 @@ Every streaming adapter (#18) and the hand-written client (#19) records one `Ses
 | `audio_sent` | A chunk was sent (use the pacer's `sent_ns`, or better, the time right after the socket write) | `chunk_index`, `audio_offset_ms` |
 | `audio_end` | Last audio chunk (incl. trailing silence) sent | |
 | `finalize_sent` | Forced mode: explicit finalize sent | `audio_offset_ms` it was sent at, `raw` (the message) |
-| `partial` / `final` | Provider transcript messages | `text`, `raw` |
+| `partial` / `final` | Provider transcript messages | `text`, `raw`; finals also `words` (word, `start_ms`, `end_ms` in *audio* time) whenever the provider returns word timings |
 | `endpoint` | Provider end-of-turn signal (speech_final, utterance end, end of turn) | `raw` |
 | `vad_event` | Provider speech start/end events, if any | `raw` |
 | `error`, `closed` | Errors and session close | `raw` |
@@ -34,11 +34,11 @@ Use `Recorder` during a live session: `start()`, then `record(kind, at_ns=..., *
 ## Metrics (per session)
 - **connection setup** = `connect_ready − connect_start`; never folded into speech latency.
 - **first partial** = first `partial` − send time of the chunk containing speech onset.
-- **TTFS** = last `final` after speech end − send time of the chunk containing speech end. "Last final" approximates "the final covering the last word"; word timestamps could refine it later.
+- **TTFS** = arrival of the final containing the speaker's last word − send time of the chunk containing speech end. With word timings, the last word is the latest-ending word among those ending within 300 ms of the true speech end, and the first final containing it counts; so a trailing final transcribed from silence ("um" two seconds later) or a re-sent final doesn't make a provider look slower. Without word timings it falls back to the last final after the anchor. Each TTFS records its `basis` (`word_timestamps` or `last_final`), and summaries count sessions per basis.
 - **finalize latency** (forced) = first `final` after `finalize_sent` − `finalize_sent`.
 - **endpoint delay** (natural) = first `endpoint` at/after the speech-end anchor − anchor; endpoints before it are counted as premature (rates in #20).
 
-Statuses: `ok`, `timeout`, `not_applicable`, `not_supported`, `missing_ground_truth`. Aggregates (`summarize`) report p50/p95/p99 with bootstrap CIs, treating timeouts as +inf, plus the timeout rate.
+Statuses: `ok`, `timeout`, `not_applicable`, `not_supported`, `missing_ground_truth`. Aggregates (`summarize`) report p50/p95/p99 with bootstrap CIs, treating timeouts as +inf, plus the timeout rate. Pass `clusters` (utt_id → speaker) to resample whole speakers, as the WER intervals do; the summary then reports `cluster_effect`, the clustered p50 interval width divided by the iid one (≈1: speakers don't matter; well above 1: they do, and iid intervals would have been too narrow).
 
 ## Provider message mapping
 Filled in per provider by #18 (which vendor flag becomes `partial` / `final` / `endpoint`).

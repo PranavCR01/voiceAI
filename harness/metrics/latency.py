@@ -19,14 +19,19 @@ timeout ("slower than we waited"), instead of a flattering number over the survi
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable, Sequence
-from dataclasses import dataclass
+from collections.abc import Hashable, Iterable, Mapping, Sequence
+from dataclasses import dataclass, field
 from typing import Literal
 
 from harness.metrics.stats import Interval, percentile_bootstrap
-from harness.streaming.trace import EventKind, SessionTrace
+from harness.streaming.trace import Event, EventKind, SessionTrace
 
 Status = Literal["ok", "timeout", "not_applicable", "not_supported", "missing_ground_truth"]
+# How TTFS found "the final covering the last word".
+TtfsBasis = Literal["word_timestamps", "last_final"]
+# Words ending this long after the true speech end are not the speaker's last word (they are
+# hallucinations or noise transcribed during silence), so they can't define TTFS.
+LAST_WORD_TOLERANCE_MS = 300.0
 METRICS = ("connection_setup", "first_partial", "ttfs", "finalize_latency", "endpoint_delay")
 
 
@@ -34,10 +39,11 @@ METRICS = ("connection_setup", "first_partial", "ttfs", "finalize_latency", "end
 class Measurement:
     status: Status
     value_ms: float | None = None
+    basis: TtfsBasis | None = None  # TTFS only
 
     @staticmethod
-    def ok(ns: int) -> Measurement:
-        return Measurement("ok", ns / 1e6)
+    def ok(ns: int, basis: TtfsBasis | None = None) -> Measurement:
+        return Measurement("ok", ns / 1e6, basis)
 
 
 @dataclass(frozen=True)
@@ -68,6 +74,26 @@ def sent_at_ns(trace: SessionTrace, audio_offset_ms: float) -> int | None:
     return None
 
 
+def _ttfs(finals: Sequence[Event], speech_end_ns: int, speech_end_ms: float) -> Measurement:
+    """Time from the speech-end anchor to the final containing the speaker's last word.
+
+    With word timings: the last word is the one ending latest, among words ending no later than
+    `LAST_WORD_TOLERANCE_MS` after the true speech end; TTFS is the arrival of the first final
+    that contains it (a trailing final with a filler or hallucination during silence is
+    ignored). Without word timings: the last final after the anchor, labelled as such.
+    """
+    limit = speech_end_ms + LAST_WORD_TOLERANCE_MS
+    candidates = [(w.end_ms, e.t_ns) for e in finals for w in (e.words or ()) if w.end_ms <= limit]
+    if candidates:
+        last_end = max(end for end, _ in candidates)
+        arrival = min(t for end, t in candidates if end == last_end)
+        return Measurement.ok(arrival - speech_end_ns, "word_timestamps")
+    late = [e for e in finals if e.t_ns >= speech_end_ns]
+    if late:
+        return Measurement.ok(late[-1].t_ns - speech_end_ns, "last_final")
+    return Measurement("timeout")
+
+
 def session_latency(trace: SessionTrace) -> SessionLatency:
     meta = trace.meta
     start, ready = trace.first(EventKind.CONNECT_START), trace.first(EventKind.CONNECT_READY)
@@ -90,16 +116,11 @@ def session_latency(trace: SessionTrace) -> SessionLatency:
     finals = trace.of(EventKind.FINAL)
     endpoints = trace.of(EventKind.ENDPOINT)
 
-    # TTFS: the last final (approximating "the final covering the last word") after speech end.
-    if speech_end is None:
+    # TTFS: when the final containing the speaker's last word arrived.
+    if speech_end is None or meta.speech_end_ms is None:
         ttfs = Measurement("missing_ground_truth")
     else:
-        late_finals = [e for e in finals if e.t_ns >= speech_end]
-        ttfs = (
-            Measurement.ok(late_finals[-1].t_ns - speech_end)
-            if late_finals
-            else Measurement("timeout")
-        )
+        ttfs = _ttfs(finals, speech_end, meta.speech_end_ms)
 
     # Finalize latency: forced mode only.
     if meta.finalization_mode != "forced":
@@ -148,6 +169,12 @@ class LatencySummary:
     p95: Interval | None
     p99: Interval | None
     excluded: dict[str, int]  # not_applicable / not_supported / missing_ground_truth counts
+    clustered: bool = False  # intervals resample whole clusters (speakers)
+    # Width of the clustered p50 interval / width of the iid one. ~1: sessions behave as
+    # independent; well above 1: latency clusters by speaker and iid intervals would be too
+    # narrow. None when not clustered or when the iid interval has zero width.
+    cluster_effect: float | None = None
+    ttfs_basis: dict[str, int] = field(default_factory=dict)  # TTFS: sessions per basis
 
     @property
     def timeout_rate(self) -> float | None:
@@ -158,28 +185,53 @@ def summarize(
     sessions: Iterable[SessionLatency],
     metric: str,
     *,
+    clusters: Mapping[str, Hashable] | None = None,
     seed: int = 0,
     n_resamples: int = 10_000,
     quantiles: Sequence[float] = (50, 95, 99),
 ) -> LatencySummary:
-    """Percentiles with bootstrap CIs over sessions where the metric applies; timeouts = +inf."""
+    """Percentiles with bootstrap CIs over sessions where the metric applies; timeouts = +inf.
+
+    `clusters` maps utt_id -> cluster (normally the speaker); pass it to resample whole
+    speakers, as the WER intervals do. Every included session must have a cluster.
+    """
     values: list[float] = []
+    cluster_ids: list[Hashable] = []
     n_timeout = 0
     excluded: dict[str, int] = {}
+    basis: dict[str, int] = {}
     for s in sessions:
         m = s.get(metric)
+        if m.status not in ("ok", "timeout"):
+            excluded[m.status] = excluded.get(m.status, 0) + 1
+            continue
         if m.status == "ok":
             assert m.value_ms is not None
             values.append(m.value_ms)
-        elif m.status == "timeout":
+            if m.basis is not None:
+                basis[m.basis] = basis.get(m.basis, 0) + 1
+        else:
             values.append(math.inf)
             n_timeout += 1
-        else:
-            excluded[m.status] = excluded.get(m.status, 0) + 1
+        if clusters is not None:
+            if s.utt_id not in clusters:
+                raise KeyError(f"no cluster for {s.utt_id}")
+            cluster_ids.append(clusters[s.utt_id])
+    ids = cluster_ids if clusters is not None else None
     p = {
-        q: percentile_bootstrap(values, q, seed=seed, n_resamples=n_resamples) if values else None
+        q: percentile_bootstrap(values, q, seed=seed, n_resamples=n_resamples, cluster_ids=ids)
+        if values
+        else None
         for q in quantiles
     }
+    effect = None
+    if ids is not None and values and p.get(50) is not None:
+        iid = percentile_bootstrap(values, 50, seed=seed, n_resamples=n_resamples)
+        clustered = p[50]
+        assert clustered is not None
+        iid_width, clustered_width = iid.high - iid.low, clustered.high - clustered.low
+        if iid_width > 0 and math.isfinite(iid_width) and math.isfinite(clustered_width):
+            effect = clustered_width / iid_width
     return LatencySummary(
         metric=metric,
         n=len(values),
@@ -188,4 +240,7 @@ def summarize(
         p95=p.get(95),
         p99=p.get(99),
         excluded=dict(sorted(excluded.items())),
+        clustered=ids is not None,
+        cluster_effect=effect,
+        ttfs_basis=dict(sorted(basis.items())),
     )

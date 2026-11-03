@@ -201,12 +201,16 @@ def percentile_bootstrap(
     seed: int,
     n_resamples: int = 10_000,
     confidence: float = 0.95,
+    cluster_ids: Sequence[Hashable] | None = None,
 ) -> Interval:
     """Percentile `q` (0-100) of `values` with a bootstrap percentile interval.
 
     Uses the "inverted_cdf" percentile (an observed value, no interpolation), so `inf` values,
     which latency code uses for timeouts, give `inf` instead of NaN. If more than (100 - q)% of
     values are infinite, the estimate is infinite: "slower than the timeout".
+
+    With `cluster_ids`, whole clusters (e.g. speakers) are resampled, so correlation within a
+    cluster widens the interval instead of being mistaken for independent evidence.
     """
     if not 0 <= q <= 100:
         raise ValueError("q must be in [0, 100]")
@@ -220,10 +224,22 @@ def percentile_bootstrap(
     estimate = float(np.percentile(x, q, method="inverted_cdf"))
     rng = np.random.default_rng(seed)
     stats = np.empty(n_resamples)
-    for start in range(0, n_resamples, _CHUNK):
-        size = min(_CHUNK, n_resamples - start)
-        idx = rng.integers(0, x.size, size=(size, x.size))
-        stats[start : start + size] = np.percentile(x[idx], q, axis=1, method="inverted_cdf")
+    if cluster_ids is None:
+        for start in range(0, n_resamples, _CHUNK):
+            size = min(_CHUNK, n_resamples - start)
+            idx = rng.integers(0, x.size, size=(size, x.size))
+            stats[start : start + size] = np.percentile(x[idx], q, axis=1, method="inverted_cdf")
+    else:
+        if len(cluster_ids) != x.size:
+            raise ValueError(f"cluster_ids must have length {x.size}")
+        groups: dict[Hashable, list[int]] = {}
+        for i, c in enumerate(cluster_ids):
+            groups.setdefault(c, []).append(i)
+        members = [np.array(ix) for ix in groups.values()]
+        for b in range(n_resamples):
+            picks = rng.integers(0, len(members), size=len(members))
+            sample = x[np.concatenate([members[k] for k in picks])]
+            stats[b] = np.percentile(sample, q, method="inverted_cdf")
     tail = (1 - confidence) / 2 * 100
     lo, hi = np.percentile(stats, (tail, 100 - tail), method="inverted_cdf")
     return Interval(estimate, float(lo), float(hi))
