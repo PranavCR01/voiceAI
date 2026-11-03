@@ -9,6 +9,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "jiwer>=4.0.0",
     "numpy>=2.5.3",
+    "onnxruntime>=1.31.1",
     "pyarrow>=25.0.1",
     "pydantic>=2.13.5",
     "pyyaml>=6.0.3",
