@@ -192,3 +192,38 @@ def holm(p_values: Sequence[float], *, alpha: float = 0.05) -> tuple[list[float]
         running = max(running, min(1.0, (m - rank) * p_values[i]))
         adjusted[i] = running
     return adjusted, [p <= alpha for p in adjusted]
+
+
+def percentile_bootstrap(
+    values: ArrayLike,
+    q: float,
+    *,
+    seed: int,
+    n_resamples: int = 10_000,
+    confidence: float = 0.95,
+) -> Interval:
+    """Percentile `q` (0-100) of `values` with a bootstrap percentile interval.
+
+    Uses the "inverted_cdf" percentile (an observed value, no interpolation), so `inf` values,
+    which latency code uses for timeouts, give `inf` instead of NaN. If more than (100 - q)% of
+    values are infinite, the estimate is infinite: "slower than the timeout".
+    """
+    if not 0 <= q <= 100:
+        raise ValueError("q must be in [0, 100]")
+    if not 0 < confidence < 1 or n_resamples < 1:
+        raise ValueError("confidence must be in (0, 1) and n_resamples >= 1")
+    x = np.asarray(values, dtype=np.float64)
+    if x.ndim != 1 or x.size == 0:
+        raise ValueError("values must be a non-empty 1-D array")
+    if np.any(np.isnan(x)):
+        raise ValueError("values must not contain NaN")
+    estimate = float(np.percentile(x, q, method="inverted_cdf"))
+    rng = np.random.default_rng(seed)
+    stats = np.empty(n_resamples)
+    for start in range(0, n_resamples, _CHUNK):
+        size = min(_CHUNK, n_resamples - start)
+        idx = rng.integers(0, x.size, size=(size, x.size))
+        stats[start : start + size] = np.percentile(x[idx], q, axis=1, method="inverted_cdf")
+    tail = (1 - confidence) / 2 * 100
+    lo, hi = np.percentile(stats, (tail, 100 - tail), method="inverted_cdf")
+    return Interval(estimate, float(lo), float(hi))

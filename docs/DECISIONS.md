@@ -2,6 +2,13 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-03 — Streaming trace format and latency metrics
+- One trace per session, all metrics computed afterwards from traces, so they are tested on hand-specified traces without a live provider. Schema: `harness/streaming/README.md`.
+- Anchor: an audio moment (speech start/end from #15) maps to the time the chunk containing it was *sent*. A late chunk moves the anchor with it, so pacing jitter isn't charged to the provider.
+- TTFS uses the last final after speech end as "the final covering the last word" (no word timestamps yet). Endpoint delay is natural-mode only; finalize latency is forced-mode only; endpoints before the anchor are counted as premature for #20.
+- Timeouts are +inf in percentile aggregates, with the timeout rate beside them: if >5% of sessions never finalize, p95 reads as the timeout rather than a number computed over survivors. Percentiles use the `inverted_cdf` method (an observed value, no interpolation) so inf doesn't turn into NaN.
+- Percentile intervals resample sessions iid, not by speaker: latency depends far more on network and provider load than on the speaker. Revisit if real data shows speaker-level clustering.
+
 ## 2026-11-03 — Forced finalization as a separate latency; configurable host
 - Prompted by an external comment on #20 (from someone who disclosed working for an STT vendor; the comment was later deleted). Judged on its merits:
 - **Adopted:** measure finalize latency separately. In `forced` mode the adapter sends the provider's explicit finalize when the paced audio reaches the true speech end, and we time finalize → final. TTFS mixes model + network speed with the provider's endpointing policy; an agent with its own turn detector (our M5 controller) only needs the former, and the recommender scores STT and turn detection as separate layers. Providers without an explicit finalize show "not supported". Added to #14 and #18.

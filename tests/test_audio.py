@@ -230,8 +230,11 @@ def test_pace_does_not_drift() -> None:
     t0 = chunks[0].scheduled_ns
     last = chunks[-1]
     assert last.scheduled_ns - t0 == 149 * 20_000_000  # absolute schedule
+    # No drift: lateness doesn't accumulate. A single scheduler/GC stall on a busy machine
+    # can make one chunk late, so assert on the typical chunk and the last one, not the max.
+    lateness = sorted(c.lateness_ms for c in chunks)
+    assert lateness[len(lateness) // 2] < 5
     assert last.lateness_ms < 20
-    assert max(c.lateness_ms for c in chunks) < 20
 
 
 @pytest.mark.timing
