@@ -87,3 +87,16 @@ def test_undefined_aggregates_raise() -> None:
         pooled_wer(empty)
     with pytest.raises(ValueError, match="no non-empty references"):
         mean_utt_wer(empty)
+
+
+def test_hypothesis_dates_read_in_the_providers_order() -> None:
+    # UK speaker, US-formatting provider: the same date, written month-first.
+    ref, hyp = "born on the twentieth of April 1980", "born on the 04/20/1980"
+    assert score_utterance(ref, hyp, date_order="dmy", hyp_date_order="mdy").errors == 0
+    assert score_utterance(ref, hyp, date_order="dmy").errors > 0  # hyp read day-first
+    # Ambiguous digits follow the stated order, not a guess: 05/06 is May 6 for an mdy provider.
+    ref2 = "the sixth of May 1990"
+    assert (
+        score_utterance(ref2, "the 05/06/1990", date_order="dmy", hyp_date_order="mdy").errors == 0
+    )
+    assert score_utterance(ref2, "the 05/06/1990", date_order="dmy").errors > 0

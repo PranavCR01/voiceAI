@@ -3,7 +3,7 @@
 Code: `harness/metrics/entities.py`. Categories come from the use-case profile (`configs/profiles/README.md`); this module holds no domain vocabulary (a test enforces that no lexicon term appears in its source).
 
 ## Where tagging happens
-On the **normalized reference** (Whisper + equivalence layer, same as WER), so entity spans line up with the WER alignment. Normalize with the same `date_order` you score with.
+On the **normalized reference** (Whisper + equivalence layer, same as WER), so entity spans line up with the WER alignment. Normalize with the same `date_order` you score with (the reference's; the hypothesis may use the provider's `output_date_order`, see `score_utterance(hyp_date_order=...)`).
 
 ## Category kinds
 | Kind | Matches | Notes |

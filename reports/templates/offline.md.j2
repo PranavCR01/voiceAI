@@ -10,10 +10,10 @@
 
 ## Configurations
 
-| Config | Provider | Model | Mode | Settings | Run | Recorded | Git |
-|---|---|---|---|---|---|---|---|
+| Config | Provider | Model | Mode | Settings | Hyp. dates | Run | Recorded | Git |
+|---|---|---|---|---|---|---|---|---|
 {% for r in d.runs %}
-| {{ r.meta.config_id }} | {{ r.meta.provider | md }} | `{{ r.meta.model_id }}` | {{ r.meta.mode }} | `{{ r.meta.settings | settings | md }}` | {{ r.meta.run_id }} | {{ r.meta.created_at.strftime("%Y-%m-%d") }} | `{{ r.meta.git_sha[:7] }}` |
+| {{ r.meta.config_id }} | {{ r.meta.provider | md }} | `{{ r.meta.model_id }}` | {{ r.meta.mode }} | `{{ r.meta.settings | settings | md }}` | {{ d.hyp_date_orders[r.meta.config_id] or "as reference" }} | {{ r.meta.run_id }} | {{ r.meta.created_at.strftime("%Y-%m-%d") }} | `{{ r.meta.git_sha[:7] }}` |
 {% endfor %}
 {% for synthetic in [false, true] %}
 {% set groups = d.groups | selectattr("synthetic", "equalto", synthetic) | list %}

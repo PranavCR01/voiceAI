@@ -75,15 +75,18 @@ def score_utterance(
     normalized: bool = False,
     equivalences: bool = True,
     date_order: DateOrder = "mdy",
+    hyp_date_order: DateOrder | None = None,
 ) -> UttScore:
     """Align ref and hyp.
 
     Both are normalized first (Whisper + equivalence layer) unless `normalized=True`.
+    `date_order` reads numeric dates in the reference (its language); `hyp_date_order` reads
+    them in the hypothesis (the provider's output convention), defaulting to `date_order`.
     `equivalences=False` gives plain-Whisper WER, comparable with public leaderboards.
     """
     if not normalized:
         ref = normalize(ref, equivalences=equivalences, date_order=date_order)
-        hyp = normalize(hyp, equivalences=equivalences, date_order=date_order)
+        hyp = normalize(hyp, equivalences=equivalences, date_order=hyp_date_order or date_order)
     ref_tokens, hyp_tokens = tuple(ref.split()), tuple(hyp.split())
     if not ref_tokens and not hyp_tokens:
         return UttScore(ref_tokens, hyp_tokens, 0, 0, 0, 0, ())

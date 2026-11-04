@@ -11,6 +11,7 @@ from __future__ import annotations
 from datetime import date
 from enum import StrEnum
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, ValidationError, model_validator
@@ -84,6 +85,10 @@ class ProviderConfig(_Strict):
     # Override the provider's default host, e.g. a self-hosted or protocol-compatible endpoint.
     # Only adapters that declare support accept it; compatibility is verified per setting.
     base_url: str | None = Field(default=None, pattern=r"^https://[^/\s]+(/[^\s]*)?$")
+    # How the provider writes numeric dates ("04/20/1980" is mdy), whatever the audio's locale.
+    # The scorer reads hypothesis dates with this and reference dates with the manifest
+    # language. None = same as the reference. Set from observed output, not from docs.
+    output_date_order: Literal["mdy", "dmy"] | None = None
     verify: bool = True  # model id / price / settings not yet checked against vendor docs
     notes: str = ""
 

@@ -7,7 +7,9 @@ Scoring rules (see docs/DECISIONS.md):
 - Utterances with an `exclude_reason` are not scored. Within each group, only utterances that
   every run covers are scored, so all configs are compared on identical audio (paired).
 - A failed request (row with `error`) is scored as an empty hypothesis: failures are errors.
-- Dates are read per utterance language (`date_order_for`).
+- Reference dates are read per utterance language (`date_order_for`); hypothesis dates per
+  provider config (`output_date_order` in the registry), since a formatter may write US dates
+  for UK audio.
 - Real and synthetic audio are reported in separate sections and never pooled together.
 """
 
@@ -16,7 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections import Counter, defaultdict
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import cache
@@ -37,10 +39,13 @@ from harness.metrics.entities import (
 from harness.metrics.normalize import WHISPER_ID, DateOrder, date_order_for, normalizer_id
 from harness.metrics.stats import Interval, holm, paired_bootstrap
 from harness.metrics.wer import UttScore, mean_utt_wer, pooled_wer, score_utterance
+from harness.providers.registry import load_registry
 from harness.results import ResultRow, Run, read_runs
 from recommender.profile import Profile, load_profile
 
-TEMPLATES = Path(__file__).resolve().parent.parent / "reports" / "templates"
+_ROOT = Path(__file__).resolve().parent.parent
+TEMPLATES = _ROOT / "reports" / "templates"
+DEFAULT_REGISTRY = _ROOT / "configs" / "providers.yaml"
 ClusterBy = Literal["speaker", "none"]
 WORST_N = 10
 # Below this many resampled clusters (speakers, or utterances with --cluster-by none) the
@@ -108,6 +113,7 @@ class ReportData:
     runs: list[Run]
     profile_label: str | None
     normalizer_ids: list[str]
+    hyp_date_orders: dict[str, DateOrder | None]
     whisper_id: str
     n_resamples: int
     seed: int
@@ -150,11 +156,15 @@ class _Taggers:
 
 
 def _score_one(
-    utt: Utterance, row: ResultRow, taggers: _Taggers | None, keyterms: list[str]
+    utt: Utterance,
+    row: ResultRow,
+    taggers: _Taggers | None,
+    keyterms: list[str],
+    hyp_order: DateOrder | None = None,
 ) -> Scored:
     order = date_order_for(utt.language)
     hyp = "" if row.error is not None else row.hyp_text
-    score = score_utterance(utt.ref_text, hyp, date_order=order)
+    score = score_utterance(utt.ref_text, hyp, date_order=order, hyp_date_order=hyp_order)
     entities: tuple[EntityOutcome, ...] = ()
     false = 0
     if taggers is not None:
@@ -246,7 +256,10 @@ def build_report(
     seed: int = 0,
     cluster_by: ClusterBy = "speaker",
     generated_at: str | None = None,
+    hyp_date_orders: Mapping[str, DateOrder | None] | None = None,
 ) -> ReportData:
+    """`hyp_date_orders`: config_id -> how that provider writes numeric dates (None or
+    missing = same as the reference)."""
     if not runs:
         raise ValueError("no runs to report on")
     configs = [r.meta.config_id for r in runs]
@@ -257,8 +270,12 @@ def build_report(
     keyterms = profile.keyterm_list() if profile is not None else []
     categories = [e.name for e in profile.entities] if profile is not None else []
 
+    hyp_orders = {c: (hyp_date_orders or {}).get(c) for c in configs}
     scored = {
-        c: {u.utt_id: _score_one(u, rows[c][u.utt_id], taggers, keyterms) for u in covered}
+        c: {
+            u.utt_id: _score_one(u, rows[c][u.utt_id], taggers, keyterms, hyp_orders[c])
+            for u in covered
+        }
         for c in configs
     }
 
@@ -268,8 +285,13 @@ def build_report(
         runs=list(runs),
         profile_label=profile_label,
         normalizer_ids=sorted(
-            {normalizer_id(date_order=date_order_for(u.language)) for u in covered}
+            {
+                normalizer_id(date_order=date_order_for(u.language), hyp_date_order=hyp_orders[c])
+                for u in covered
+                for c in configs
+            }
         ),
+        hyp_date_orders=hyp_orders,
         whisper_id=WHISPER_ID,
         n_resamples=n_resamples,
         seed=seed,
@@ -352,6 +374,18 @@ def render(data: ReportData) -> str:
     return env.get_template("offline.md.j2").render(d=data)
 
 
+def _hyp_date_orders(registry: Path, runs: Sequence[Run]) -> dict[str, DateOrder | None]:
+    """Each run's provider date convention from the registry; configs not in it get None."""
+    if not registry.exists():
+        return {}
+    known = {c.config_id: c for c in load_registry(registry).configs}
+    return {
+        r.meta.config_id: known[r.meta.config_id].output_date_order
+        for r in runs
+        if r.meta.config_id in known
+    }
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Offline STT accuracy report")
     parser.add_argument("--results", type=Path, required=True, help="directory of runs")
@@ -361,12 +395,19 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--resamples", type=int, default=10_000)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--cluster-by", choices=["speaker", "none"], default="speaker")
+    parser.add_argument(
+        "--registry",
+        type=Path,
+        default=DEFAULT_REGISTRY,
+        help="provider registry, for each config's output_date_order",
+    )
     parser.add_argument("--generated-at", help="override the timestamp (for reproducible output)")
     args = parser.parse_args(argv)
 
+    runs = read_runs(args.results)
     data = build_report(
         read_manifest(args.manifest),
-        read_runs(args.results),
+        runs,
         manifest_label=args.manifest.as_posix(),
         profile=load_profile(args.profile) if args.profile else None,
         profile_label=args.profile.as_posix() if args.profile else None,
@@ -374,6 +415,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         seed=args.seed,
         cluster_by=args.cluster_by,
         generated_at=args.generated_at,
+        hyp_date_orders=_hyp_date_orders(args.registry, runs),
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(render(data), encoding="utf-8")

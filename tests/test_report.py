@@ -62,7 +62,7 @@ def test_header_states_date_models_and_normalizer(
     text = run_cli(tmp_path)
     assert "**Generated:** 2026-10-06 12:00 UTC" in text
     assert "`fake-a-2026-10`" in text and "`fake-b-v3`" in text
-    assert "equiv-v2/dmy" in text and "equiv-v2/mdy" in text  # en-GB real, en-US synthetic
+    assert "equiv-v3/dmy" in text and "equiv-v3/mdy" in text  # en-GB real, en-US synthetic
     assert "whisper-normalizer==" in text
 
 
@@ -140,3 +140,47 @@ def test_render_escapes_table_pipes(tmp_path: Path) -> None:
         read_manifest(FIX / "manifest.jsonl"), runs, manifest_label="a|b", n_resamples=100
     )
     assert "`a|b`" in render(data)  # header path is in code span; tables escape pipes
+
+
+def test_hypothesis_date_order_per_config(tmp_path: Path) -> None:
+    from datetime import UTC, datetime
+
+    from harness.datasets.manifest import Utterance
+
+    utt = Utterance(
+        utt_id="x:1",
+        dataset="x",
+        subset="patient",
+        speaker_id="s1",
+        audio_path="x/1.wav",
+        ref_text="My date of birth is the twentieth of April 1980",
+        sample_rate=16000,
+        license="CC-BY-4.0",
+        language="en-GB",
+    )
+    hyp = "My date of birth is the 04/20/1980."
+    for cid in ("us_fmt", "plain"):
+        meta = RunMeta(
+            run_id=cid,
+            config_id=cid,
+            provider="p",
+            model_id="m",
+            mode="batch",
+            created_at=datetime(2026, 11, 4, tzinfo=UTC),
+            git_sha="abcdef0",
+            manifest="m",
+        )
+        write_run(tmp_path, meta, [ResultRow(utt_id="x:1", hyp_text=hyp)])
+    data = build_report(
+        [utt],
+        read_runs(tmp_path),
+        manifest_label="m",
+        profile=load_profile(PROFILE),
+        n_resamples=50,
+        hyp_date_orders={"us_fmt": "mdy"},
+    )
+    cfg = {c.config_id: c for c in data.groups[0].configs}
+    assert cfg["us_fmt"].entities["date_of_birth"].recovered == 1
+    assert cfg["plain"].entities["date_of_birth"].recovered == 0
+    assert any(n.endswith("/dmy,hyp-mdy") for n in data.normalizer_ids)
+    assert "| mdy |" in render(data) and "| as reference |" in render(data)

@@ -1,19 +1,19 @@
 # Offline STT accuracy report
 
-- **Generated:** 2026-11-04 00:24 UTC
+- **Generated:** 2026-11-04 23:21 UTC
 - **Manifest:** `data/manifests/primock57.jsonl` (7108 utterances; excluded from scoring: inaudible 706, unintelligible 1147)
 - **Profile:** `configs/profiles/healthcare_intake.yaml`
-- **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v2/dmy`
+- **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v3/dmy,hyp-mdy`
 - **Leaderboard-comparable WER:** `whisper-normalizer==0.1.15/EnglishTextNormalizer`
 - **Intervals:** 95% paired percentile bootstrap, 10000 resamples, seed 0, resampling whole speakers. Pairwise p-values Holm-adjusted within each table. "Tie" = difference interval includes 0. No winner is called with fewer than 10 speakers in a table.
 - **Failed requests** are scored as empty transcripts (every reference word deleted).
 
 ## Configurations
 
-| Config | Provider | Model | Mode | Settings | Run | Recorded | Git |
-|---|---|---|---|---|---|---|---|
-| deepgram_nova3_batch | deepgram | `nova-3` | batch | `{"punctuate": true, "smart_format": true}` | deepgram-nova3-batch | 2026-11-04 | `207cdd3` |
-| deepgram_nova3_batch_keyterms | deepgram | `nova-3` | batch | `{"keyterms": "profile", "punctuate": true, "smart_format": true}` | deepgram-nova3-batch-keyterms | 2026-11-04 | `8f09f37` |
+| Config | Provider | Model | Mode | Settings | Hyp. dates | Run | Recorded | Git |
+|---|---|---|---|---|---|---|---|---|
+| deepgram_nova3_batch | deepgram | `nova-3` | batch | `{"punctuate": true, "smart_format": true}` | mdy | deepgram-nova3-batch | 2026-11-04 | `207cdd3` |
+| deepgram_nova3_batch_keyterms | deepgram | `nova-3` | batch | `{"keyterms": "profile", "punctuate": true, "smart_format": true}` | mdy | deepgram-nova3-batch-keyterms | 2026-11-04 | `8f09f37` |
 
 ## Real audio
 
@@ -23,8 +23,8 @@
 
 | Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
 |---|---|---|---|---|---|---|
-| deepgram_nova3_batch | 7.5% [6.9, 8.2] | 10.2% | 12.4% | 5255 | 56812 | 0 |
-| deepgram_nova3_batch_keyterms | 7.5% [6.9, 8.2] | 10.2% | 12.4% | 5255 | 56812 | 0 |
+| deepgram_nova3_batch | 7.4% [6.8, 8.1] | 10.2% | 12.2% | 5255 | 56798 | 0 |
+| deepgram_nova3_batch_keyterms | 7.4% [6.8, 8.1] | 10.2% | 12.3% | 5255 | 56798 | 0 |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
@@ -36,11 +36,11 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 |---|---|---|---|---|---|
 | deepgram_nova3_batch | medication | 74.2% [67.0, 80.3] | 121/163 | 12.4% | - |
 | deepgram_nova3_batch | dosage | 93.8% [71.7, 98.9] | 15/16 | 0.9% | 0.0% [0.0, 19.4] |
-| deepgram_nova3_batch | date_of_birth | 9.5% [2.7, 28.9] | 2/21 | 64.9% | 9.5% [2.7, 28.9] |
+| deepgram_nova3_batch | date_of_birth | 81.0% [60.0, 92.3] | 17/21 | 9.0% | 81.0% [60.0, 92.3] |
 | deepgram_nova3_batch | phone | 50.0% [9.5, 90.5] | 1/2 | 26.7% | 0.0% [0.0, 65.8] |
 | deepgram_nova3_batch_keyterms | medication | 87.7% [81.8, 91.9] | 143/163 | 6.4% | - |
 | deepgram_nova3_batch_keyterms | dosage | 93.8% [71.7, 98.9] | 15/16 | 0.9% | 0.0% [0.0, 19.4] |
-| deepgram_nova3_batch_keyterms | date_of_birth | 9.5% [2.7, 28.9] | 2/21 | 64.9% | 9.5% [2.7, 28.9] |
+| deepgram_nova3_batch_keyterms | date_of_birth | 81.0% [60.0, 92.3] | 17/21 | 9.0% | 81.0% [60.0, 92.3] |
 | deepgram_nova3_batch_keyterms | phone | 50.0% [9.5, 90.5] | 1/2 | 26.7% | 0.0% [0.0, 65.8] |
 
 Boosted keyterms written where the speaker didn't say them: deepgram_nova3_batch 3, deepgram_nova3_batch_keyterms 9.
@@ -79,8 +79,8 @@ Boosted keyterms written where the speaker didn't say them: deepgram_nova3_batch
 
 | Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
 |---|---|---|---|---|---|---|
-| deepgram_nova3_batch | 9.0% [7.9, 10.2] | 10.2% | 15.5% | 2640 | 22943 | 0 |
-| deepgram_nova3_batch_keyterms | 8.9% [7.9, 10.1] | 10.2% | 15.5% | 2640 | 22943 | 0 |
+| deepgram_nova3_batch | 8.8% [7.7, 9.9] | 10.2% | 15.2% | 2640 | 22929 | 0 |
+| deepgram_nova3_batch_keyterms | 8.7% [7.7, 9.8] | 10.2% | 15.2% | 2640 | 22929 | 0 |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
@@ -92,11 +92,11 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 |---|---|---|---|---|---|
 | deepgram_nova3_batch | medication | 71.0% [59.4, 80.4] | 49/69 | 15.9% | - |
 | deepgram_nova3_batch | dosage | 100.0% [34.2, 100.0] | 2/2 | 0.0% | 0.0% [0.0, 65.8] |
-| deepgram_nova3_batch | date_of_birth | 9.5% [2.7, 28.9] | 2/21 | 64.9% | 9.5% [2.7, 28.9] |
+| deepgram_nova3_batch | date_of_birth | 81.0% [60.0, 92.3] | 17/21 | 9.0% | 81.0% [60.0, 92.3] |
 | deepgram_nova3_batch | phone | 50.0% [9.5, 90.5] | 1/2 | 26.7% | 0.0% [0.0, 65.8] |
 | deepgram_nova3_batch_keyterms | medication | 84.1% [73.7, 90.9] | 58/69 | 8.1% | - |
 | deepgram_nova3_batch_keyterms | dosage | 100.0% [34.2, 100.0] | 2/2 | 0.0% | 0.0% [0.0, 65.8] |
-| deepgram_nova3_batch_keyterms | date_of_birth | 9.5% [2.7, 28.9] | 2/21 | 64.9% | 9.5% [2.7, 28.9] |
+| deepgram_nova3_batch_keyterms | date_of_birth | 81.0% [60.0, 92.3] | 17/21 | 9.0% | 81.0% [60.0, 92.3] |
 | deepgram_nova3_batch_keyterms | phone | 50.0% [9.5, 90.5] | 1/2 | 26.7% | 0.0% [0.0, 65.8] |
 
 Boosted keyterms written where the speaker didn't say them: deepgram_nova3_batch 2, deepgram_nova3_batch_keyterms 5.

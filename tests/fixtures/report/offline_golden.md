@@ -3,17 +3,17 @@
 - **Generated:** 2026-10-06 12:00 UTC
 - **Manifest:** `tests/fixtures/report/manifest.jsonl` (9 utterances; excluded from scoring: unintelligible 1)
 - **Profile:** `configs/profiles/healthcare_intake.yaml`
-- **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v2/dmy`, `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v2/mdy`
+- **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v3/dmy`, `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v3/mdy`
 - **Leaderboard-comparable WER:** `whisper-normalizer==0.1.15/EnglishTextNormalizer`
 - **Intervals:** 95% paired percentile bootstrap, 2000 resamples, seed 0, resampling whole speakers. Pairwise p-values Holm-adjusted within each table. "Tie" = difference interval includes 0. No winner is called with fewer than 10 speakers in a table.
 - **Failed requests** are scored as empty transcripts (every reference word deleted).
 
 ## Configurations
 
-| Config | Provider | Model | Mode | Settings | Run | Recorded | Git |
-|---|---|---|---|---|---|---|---|
-| fake_a | Fake Provider A | `fake-a-2026-10` | batch | `{"smart_format": true}` | run-a | 2026-10-06 | `0123456` |
-| fake_b | Fake Provider B | `fake-b-v3` | batch | `{"keyterms": "profile"}` | run-b | 2026-10-06 | `fedcba9` |
+| Config | Provider | Model | Mode | Settings | Hyp. dates | Run | Recorded | Git |
+|---|---|---|---|---|---|---|---|---|
+| fake_a | Fake Provider A | `fake-a-2026-10` | batch | `{"smart_format": true}` | as reference | run-a | 2026-10-06 | `0123456` |
+| fake_b | Fake Provider B | `fake-b-v3` | batch | `{"keyterms": "profile"}` | as reference | run-b | 2026-10-06 | `fedcba9` |
 
 ## Real audio
 
@@ -23,12 +23,12 @@
 
 | Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
 |---|---|---|---|---|---|---|
-| fake_a | 4.5% [0.0, 9.4] | 6.8% | 3.3% | 6 | 44 | 0 |
-| fake_b | 20.5% [0.0, 50.0] | 20.5% | 27.1% | 6 | 44 | 1 |
+| fake_a | 2.3% [0.0, 4.9] | 6.8% | 1.9% | 6 | 43 | 0 |
+| fake_b | 20.9% [0.0, 50.0] | 20.5% | 27.1% | 6 | 43 | 1 |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
-| fake_a − fake_b | -15.9 pp [-50.0, +7.7] | 0.3898 | 0.3898 | too few speakers (4) to call |
+| fake_a − fake_b | -18.6 pp [-50.0, +4.0] | 0.2479 | 0.2479 | too few speakers (4) to call |
 
 Entities (recall = every word of the entity correct; CER = character error rate on the entity; formatted = recalled and written as digits):
 
@@ -36,7 +36,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 |---|---|---|---|---|---|
 | fake_a | medication | 100.0% [43.9, 100.0] | 3/3 | 0.0% | - |
 | fake_a | dosage | 100.0% [34.2, 100.0] | 2/2 | 0.0% | 100.0% [34.2, 100.0] |
-| fake_a | date_of_birth | 0.0% [0.0, 79.3] | 0/1 | 16.7% | 0.0% [0.0, 79.3] |
+| fake_a | date_of_birth | 100.0% [20.7, 100.0] | 1/1 | 0.0% | 100.0% [20.7, 100.0] |
 | fake_a | phone | no instances | 0 | - | - |
 | fake_b | medication | 66.7% [20.8, 93.9] | 2/3 | 20.7% | - |
 | fake_b | dosage | 100.0% [34.2, 100.0] | 2/2 | 0.0% | 0.0% [0.0, 65.8] |
@@ -79,12 +79,12 @@ Boosted keyterms written where the speaker didn't say them: fake_a 0, fake_b 0.
 
 | Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
 |---|---|---|---|---|---|---|
-| fake_a | 6.1% [0.0, 10.5] | 9.1% | 5.0% | 4 | 33 | 0 |
-| fake_b | 21.2% [0.0, 50.0] | 21.2% | 28.1% | 4 | 33 | 1 |
+| fake_a | 3.1% [0.0, 5.6] | 9.1% | 2.8% | 4 | 32 | 0 |
+| fake_b | 21.9% [0.0, 50.0] | 21.2% | 28.1% | 4 | 32 | 1 |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
-| fake_a − fake_b | -15.2 pp [-50.0, +10.5] | 0.5127 | 0.5127 | too few speakers (2) to call |
+| fake_a − fake_b | -18.8 pp [-50.0, +5.6] | 0.5127 | 0.5127 | too few speakers (2) to call |
 
 Entities (recall = every word of the entity correct; CER = character error rate on the entity; formatted = recalled and written as digits):
 
@@ -92,7 +92,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 |---|---|---|---|---|---|
 | fake_a | medication | 100.0% [34.2, 100.0] | 2/2 | 0.0% | - |
 | fake_a | dosage | 100.0% [34.2, 100.0] | 2/2 | 0.0% | 100.0% [34.2, 100.0] |
-| fake_a | date_of_birth | 0.0% [0.0, 79.3] | 0/1 | 16.7% | 0.0% [0.0, 79.3] |
+| fake_a | date_of_birth | 100.0% [20.7, 100.0] | 1/1 | 0.0% | 100.0% [20.7, 100.0] |
 | fake_a | phone | no instances | 0 | - | - |
 | fake_b | medication | 100.0% [34.2, 100.0] | 2/2 | 0.0% | - |
 | fake_b | dosage | 100.0% [34.2, 100.0] | 2/2 | 0.0% | 0.0% [0.0, 65.8] |
@@ -139,7 +139,7 @@ Normalized alignment: `[ref→hyp]` substitution, `[-ref]` deletion, `[+hyp]` in
 
 | Utterance | Subset | Errors / ref words | Alignment |
 |---|---|---|---|
-| `fixture:p2` | patient | 2/10 | my date of birth is [-the] 3 [-of] march 1980 |
+| `fixture:p2` | patient | 1/9 | my date of birth is [-the] march 3 1980 |
 
 ### fake_b
 

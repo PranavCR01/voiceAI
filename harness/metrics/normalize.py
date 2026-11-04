@@ -7,7 +7,8 @@ Two layers, applied identically to both sides:
    "whisper-only" WER column for comparability.
 2. An equivalence layer (`EQUIVALENCE_VERSION`) for formatting differences Whisper leaves apart
    but a customer would call identical (unit abbreviations, numeric dates, ordinal suffixes,
-   "O.K."/"ok"), and works around Whisper's digit handling: it rewrites the digit 1 as "one"
+   "O.K."/"ok", spoken day-month order), and works around Whisper's digit handling: it rewrites
+   the digit 1 as "one"
    (breaking decimals and digit runs), drops leading zeros, and deletes parenthesized text such
    as a phone area code. Each rule has a fixture in tests/fixtures/normalization_cases.jsonl
    and a reason in docs/DECISIONS.md. Rules are domain-neutral: no healthcare terms here.
@@ -32,7 +33,7 @@ with warnings.catch_warnings():
 DateOrder = Literal["mdy", "dmy"]
 
 WHISPER_ID = f"whisper-normalizer=={version('whisper-normalizer')}/EnglishTextNormalizer"
-EQUIVALENCE_VERSION = "2"
+EQUIVALENCE_VERSION = "3"
 
 # Transcriber markup such as <UNSURE>word</UNSURE> or <UNIN/>. Paired tags are unwrapped (the
 # transcriber's best guess is kept); self-closing tags are dropped. Utterances that should not be
@@ -76,6 +77,10 @@ _UNITS = {
     "kilometres": "km",
 }
 _TOKEN_MAP = {**_UNITS, "ok": "okay"}
+# Words that are also months but common as other words: only read as a month when "of"
+# precedes them ("2 of may") or a year follows ("2 may 1990"), never in "1 may be".
+_AMBIGUOUS_MONTHS = frozenset({"may", "march"})
+_YEAR = re.compile(r"^\d{4}$")
 _ORDINAL = re.compile(r"^(\d+)(?:st|nd|rd|th)$")
 _ONE_DECIMAL = re.compile(r"^one(\.\d+)$")  # Whisper: "1.5" -> "one.5"
 _BARE_DECIMAL = re.compile(r"^(\.\d+)$")  # Whisper: "0 point 5" -> ".5"
@@ -92,10 +97,19 @@ def _whisper() -> EnglishTextNormalizer:
     return EnglishTextNormalizer()
 
 
-def normalizer_id(*, equivalences: bool = True, date_order: DateOrder = "mdy") -> str:
+def normalizer_id(
+    *,
+    equivalences: bool = True,
+    date_order: DateOrder = "mdy",
+    hyp_date_order: DateOrder | None = None,
+) -> str:
+    """`date_order` is the reference's; `hyp_date_order` is recorded only when it differs."""
     if not equivalences:
         return WHISPER_ID
-    return f"{WHISPER_ID}+equiv-v{EQUIVALENCE_VERSION}/{date_order}"
+    base = f"{WHISPER_ID}+equiv-v{EQUIVALENCE_VERSION}/{date_order}"
+    if hyp_date_order is not None and hyp_date_order != date_order:
+        return f"{base},hyp-{hyp_date_order}"
+    return base
 
 
 # Regions that write numeric dates month-first. Everything else is read day-first.
@@ -174,6 +188,42 @@ def _fix_digit_runs(tokens: list[str]) -> list[str]:
     return merged
 
 
+def _day(token: str) -> str | None:
+    """A day-of-month token as digits ("one" counts: Whisper spells a lone digit 1)."""
+    if token == "one":
+        return "1"
+    if _DIGITS.match(token) and not token.startswith("0") and 1 <= int(token) <= 31:
+        return token
+    return None
+
+
+def _canonical_dates(tokens: list[str]) -> list[str]:
+    """Spoken day-month order to month-day: "20 of april" / "20 april" -> "april 20".
+
+    Formatters write "April 20, 1980" while people say "the twentieth of April", so the same
+    date otherwise costs two errors. "MONTH one" becomes "MONTH 1" for the same reason.
+    """
+    out: list[str] = []
+    i = 0
+    while i < len(tokens):
+        day = _day(tokens[i])
+        if day is not None:
+            has_of = i + 2 < len(tokens) and tokens[i + 1] == "of"
+            j = i + 2 if has_of else i + 1
+            month = tokens[j] if j < len(tokens) else ""
+            year_follows = j + 1 < len(tokens) and bool(_YEAR.match(tokens[j + 1]))
+            if month in _MONTHS and (month not in _AMBIGUOUS_MONTHS or has_of or year_follows):
+                out += [month, day]
+                i = j + 1
+                continue
+        if tokens[i] == "one" and out and out[-1] in _MONTHS:
+            out.append("1")
+        else:
+            out.append(tokens[i])
+        i += 1
+    return out
+
+
 def normalize(text: str, *, equivalences: bool = True, date_order: DateOrder = "mdy") -> str:
     """Markup-stripped, normalized text with single spaces.
 
@@ -185,5 +235,5 @@ def normalize(text: str, *, equivalences: bool = True, date_order: DateOrder = "
         text = _pre(text, date_order)
     tokens = str(_whisper()(text)).split()
     if equivalences:
-        tokens = _fix_digit_runs([_post_token(t) for t in tokens])
+        tokens = _canonical_dates(_fix_digit_runs([_post_token(t) for t in tokens]))
     return " ".join(tokens)
