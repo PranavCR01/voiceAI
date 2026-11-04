@@ -76,7 +76,6 @@ _UNITS = {
     "kilometre": "km",
     "kilometres": "km",
 }
-_TOKEN_MAP = {**_UNITS, "ok": "okay"}
 # Words that are also months but common as other words: only read as a month when "of"
 # precedes them ("2 of may") or a year follows ("2 may 1990"), never in "1 may be".
 _AMBIGUOUS_MONTHS = frozenset({"may", "march"})
@@ -90,6 +89,22 @@ _DIGITS = re.compile(r"^\d+$")
 # digits ("1 2 3") are digit-by-digit speech, which Whisper itself joins when spelled out.
 _MIN_RUN_DIGITS = 7
 _MIN_SINGLE_DIGIT_RUN = 3
+
+
+# Equivalence rules by name, so diagnostics can switch each off (`normalize(disable=...)`).
+# Scoring always uses all of them; `normalizer_id` does not cover disabled sets.
+RULES = (
+    "okay",  # O.K. / ok -> okay
+    "numeric_dates",  # 03/04/1980 -> march 4 1980
+    "paren_digits",  # (555) -> 555
+    "leading_zero",  # 07700 -> zero seven seven zero zero
+    "units",  # milligrams -> mg
+    "ordinals",  # 5th -> 5
+    "decimals",  # one.5 -> 1.5, .5 -> 0.5
+    "digit_one",  # "one" next to a digit group -> 1
+    "digit_join",  # long digit-group runs -> one token
+    "spoken_dates",  # 20 of april -> april 20
+)
 
 
 @cache
@@ -141,27 +156,37 @@ def _spell_digits(m: re.Match[str]) -> str:
     return " ".join(_DIGIT_WORDS[int(d)] for d in m.group(0))
 
 
-def _pre(text: str, date_order: DateOrder) -> str:
-    text = _OK.sub("okay", text)
-    text = _NUMERIC_DATE.sub(lambda m: _spell_date(m, date_order), text)
-    text = _PAREN_DIGITS.sub(r" \1 ", text)
-    return _LEADING_ZERO.sub(_spell_digits, text)
+def _pre(text: str, date_order: DateOrder, off: frozenset[str] = frozenset()) -> str:
+    if "okay" not in off:
+        text = _OK.sub("okay", text)
+    if "numeric_dates" not in off:
+        text = _NUMERIC_DATE.sub(lambda m: _spell_date(m, date_order), text)
+    if "paren_digits" not in off:
+        text = _PAREN_DIGITS.sub(r" \1 ", text)
+    if "leading_zero" not in off:
+        text = _LEADING_ZERO.sub(_spell_digits, text)
+    return text
 
 
-def _post_token(token: str) -> str:
-    token = _TOKEN_MAP.get(token, token)
-    for pattern, fmt in ((_ORDINAL, "{}"), (_ONE_DECIMAL, "1{}"), (_BARE_DECIMAL, "0{}")):
+def _post_token(token: str, off: frozenset[str] = frozenset()) -> str:
+    if token in _UNITS:
+        return token if "units" in off else _UNITS[token]
+    if token == "ok" and "okay" not in off:
+        return "okay"
+    rules = (("ordinals", _ORDINAL, "{}"), ("decimals", _ONE_DECIMAL, "1{}"))
+    for name, pattern, fmt in (*rules, ("decimals", _BARE_DECIMAL, "0{}")):
         m = pattern.match(token)
-        if m:
+        if m and name not in off:
             return fmt.format(m.group(1))
     return token
 
 
-def _fix_digit_runs(tokens: list[str]) -> list[str]:
+def _fix_digit_runs(tokens: list[str], off: frozenset[str] = frozenset()) -> list[str]:
     # Whisper rewrites a lone digit 1 as "one"; restore it when it sits next to a digit group.
     out = [
         "1"
         if t == "one"
+        and "digit_one" not in off
         and (
             (i > 0 and _DIGITS.match(tokens[i - 1]))
             or (i + 1 < len(tokens) and _DIGITS.match(tokens[i + 1]))
@@ -178,7 +203,7 @@ def _fix_digit_runs(tokens: list[str]) -> list[str]:
             continue
         long_run = len(run) > 1 and sum(map(len, run)) >= _MIN_RUN_DIGITS
         spelled_run = len(run) >= _MIN_SINGLE_DIGIT_RUN and all(len(d) == 1 for d in run)
-        if long_run or spelled_run:
+        if (long_run or spelled_run) and "digit_join" not in off:
             merged.append("".join(run))
         else:
             merged.extend(run)
@@ -224,16 +249,28 @@ def _canonical_dates(tokens: list[str]) -> list[str]:
     return out
 
 
-def normalize(text: str, *, equivalences: bool = True, date_order: DateOrder = "mdy") -> str:
+def normalize(
+    text: str,
+    *,
+    equivalences: bool = True,
+    date_order: DateOrder = "mdy",
+    disable: frozenset[str] = frozenset(),
+) -> str:
     """Markup-stripped, normalized text with single spaces.
 
     `equivalences=False` gives plain Whisper normalization. `date_order` says how to read
     numeric dates like 03/04/1980 ("mdy" = US, "dmy" = UK and most other locales).
+    `disable` switches off named `RULES` (diagnostics only).
     """
+    unknown = disable - set(RULES)
+    if unknown:
+        raise ValueError(f"unknown equivalence rules: {sorted(unknown)}")
     text = strip_markup(text)
     if equivalences:
-        text = _pre(text, date_order)
+        text = _pre(text, date_order, disable)
     tokens = str(_whisper()(text)).split()
     if equivalences:
-        tokens = _canonical_dates(_fix_digit_runs([_post_token(t) for t in tokens]))
+        tokens = _fix_digit_runs([_post_token(t, disable) for t in tokens], disable)
+        if "spoken_dates" not in disable:
+            tokens = _canonical_dates(tokens)
     return " ".join(tokens)

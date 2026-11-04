@@ -2,6 +2,16 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-04 — Equivalence layer checked rule by rule: the WER gap is one spelling convention
+New diagnostic `python -m harness.metrics.equivalence_breakdown` (output: `reports/generated/equivalence_breakdown.md`). For each rule it reports WER with that rule off, how many utterances it helps or hurts, and the changed utterances, so the matches can be read. A WER drop alone can't show a rule is right, since an over-matching rule also lowers WER. Rules are switchable via `normalize(disable=...)`, for diagnostics only.
+
+On the two Deepgram PriMock57 runs (Whisper-only 10.25% → full layer 7.44%):
+- **`okay` accounts for −2.73 of the −2.81 pp.** PriMock57 references write "OK."/"OK" 1,626 times and "Okay" 24 times; Deepgram writes "Okay", and Whisper's normalizer doesn't equate them. 1,426 utterances helped, 0 hurt. It's a real equivalence, but it means **Whisper-only WER on PriMock57 is inflated by about 2.7 pp by a transcription convention** and shouldn't be compared with leaderboard numbers without saying so.
+- `numeric_dates` (−0.08 pp, 18 utts), `spoken_dates` (−0.08, 17), `ordinals` (−0.07, 17): all date/ordinal formatting, examples checked, no over-matches.
+- `paren_digits`, `units`, `decimals`, `digit_one`, `digit_join`: no effect on this data (PriMock57 has almost no numbers). They stay covered by the normalization fixtures and get re-checked on the synthetic intake set (#17).
+- `leading_zero` **adds** 1 error (0 helped): the reference "oh three hundred" goes through Whisper as "300", while Deepgram's "0300" keeps its zero under the rule. That's an under-match (spoken "oh" as zero), recorded as known and not fixed: one utterance, and fixing it means guessing when "oh" is a digit.
+- No rule over-matches on this data.
+
 ## 2026-11-04 — "Empty on speech" metric; runner flags `suspect_empty`
 - **Definition:** a successful request whose raw hypothesis is blank while the *normalized* reference has words (`harness.metrics.wer.empty_on_speech`). Rate = those / successful requests on references with words, Wilson 95% interval (not speaker-clustered). Failed requests are excluded here because they already count in "Failed".
 - **The proposed definition ("an empty hyp on a non-empty reference") overcounts by 2.5×.** Whisper drops fillers, so 88 of the 145 empty hypotheses in the plain run are on references like "Mm.", "Um", "<UNSURE>Um</UNSURE>", where empty is correct. Real rate on PriMock57: plain 1.1% [0.9, 1.4] (57/5,105), keyterms 1.2% [1.0, 1.6] (63/5,105); patient side 1.6–1.8%, doctor 0.6–0.7%. Most are 1-word backchannels ("Yeah", "Okay"); about 7–9 per config are 3+ words, e.g. the 11-word sentence in the #13 entry below.

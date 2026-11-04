@@ -384,7 +384,7 @@ def render(data: ReportData) -> str:
     return env.get_template("offline.md.j2").render(d=data)
 
 
-def _hyp_date_orders(registry: Path, runs: Sequence[Run]) -> dict[str, DateOrder | None]:
+def registry_hyp_date_orders(registry: Path, runs: Sequence[Run]) -> dict[str, DateOrder | None]:
     """Each run's provider date convention from the registry; configs not in it get None."""
     if not registry.exists():
         return {}
@@ -425,7 +425,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         seed=args.seed,
         cluster_by=args.cluster_by,
         generated_at=args.generated_at,
-        hyp_date_orders=_hyp_date_orders(args.registry, runs),
+        hyp_date_orders=registry_hyp_date_orders(args.registry, runs),
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(render(data), encoding="utf-8")
