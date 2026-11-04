@@ -45,4 +45,5 @@ Commit straight to `main` and push; CI runs on every push to `main`. Run all che
 
 ## Where work runs
 - Cloud sessions: pure code with fixture tests (scaffold, loaders, metrics, stats, recommender, reports).
-- Owner's machine: anything needing live APIs, a mic/speakers, latency measurement, Twilio.
+- Cloud sessions with a provider key in the environment: batch (pre-recorded) accuracy runs.
+- Owner's machine: other live-API work, a mic/speakers, latency measurement, Twilio.

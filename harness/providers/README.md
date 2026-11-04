@@ -27,7 +27,10 @@ The adapters were written from recollection of each API because vendor docs are 
 - [ ] Keyterm field name and format for Scribe v2 (sent here as repeated `keyterms` fields), and its add-on price.
 - [ ] Text at top-level `text`.
 
-## First live run (owner's machine)
+## First live run
+
+Deepgram batch was first run on 2026-11-04 from a cloud session (batch accuracy needs no mic or latency measurement); results and caveats are in `docs/DECISIONS.md`. Streaming and latency runs still need the owner's machine.
+
 
 ```bash
 cp .env.example .env   # fill DEEPGRAM_API_KEY etc.; never commit .env
