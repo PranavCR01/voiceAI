@@ -80,7 +80,7 @@ def test_deepgram_request_and_parse() -> None:
         cfg, "KEY", keyterms=["paracetamol", "co-codamol"], client=client(handler)
     )
     tr = run(adapter.transcribe(CLIP, cfg.settings))
-    assert tr.text == "I take 500 mg of paracetamol."
+    assert tr.text == "I've taken some paracetamol."
     assert tr.raw == fixture("deepgram/success.json")
     [req] = seen
     assert (req.method, req.url.host, req.url.path) == ("POST", "api.deepgram.com", "/v1/listen")
@@ -118,6 +118,7 @@ def _adapters(handler: Handler) -> list[Any]:
     ("response", "error"),
     [
         (httpx.Response(401, json=fixture("deepgram/error_401.json")), PermanentError),
+        (httpx.Response(400, json=fixture("deepgram/error_400_keyterm.json")), PermanentError),
         (httpx.Response(400, text="bad request"), PermanentError),
         (httpx.Response(429, text="slow down"), RetryableError),
         (httpx.Response(503, text="unavailable"), RetryableError),
@@ -276,7 +277,7 @@ def test_end_to_end_runner_audio_adapter(tmp_path: Path) -> None:
         subset="s",
         speaker_id="x",
         audio_path="u.wav",
-        ref_text="I take 500 mg of paracetamol.",
+        ref_text="I've taken some paracetamol.",
         sample_rate=16000,
         license="CC0-1.0",
     )
@@ -299,7 +300,7 @@ def test_end_to_end_runner_audio_adapter(tmp_path: Path) -> None:
         )
     )
     [row] = read_run(summary.run_dir).rows
-    assert row.hyp_text == "I take 500 mg of paracetamol." and row.error is None
+    assert row.hyp_text == "I've taken some paracetamol." and row.error is None
     assert json.loads((summary.run_dir / str(row.raw_response_path)).read_text())["results"]
     assert len(bodies[0]) == 44 + 16000  # WAV header + 0.5 s of 16 kHz PCM16
 

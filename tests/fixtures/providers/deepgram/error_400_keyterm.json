@@ -1,0 +1,1 @@
+{"err_code": "INVALID_QUERY_PARAMETER", "err_msg": "`keyterm` is only supported for Nova-3 and Flux. Please use `keywords` instead.", "request_id": "00000000-0000-0000-0000-000000000000"}
