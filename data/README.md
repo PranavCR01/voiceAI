@@ -9,7 +9,14 @@ Fetch on your own machine. The cloud dev environment's network policy blocks the
 ./data/fetch_primock57.sh              # needs git-lfs; SKIP_AUDIO=1 for transcripts only
 uv run python -m harness.datasets.primock57 --root data/raw/primock57 --out data/manifests/primock57.jsonl
 ```
-The manifest is already committed; rebuilding it must give identical bytes.
+The manifest is already committed; rebuilding it must give identical bytes. In a cloud session `git lfs pull` is refused by the git proxy; the script then fetches the audio from GitHub's media host and checks each file's sha256.
+
+## Speech bounds sidecars (Silero VAD)
+```
+python data/fetch_silero_vad.py        # pinned silero-vad wheel -> data/cache/ (sha256-checked)
+uv run python -m harness.vad --manifest data/manifests/primock57.jsonl --data-root data/raw
+```
+Writes `data/manifests/<name>.speech.jsonl` (`SpeechSpan` per utterance: speech start/end in ms from the clip start, coverage, flags `no_speech`/`low_coverage`, `vad_id`). Needs the audio; the PriMock57 sidecar is committed. Join with `harness.vad.join_speech`, which reports missing utterances rather than filling zeros. Why VAD bounds and their known bias: `docs/DECISIONS.md` (2026-11-04, VAD bounds).
 
 ## LibriSpeech test-clean (CC BY 4.0)
 1. Download `test-clean.tar.gz` (~346 MB) from https://www.openslr.org/12 and check it against the md5 listed on that page.

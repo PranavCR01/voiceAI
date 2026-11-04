@@ -27,3 +27,6 @@ Unknown fields are rejected, and utterances are immutable once loaded.
 ## Reading and writing
 - `read_manifest(path)` skips blank lines and raises `ManifestError` naming the file and line on any invalid line, or on duplicate `utt_id`s.
 - `write_manifest(path, utts)` sorts by `utt_id`, so regenerating a manifest from the same input yields identical bytes and clean diffs.
+
+## Sidecars
+Audio-derived per-utterance data lives in separate files next to the manifest, so manifests stay audio-independent: `<name>.speech.jsonl` holds VAD speech bounds (`harness/vad.py`, see `data/README.md`).

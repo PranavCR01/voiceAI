@@ -48,7 +48,7 @@ plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 # Ships no type information.
-module = ["whisper_normalizer.*"]
+module = ["whisper_normalizer.*", "onnxruntime.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
