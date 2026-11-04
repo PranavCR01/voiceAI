@@ -144,6 +144,7 @@ async def run_batch(
     run_id: str | None = None,
     concurrency: int = 4,
     include_excluded: bool = False,
+    limit: int | None = None,
     retry_failed: bool = False,
     max_attempts: int = 3,
     backoff_s: float = 1.0,
@@ -155,6 +156,8 @@ async def run_batch(
         raise ValueError(f"{config.config_id} is a {config.mode} config; this runner is batch-only")
     if concurrency < 1 or max_attempts < 1 or flush_every < 1:
         raise ValueError("concurrency, max_attempts and flush_every must be >= 1")
+    if limit is not None and limit < 1:
+        raise ValueError("limit must be >= 1")
     run_id = run_id or config.config_id.replace("_", "-")
     run_dir = results_dir / run_id
 
@@ -171,6 +174,9 @@ async def run_batch(
         sum(u.exclude_reason is not None for u in manifest) if not include_excluded else 0
     )
     candidates = [u for u in manifest if include_excluded or u.exclude_reason is None]
+    # A trial's N counts utterances that will be sent, not manifest rows (excluded ones would
+    # otherwise eat the budget: a "5-utterance" PriMock57 trial sent 2).
+    candidates = candidates[:limit] if limit is not None else candidates
     todo = [u for u in candidates if u.utt_id not in rows]
     skipped_existing = len(candidates) - len(todo)
 
@@ -266,7 +272,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--results", type=Path, required=True)
     parser.add_argument("--run-id")
     parser.add_argument("--concurrency", type=int, default=4)
-    parser.add_argument("--limit", type=int, help="only the first N utterances (trial runs)")
+    parser.add_argument(
+        "--limit", type=int, help="only the first N scorable utterances (trial runs)"
+    )
     parser.add_argument("--include-excluded", action="store_true")
     parser.add_argument("--retry-failed", action="store_true")
     parser.add_argument("--profile", type=Path, help="profile whose keyterms 'profile' refers to")
@@ -287,8 +295,6 @@ def main(argv: Sequence[str] | None = None) -> None:
     except ValueError as e:
         raise SystemExit(str(e)) from e
     manifest = read_manifest(args.manifest)
-    if args.limit:
-        manifest = manifest[: args.limit]
     summary = asyncio.run(
         run_batch(
             config,
@@ -300,6 +306,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             run_id=args.run_id,
             concurrency=args.concurrency,
             include_excluded=args.include_excluded,
+            limit=args.limit,
             retry_failed=args.retry_failed,
         )
     )

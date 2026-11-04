@@ -281,3 +281,20 @@ def test_audio_loader_maps_missing_files_to_permanent_errors(tmp_path: Path) -> 
     )
     row = read_run(summary.run_dir).rows[0]
     assert row.error is not None and row.error.startswith("PermanentError: audio:")
+
+
+def test_limit_counts_scorable_utterances(tmp_path: Path) -> None:
+    # 3 excluded rows first, as in PriMock57: --limit 2 still sends 2.
+    manifest = utts(8, excluded=3)
+    adapter = FakeAdapter()
+    summary = run(tmp_path, adapter, manifest, limit=2)
+    assert adapter.calls == 2 and summary.succeeded == 2
+    assert sorted(read_run(summary.run_dir).by_utt()) == ["t:003", "t:004"]
+    # Re-running the same trial sends nothing new; a larger limit sends only the extra ones.
+    assert run(tmp_path, FakeAdapter(), manifest, limit=2).attempted == 0
+    assert run(tmp_path, FakeAdapter(), manifest, limit=4).attempted == 2
+
+
+def test_limit_must_be_positive(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="limit"):
+        run(tmp_path, FakeAdapter(), utts(2), limit=0)

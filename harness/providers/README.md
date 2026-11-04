@@ -37,7 +37,7 @@ cp .env.example .env   # fill DEEPGRAM_API_KEY etc.; never commit .env
 set -a; source .env; set +a
 ./data/fetch_primock57.sh            # audio needs git-lfs (~1.1 GB)
 
-# 1. Trial: 5 utterances, check the raw responses look like the fixtures
+# 1. Trial: 5 scorable utterances (excluded rows do not count), check the raw responses look like the fixtures
 uv run python -m harness.providers.runner --config deepgram_nova3_batch \
     --manifest data/manifests/primock57.jsonl --data-root data/raw --results results/ --limit 5
 
