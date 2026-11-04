@@ -26,6 +26,25 @@ configs:
     provider: deepgram
     model_id: nova-3
     mode: batch
+    settings: {smart_format: true, punctuate: true, keyterms: lexicon}
+    pricing:
+      amount: 0.0043
+      unit: minute
+      billing_basis: audio_duration
+      source: https://dynalord.com/blog/deepgram-pricing
+      as_of: 2026-10-06
+    output_date_order: mdy  # smart_format writes 04/20/1980 even for en-GB audio (observed 2026-11-04)
+    env_key: DEEPGRAM_API_KEY
+    verify: true
+    notes: >-
+      ORACLE: boosts the profile's scoring lexicon, which for healthcare_intake was drawn from
+      PriMock57's own transcripts, so its gain on PriMock57 is an upper bound. Compare with
+      deepgram_nova3_batch_keyterms_common. Price and any keyterm surcharge unverified.
+
+  - config_id: deepgram_nova3_batch_keyterms_common
+    provider: deepgram
+    model_id: nova-3
+    mode: batch
     settings: {smart_format: true, punctuate: true, keyterms: profile}
     pricing:
       amount: 0.0043
@@ -37,8 +56,8 @@ configs:
     env_key: DEEPGRAM_API_KEY
     verify: true
     notes: >-
-      Same as deepgram_nova3_batch plus the profile's keyterms. API params live-checked
-      2026-11-04 (docs/RESEARCH.md); price and any keyterm surcharge still unverified.
+      Boosts the profile's keyterm list (healthcare_intake: data/lexicons/common_uk_generics.txt,
+      written without reference to the test set): what a deployment could know in advance.
 
   - config_id: assemblyai_batch
     provider: assemblyai

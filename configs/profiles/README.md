@@ -32,7 +32,7 @@ List of categories; names are lowercase snake_case and unique. Each has a `kind`
 A category's **signature** is its builtin type (so `date_of_birth` and `due_date` both have signature `date`) or, for lexicon/regex, its name. Suite matching compares signatures.
 
 ## Other fields
-- `keyterms`: explicit STT boost list. If absent, `keyterm_list()` uses every lexicon term.
+- `keyterms` / `keyterms_path` (one or neither): explicit STT boost list, inline or as a lexicon-format file. If both are absent, `keyterm_list()` uses every lexicon term. If a scoring lexicon was drawn from the evaluation audio's own transcripts, boosting with it is an oracle upper bound: give an independent `keyterms_path` (healthcare_intake does). Registry configs pick the source with `keyterms: profile` (this list) or `keyterms: lexicon` (the scoring lexicon, `lexicon_terms()`), and runs record the exact list in `run.json`.
 - `conversation_scripts`: path to scripted conversations for LLM checks (format defined in M3).
 - `audio.manifest_path`: customer audio manifest (`harness/datasets/README.md`). Absent → no-audio mode.
 - `reference_suite`: force a suite instead of matching.

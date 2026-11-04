@@ -44,7 +44,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | fake_b | date_of_birth | 100.0% [20.7, 100.0] | 1/1 | 0.0% | 0.0% [0.0, 79.3] |
 | fake_b | phone | no instances | 0 | - | - |
 
-Boosted keyterms written where the speaker didn't say them: fake_a 0, fake_b 0.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): fake_a 0, fake_b 0.
 
 ### doctor (real)
 
@@ -72,7 +72,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | fake_b | date_of_birth | no instances | 0 | - | - |
 | fake_b | phone | no instances | 0 | - | - |
 
-Boosted keyterms written where the speaker didn't say them: fake_a 0, fake_b 0.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): fake_a 0, fake_b 0.
 
 ### patient (real)
 
@@ -100,7 +100,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | fake_b | date_of_birth | 100.0% [20.7, 100.0] | 1/1 | 0.0% | 0.0% [0.0, 79.3] |
 | fake_b | phone | no instances | 0 | - | - |
 
-Boosted keyterms written where the speaker didn't say them: fake_a 0, fake_b 0.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): fake_a 0, fake_b 0.
 
 ## Synthetic audio (TTS-generated; not comparable to real audio)
 
@@ -130,7 +130,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | fake_b | date_of_birth | no instances | 0 | - | - |
 | fake_b | phone | 0.0% [0.0, 79.3] | 0/1 | 9.1% | 0.0% [0.0, 79.3] |
 
-Boosted keyterms written where the speaker didn't say them: fake_a 0, fake_b 1.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): fake_a 0, fake_b 1.
 
 ## Worst utterances
 

@@ -242,3 +242,29 @@ def test_profile_is_immutable() -> None:
     p: Profile = parse_profile(minimal(), Path("."))
     with pytest.raises(ValueError):
         p.reference_suite = "x"  # type: ignore[misc]
+
+
+def test_keyterms_path_is_the_boost_list_and_lexicon_terms_stay_for_scoring(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "boost.txt").write_text("# header\nAtorvastatin\nparacetamol\n")
+    (tmp_path / "score.txt").write_text("paracetamol\nventolin\n")
+    data = with_(minimal(), "keyterms_path", "boost.txt")
+    data["entities"] = [{"name": "drug", "kind": "lexicon", "lexicon_path": "score.txt"}]
+    p = load_profile(write(tmp_path, data))
+    assert p.keyterm_list() == ["atorvastatin", "paracetamol"]
+    assert p.lexicon_terms() == ["paracetamol", "ventolin"]
+    assert ("keyterms_path", "boost.txt") in p.referenced_paths()
+
+
+def test_keyterms_and_keyterms_path_are_exclusive() -> None:
+    data = with_(with_(minimal(), "keyterms", ["a"]), "keyterms_path", "b.txt")
+    with pytest.raises(ValueError, match="not both"):
+        parse_profile(data, Path("."))
+
+
+def test_healthcare_boost_list_is_independent_of_the_scoring_lexicon() -> None:
+    p = load_profile(HEALTHCARE)
+    assert p.keyterms_path is not None and "common_uk_generics" in p.keyterms_path
+    assert p.keyterm_list() != p.lexicon_terms()
+    assert "ventolin" in p.lexicon_terms() and "ventolin" not in p.keyterm_list()

@@ -157,6 +157,7 @@ class Profile(_Strict):
     constraints: Constraints = Field(default_factory=Constraints)
     entities: list[EntityCategory] = Field(default_factory=list)
     keyterms: list[str] | None = None
+    keyterms_path: str | None = None  # lexicon-format boost list; exclusive with `keyterms`
     conversation_scripts: str | None = None
     audio: AudioSource | None = None
     reference_suite: str | None = None
@@ -169,6 +170,8 @@ class Profile(_Strict):
         dupes = sorted({n for n in names if names.count(n) > 1})
         if dupes:
             raise ValueError(f"duplicate entity names: {dupes}")
+        if self.keyterms is not None and self.keyterms_path is not None:
+            raise ValueError("set keyterms or keyterms_path, not both")
         unknown = sorted(set(self.constraints.stt.min_entity_recall) - set(names))
         if unknown:
             raise ValueError(f"min_entity_recall references undefined entities: {unknown}")
@@ -186,17 +189,27 @@ class Profile(_Strict):
     def referenced_paths(self) -> list[tuple[str, str]]:
         """(field, path) for every file the profile points at."""
         refs = [(f"entities.{e.name}.lexicon_path", e.lexicon_path) for e in self.entities]
+        refs.append(("keyterms_path", self.keyterms_path))
         refs.append(("conversation_scripts", self.conversation_scripts))
         refs.append(("audio.manifest_path", self.audio.manifest_path if self.audio else None))
         return [(field, path) for field, path in refs if path is not None]
 
     def keyterm_list(self) -> list[str]:
-        """Explicit `keyterms` if given, else every term from the lexicon entities.
+        """The STT boost list: `keyterms`, else the `keyterms_path` file, else every term from
+        the lexicon entities.
 
         Lexicon files: one term per line, `#` starts a comment line, blanks ignored.
+        Boosting with the lexicon used for scoring measures an upper bound when the lexicon was
+        drawn from the test audio's transcripts; prefer an independent `keyterms_path`.
         """
         if self.keyterms is not None:
             return list(self.keyterms)
+        if self.keyterms_path is not None:
+            return sorted(set(read_lexicon(self.resolve_path(self.keyterms_path))))
+        return self.lexicon_terms()
+
+    def lexicon_terms(self) -> list[str]:
+        """Every term from the lexicon entities (the scoring vocabulary)."""
         terms: set[str] = set()
         for e in self.entities:
             if e.lexicon_path is not None:

@@ -57,7 +57,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 {% endfor %}
 {% endfor %}
 
-Boosted keyterms written where the speaker didn't say them: {% for c in g.configs %}{{ c.config_id }} {{ c.keyterm_false }}{{ ", " if not loop.last }}{% endfor %}.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): {% for c in g.configs %}{{ c.config_id }} {{ c.keyterm_false }}{{ ", " if not loop.last }}{% endfor %}.
 {% endif %}
 {% endfor %}
 {% endif %}

@@ -277,13 +277,19 @@ def build_report(
     scorable = [u for u in manifest if u.exclude_reason is None]
     covered = [u for u in scorable if all(u.utt_id in rows[c] for c in configs)]
     taggers = _Taggers(profile) if profile is not None and profile.entities else None
-    keyterms = profile.keyterm_list() if profile is not None else []
+    # False keyterm insertions are counted against what each run boosted (run.json), or, for a
+    # run without boosting, against the profile's boost list as a baseline.
+    default_keyterms = profile.keyterm_list() if profile is not None else []
+    keyterms = {
+        r.meta.config_id: r.meta.keyterms if r.meta.keyterms is not None else default_keyterms
+        for r in runs
+    }
     categories = [e.name for e in profile.entities] if profile is not None else []
 
     hyp_orders = {c: (hyp_date_orders or {}).get(c) for c in configs}
     scored = {
         c: {
-            u.utt_id: _score_one(u, rows[c][u.utt_id], taggers, keyterms, hyp_orders[c])
+            u.utt_id: _score_one(u, rows[c][u.utt_id], taggers, keyterms[c], hyp_orders[c])
             for u in covered
         }
         for c in configs

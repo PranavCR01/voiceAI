@@ -317,3 +317,42 @@ def test_empty_transcript_on_speech_is_flagged_not_retried(tmp_path: Path) -> No
     assert rows[speech.utt_id].suspect_empty and rows[speech.utt_id].error is None
     assert not rows[filler.utt_id].suspect_empty  # empty is correct for a filler
     assert run(tmp_path, EmptyAdapter(), [speech, filler], retry_failed=True).attempted == 0
+
+
+def test_profile_keyterms_by_source(tmp_path: Path) -> None:
+    from harness.providers.runner import profile_keyterms
+    from recommender.profile import parse_profile
+
+    (tmp_path / "boost.txt").write_text("atorvastatin\n")
+    (tmp_path / "score.txt").write_text("ventolin\n")
+    profile = parse_profile(
+        {
+            "use_case": {
+                "name": "x",
+                "domain": "y",
+                "channel": "telephony_8k",
+                "languages": ["en"],
+                "avg_call_minutes": 3,
+                "agent_talk_ratio": 0.5,
+            },
+            "keyterms_path": "boost.txt",
+            "entities": [{"name": "drug", "kind": "lexicon", "lexicon_path": "score.txt"}],
+        },
+        tmp_path,
+    )
+
+    def cfg(**settings: Any) -> ProviderConfig:
+        return CONFIG.model_copy(update={"settings": settings})
+
+    assert profile_keyterms(cfg(keyterms="profile"), profile) == ["atorvastatin"]
+    assert profile_keyterms(cfg(keyterms="lexicon"), profile) == ["ventolin"]
+    assert profile_keyterms(cfg(keyterms=["inline"]), profile) is None
+    assert profile_keyterms(cfg(), profile) is None
+
+
+def test_boost_list_recorded_and_resume_refuses_a_different_list(tmp_path: Path) -> None:
+    summary = run(tmp_path, FakeAdapter(), utts(2), keyterms=["a", "b"])
+    assert read_run(summary.run_dir).meta.keyterms == ["a", "b"]
+    with pytest.raises(RunConflictError, match="keyterms"):
+        run(tmp_path, FakeAdapter(), utts(3), keyterms=["a"])
+    assert run(tmp_path, FakeAdapter(), utts(3), keyterms=["a", "b"]).attempted == 1

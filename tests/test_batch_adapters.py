@@ -153,6 +153,9 @@ def test_unknown_settings_rejected(cls: Any) -> None:
 def test_profile_keyterms_require_a_profile(cls: Any) -> None:
     with pytest.raises(ValueError, match="needs --profile"):
         cls(config("x", keyterms="profile"), "K")
+    with pytest.raises(ValueError, match="needs --profile"):
+        cls(config("x", keyterms="lexicon"), "K")
+    assert cls(config("x", keyterms="lexicon"), "K", keyterms=["z"]).keyterms == ["z"]
     with pytest.raises(ValueError, match="list of strings"):
         cls(config("x", keyterms=5), "K")
     assert cls(config("x", keyterms=["a", "b"]), "K").keyterms == ["a", "b"]

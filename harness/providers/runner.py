@@ -35,7 +35,7 @@ from harness.providers.deepgram_batch import DeepgramBatch
 from harness.providers.elevenlabs_batch import ElevenLabsBatch
 from harness.providers.registry import Mode, ProviderConfig, load_registry
 from harness.results import RUN_META, ResultRow, RunMeta, read_run, write_run
-from recommender.profile import load_profile
+from recommender.profile import Profile, load_profile
 
 ClipLoader = Callable[[Utterance], Awaitable[Any]]
 Sleep = Callable[[float], Awaitable[None]]
@@ -83,7 +83,13 @@ def raw_filename(utt_id: str, suffix: str) -> str:
     return utt_id.replace(":", "__").replace("/", "_") + suffix
 
 
-def _meta_for(config: ProviderConfig, run_id: str, manifest_label: str, sha: str) -> RunMeta:
+def _meta_for(
+    config: ProviderConfig,
+    run_id: str,
+    manifest_label: str,
+    sha: str,
+    keyterms: list[str] | None = None,
+) -> RunMeta:
     return RunMeta(
         run_id=run_id,
         config_id=config.config_id,
@@ -94,10 +100,13 @@ def _meta_for(config: ProviderConfig, run_id: str, manifest_label: str, sha: str
         created_at=datetime.now(UTC),
         git_sha=sha,
         manifest=manifest_label,
+        keyterms=keyterms,
     )
 
 
-def _check_resumable(existing: RunMeta, config: ProviderConfig) -> None:
+def _check_resumable(
+    existing: RunMeta, config: ProviderConfig, keyterms: list[str] | None = None
+) -> None:
     mismatches = [
         name
         for name, old, new in [
@@ -106,6 +115,7 @@ def _check_resumable(existing: RunMeta, config: ProviderConfig) -> None:
             ("model_id", existing.model_id, config.model_id),
             ("mode", existing.mode, config.mode.value),
             ("settings", existing.settings, dict(config.settings)),
+            ("keyterms", existing.keyterms, keyterms),
         ]
         if old != new
     ]
@@ -153,7 +163,9 @@ async def run_batch(
     flush_every: int = 20,
     sleep: Sleep = asyncio.sleep,
     sha: str | None = None,
+    keyterms: list[str] | None = None,
 ) -> RunSummary:
+    """`keyterms`: the boost list the adapter was built with, recorded in run.json."""
     if config.mode is not Mode.BATCH:
         raise ValueError(f"{config.config_id} is a {config.mode} config; this runner is batch-only")
     if concurrency < 1 or max_attempts < 1 or flush_every < 1:
@@ -166,11 +178,11 @@ async def run_batch(
     rows: dict[str, ResultRow] = {}
     if (run_dir / RUN_META).exists():
         existing = read_run(run_dir)
-        _check_resumable(existing.meta, config)
+        _check_resumable(existing.meta, config, keyterms)
         meta = existing.meta
         rows = {r.utt_id: r for r in existing.rows if not (retry_failed and r.error is not None)}
     else:
-        meta = _meta_for(config, run_id, manifest_label, sha or git_sha())
+        meta = _meta_for(config, run_id, manifest_label, sha or git_sha(), keyterms)
 
     skipped_excluded = (
         sum(u.exclude_reason is not None for u in manifest) if not include_excluded else 0
@@ -255,6 +267,17 @@ async def run_batch(
     )
 
 
+def profile_keyterms(config: ProviderConfig, profile: Profile) -> list[str] | None:
+    """The list a config's `keyterms` setting names: "profile" -> the profile's boost list,
+    "lexicon" -> its scoring lexicon. None when the setting is absent or an inline list."""
+    source = config.settings.get("keyterms")
+    if source == "profile":
+        return profile.keyterm_list()
+    if source == "lexicon":
+        return profile.lexicon_terms()
+    return None
+
+
 def audio_loader(data_root: Path) -> ClipLoader:
     """Clip loader for real runs: decodes off the event loop (ffmpeg is blocking)."""
 
@@ -281,7 +304,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
     parser.add_argument("--include-excluded", action="store_true")
     parser.add_argument("--retry-failed", action="store_true")
-    parser.add_argument("--profile", type=Path, help="profile whose keyterms 'profile' refers to")
+    parser.add_argument(
+        "--profile", type=Path, help="profile for keyterms 'profile' (boost list) or 'lexicon'"
+    )
     args = parser.parse_args(argv)
 
     config = load_registry(args.registry).get(args.config)
@@ -293,7 +318,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     api_key = os.environ.get(config.env_key)
     if not api_key:
         raise SystemExit(f"set {config.env_key} (see .env.example)")
-    keyterms = load_profile(args.profile).keyterm_list() if args.profile else None
+    keyterms = profile_keyterms(config, load_profile(args.profile)) if args.profile else None
     try:
         adapter = factory(config, api_key, keyterms)
     except ValueError as e:
@@ -312,6 +337,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             include_excluded=args.include_excluded,
             limit=args.limit,
             retry_failed=args.retry_failed,
+            keyterms=keyterms,
         )
     )
     print(

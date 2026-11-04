@@ -15,6 +15,11 @@ results/**
 !results/*/
 !results/*/run.json
 !results/*/results.parquet
+# Repeat runs of a config (run-to-run noise), kept apart because a report takes one run per config.
+results_retest/**
+!results_retest/*/
+!results_retest/*/run.json
+!results_retest/*/results.parquet
 
 # Python
 __pycache__/

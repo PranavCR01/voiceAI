@@ -44,6 +44,10 @@ class RunMeta(BaseModel):
     created_at: datetime
     git_sha: str = Field(min_length=7)
     manifest: str  # path or name of the manifest the run used
+    # The exact boost list sent, when settings name a profile source ("profile"/"lexicon"),
+    # since the profile can change after the run. None: no keyterms, or recorded before
+    # 2026-11-04 (see docs/DECISIONS.md for those runs).
+    keyterms: list[str] | None = None
 
 
 class ResultRow(BaseModel):

@@ -2,6 +2,13 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-04 — Keyterm boost list separated from the scoring lexicon
+- `healthcare_intake` now boosts with `data/lexicons/common_uk_generics.txt` (new profile field `keyterms_path`): 86 common UK primary-care generics written without reference to PriMock57, since openFDA, NHSBSA and OpenPrescribing were unreachable. It shares 25 of the scoring lexicon's 49 terms; the other 24 are mostly brands (Ventolin, Piriton, Cerazette), US names (acetaminophen) and spelling variants, which a deployment can't predict. Weakness: hand-written, not ranked by a public dataset. Replace it with a ranked list when one is reachable. Scoring still uses `medications.txt`.
+- Registry `keyterms:` takes `profile` (the boost list) or `lexicon` (the scoring lexicon, i.e. the oracle). `deepgram_nova3_batch_keyterms` is now `keyterms: lexicon`; the new `deepgram_nova3_batch_keyterms_common` is `keyterms: profile`.
+- **Runs now record the exact boosted list** (`run.json` `keyterms`), and resume refuses a different list. Reason: `"profile"` alone stops describing a run as soon as the profile changes.
+- **Relabeled one recorded run:** `results/deepgram-nova3-batch-keyterms/run.json` had `keyterms: profile`, which at its git SHA (8f09f37; profile and lexicon unchanged since) resolved to the 49 lexicon terms. Its settings now read `lexicon` and its `keyterms` field lists those 49 terms. The hypotheses are untouched.
+- The report counts false keyterm insertions against each run's own list. A run without boosting is counted against the profile's boost list as a baseline.
+
 ## 2026-11-04 — Equivalence layer checked rule by rule: the WER gap is one spelling convention
 New diagnostic `python -m harness.metrics.equivalence_breakdown` (output: `reports/generated/equivalence_breakdown.md`). For each rule it reports WER with that rule off, how many utterances it helps or hurts, and the changed utterances, so the matches can be read. A WER drop alone can't show a rule is right, since an over-matching rule also lowers WER. Rules are switchable via `normalize(disable=...)`, for diagnostics only.
 

@@ -1,0 +1,105 @@
+# Common UK primary-care generic drug names: keyterm BOOST list, independent of the test set.
+# Written 2026-11-04 from general knowledge of commonly prescribed generics, grouped by BNF
+# chapter, without consulting PriMock57 transcripts or data/lexicons/medications.txt (whose
+# first 10 entries the author had seen). Not ranked by a public dataset: openFDA, NHSBSA and
+# OpenPrescribing were unreachable from the session. The five most-dispensed items in England in
+# 2024/25 per NHSBSA (atorvastatin, amlodipine, lansoprazole, omeprazole, ramipril; via web
+# search, see docs/RESEARCH.md) are included. Replace with a ranked public list when reachable.
+# Purpose: boost with a list a real deployment could know in advance; scoring still uses
+# medications.txt. Generic names only, no brands. See docs/DECISIONS.md 2026-11-04.
+#
+# 2 cardiovascular
+atorvastatin
+simvastatin
+rosuvastatin
+amlodipine
+ramipril
+lisinopril
+losartan
+candesartan
+bisoprolol
+atenolol
+bendroflumethiazide
+indapamide
+furosemide
+doxazosin
+apixaban
+rivaroxaban
+edoxaban
+warfarin
+clopidogrel
+aspirin
+digoxin
+# 1 gastro-intestinal
+omeprazole
+lansoprazole
+loperamide
+mebeverine
+hyoscine
+lactulose
+senna
+metoclopramide
+domperidone
+ondansetron
+# 3 respiratory and allergy
+salbutamol
+beclometasone
+budesonide
+fluticasone
+montelukast
+tiotropium
+cetirizine
+loratadine
+fexofenadine
+chlorphenamine
+# 4 central nervous system
+sertraline
+citalopram
+fluoxetine
+mirtazapine
+amitriptyline
+venlafaxine
+duloxetine
+gabapentin
+pregabalin
+zopiclone
+diazepam
+propranolol
+sumatriptan
+paracetamol
+ibuprofen
+naproxen
+diclofenac
+codeine
+co-codamol
+tramadol
+morphine
+# 5 infections
+amoxicillin
+flucloxacillin
+clarithromycin
+doxycycline
+nitrofurantoin
+trimethoprim
+metronidazole
+cefalexin
+aciclovir
+fluconazole
+# 6 endocrine
+metformin
+gliclazide
+dapagliflozin
+empagliflozin
+insulin
+levothyroxine
+prednisolone
+# 7 genito-urinary
+tamsulosin
+finasteride
+levonorgestrel
+# 9 nutrition and blood
+colecalciferol
+folic acid
+ferrous sulfate
+# 13 skin
+hydrocortisone

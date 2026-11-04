@@ -40,6 +40,10 @@ constraints:
     min_entity_pronunciation: 0.98
     voice: [en-US, warm, calm]
 
+# STT boost list, independent of the test audio (the medication lexicon below is for scoring and
+# was drawn from PriMock57's transcripts; boosting with it is an oracle upper bound).
+keyterms_path: ../../data/lexicons/common_uk_generics.txt
+
 entities:
   - name: medication
     kind: lexicon

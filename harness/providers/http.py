@@ -31,20 +31,26 @@ def no_base_url(provider: str, base_url: str | None) -> None:
         raise ValueError(f"{provider}: base_url is not supported by this adapter")
 
 
+# "profile": the profile's boost list (`Profile.keyterm_list`). "lexicon": the profile's scoring
+# lexicon (`Profile.lexicon_terms`), an oracle upper bound when the lexicon came from the test set.
+PROFILE_KEYTERM_SOURCES = ("profile", "lexicon")
+
+
 def resolve_keyterms(
     provider: str, settings: Mapping[str, JsonValue], keyterms: list[str] | None
 ) -> list[str]:
-    """`keyterms: "profile"` means the profile's keyterm list; a list is used as given."""
+    """`keyterms: "profile"` or `"lexicon"` means the list the runner resolved from the profile
+    (`profile_keyterms`); a list is used as given."""
     value = settings.get("keyterms")
     if value is None:
         return []
-    if value == "profile":
+    if value in PROFILE_KEYTERM_SOURCES:
         if not keyterms:
-            raise ValueError(f"{provider}: keyterms 'profile' needs --profile with keyterms")
+            raise ValueError(f"{provider}: keyterms {value!r} needs --profile with keyterms")
         return list(keyterms)
     if isinstance(value, list) and all(isinstance(v, str) for v in value):
         return [str(v) for v in value]
-    raise ValueError(f"{provider}: keyterms must be 'profile' or a list of strings")
+    raise ValueError(f"{provider}: keyterms must be 'profile', 'lexicon' or a list of strings")
 
 
 def raise_for_status(response: httpx.Response, provider: str) -> None:
