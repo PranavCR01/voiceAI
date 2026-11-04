@@ -1,12 +1,13 @@
 # Offline STT accuracy report
 
-- **Generated:** 2026-11-04 23:21 UTC
+- **Generated:** 2026-11-04 23:25 UTC
 - **Manifest:** `data/manifests/primock57.jsonl` (7108 utterances; excluded from scoring: inaudible 706, unintelligible 1147)
 - **Profile:** `configs/profiles/healthcare_intake.yaml`
 - **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v3/dmy,hyp-mdy`
 - **Leaderboard-comparable WER:** `whisper-normalizer==0.1.15/EnglishTextNormalizer`
 - **Intervals:** 95% paired percentile bootstrap, 10000 resamples, seed 0, resampling whole speakers. Pairwise p-values Holm-adjusted within each table. "Tie" = difference interval includes 0. No winner is called with fewer than 10 speakers in a table.
 - **Failed requests** are scored as empty transcripts (every reference word deleted).
+- **Empty on speech:** successful requests that returned no text although the normalized reference has words (Wilson interval, not clustered). An empty transcript for "Um." is correct and not counted. These rows are scored as they came back, never selectively re-run.
 
 ## Configurations
 
@@ -21,10 +22,10 @@
 
 114 speakers.
 
-| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
-|---|---|---|---|---|---|---|
-| deepgram_nova3_batch | 7.4% [6.8, 8.1] | 10.2% | 12.2% | 5255 | 56798 | 0 |
-| deepgram_nova3_batch_keyterms | 7.4% [6.8, 8.1] | 10.2% | 12.3% | 5255 | 56798 | 0 |
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed | Empty on speech [95% CI] |
+|---|---|---|---|---|---|---|---|
+| deepgram_nova3_batch | 7.4% [6.8, 8.1] | 10.2% | 12.2% | 5255 | 56798 | 0 | 1.1% [0.9, 1.4] (57/5105) |
+| deepgram_nova3_batch_keyterms | 7.4% [6.8, 8.1] | 10.2% | 12.3% | 5255 | 56798 | 0 | 1.2% [1.0, 1.6] (63/5105) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
@@ -49,10 +50,10 @@ Boosted keyterms written where the speaker didn't say them: deepgram_nova3_batch
 
 57 speakers.
 
-| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
-|---|---|---|---|---|---|---|
-| deepgram_nova3_batch | 6.5% [5.7, 7.4] | 10.2% | 9.3% | 2615 | 33869 | 0 |
-| deepgram_nova3_batch_keyterms | 6.6% [5.8, 7.5] | 10.3% | 9.3% | 2615 | 33869 | 0 |
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed | Empty on speech [95% CI] |
+|---|---|---|---|---|---|---|---|
+| deepgram_nova3_batch | 6.5% [5.7, 7.4] | 10.2% | 9.3% | 2615 | 33869 | 0 | 0.6% [0.4, 1.0] (16/2570) |
+| deepgram_nova3_batch_keyterms | 6.6% [5.8, 7.5] | 10.3% | 9.3% | 2615 | 33869 | 0 | 0.7% [0.4, 1.1] (18/2570) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
@@ -77,10 +78,10 @@ Boosted keyterms written where the speaker didn't say them: deepgram_nova3_batch
 
 57 speakers.
 
-| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
-|---|---|---|---|---|---|---|
-| deepgram_nova3_batch | 8.8% [7.7, 9.9] | 10.2% | 15.2% | 2640 | 22929 | 0 |
-| deepgram_nova3_batch_keyterms | 8.7% [7.7, 9.8] | 10.2% | 15.2% | 2640 | 22929 | 0 |
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed | Empty on speech [95% CI] |
+|---|---|---|---|---|---|---|---|
+| deepgram_nova3_batch | 8.8% [7.7, 9.9] | 10.2% | 15.2% | 2640 | 22929 | 0 | 1.6% [1.2, 2.2] (41/2535) |
+| deepgram_nova3_batch_keyterms | 8.7% [7.7, 9.8] | 10.2% | 15.2% | 2640 | 22929 | 0 | 1.8% [1.3, 2.4] (45/2535) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|

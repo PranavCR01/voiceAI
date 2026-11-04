@@ -7,6 +7,7 @@
 - **Leaderboard-comparable WER:** `whisper-normalizer==0.1.15/EnglishTextNormalizer`
 - **Intervals:** 95% paired percentile bootstrap, 2000 resamples, seed 0, resampling whole speakers. Pairwise p-values Holm-adjusted within each table. "Tie" = difference interval includes 0. No winner is called with fewer than 10 speakers in a table.
 - **Failed requests** are scored as empty transcripts (every reference word deleted).
+- **Empty on speech:** successful requests that returned no text although the normalized reference has words (Wilson interval, not clustered). An empty transcript for "Um." is correct and not counted. These rows are scored as they came back, never selectively re-run.
 
 ## Configurations
 
@@ -21,10 +22,10 @@
 
 4 speakers.
 
-| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
-|---|---|---|---|---|---|---|
-| fake_a | 2.3% [0.0, 4.9] | 6.8% | 1.9% | 6 | 43 | 0 |
-| fake_b | 20.9% [0.0, 50.0] | 20.5% | 27.1% | 6 | 43 | 1 |
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed | Empty on speech [95% CI] |
+|---|---|---|---|---|---|---|---|
+| fake_a | 2.3% [0.0, 4.9] | 6.8% | 1.9% | 6 | 43 | 0 | 0.0% [0.0, 39.0] (0/6) |
+| fake_b | 20.9% [0.0, 50.0] | 20.5% | 27.1% | 6 | 43 | 1 | 0.0% [0.0, 43.4] (0/5) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
@@ -49,10 +50,10 @@ Boosted keyterms written where the speaker didn't say them: fake_a 0, fake_b 0.
 
 2 speakers.
 
-| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
-|---|---|---|---|---|---|---|
-| fake_a | 0.0% [0.0, 0.0] | 0.0% | 0.0% | 2 | 11 | 0 |
-| fake_b | 18.2% [0.0, 50.0] | 18.2% | 25.0% | 2 | 11 | 0 |
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed | Empty on speech [95% CI] |
+|---|---|---|---|---|---|---|---|
+| fake_a | 0.0% [0.0, 0.0] | 0.0% | 0.0% | 2 | 11 | 0 | 0.0% [0.0, 65.8] (0/2) |
+| fake_b | 18.2% [0.0, 50.0] | 18.2% | 25.0% | 2 | 11 | 0 | 0.0% [0.0, 65.8] (0/2) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
@@ -77,10 +78,10 @@ Boosted keyterms written where the speaker didn't say them: fake_a 0, fake_b 0.
 
 2 speakers.
 
-| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
-|---|---|---|---|---|---|---|
-| fake_a | 3.1% [0.0, 5.6] | 9.1% | 2.8% | 4 | 32 | 0 |
-| fake_b | 21.9% [0.0, 50.0] | 21.2% | 28.1% | 4 | 32 | 1 |
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed | Empty on speech [95% CI] |
+|---|---|---|---|---|---|---|---|
+| fake_a | 3.1% [0.0, 5.6] | 9.1% | 2.8% | 4 | 32 | 0 | 0.0% [0.0, 49.0] (0/4) |
+| fake_b | 21.9% [0.0, 50.0] | 21.2% | 28.1% | 4 | 32 | 1 | 0.0% [0.0, 56.1] (0/3) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
@@ -107,10 +108,10 @@ Boosted keyterms written where the speaker didn't say them: fake_a 0, fake_b 0.
 
 2 speakers.
 
-| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
-|---|---|---|---|---|---|---|
-| fake_a | 0.0% [0.0, 0.0] | 0.0% | 0.0% | 2 | 13 | 0 |
-| fake_b | 23.1% [16.7, 28.6] | 35.7% | 22.6% | 2 | 13 | 0 |
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed | Empty on speech [95% CI] |
+|---|---|---|---|---|---|---|---|
+| fake_a | 0.0% [0.0, 0.0] | 0.0% | 0.0% | 2 | 13 | 0 | 0.0% [0.0, 65.8] (0/2) |
+| fake_b | 23.1% [16.7, 28.6] | 35.7% | 22.6% | 2 | 13 | 0 | 0.0% [0.0, 65.8] (0/2) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|

@@ -184,3 +184,44 @@ def test_hypothesis_date_order_per_config(tmp_path: Path) -> None:
     assert cfg["plain"].entities["date_of_birth"].recovered == 0
     assert any(n.endswith("/dmy,hyp-mdy") for n in data.normalizer_ids)
     assert "| mdy |" in render(data) and "| as reference |" in render(data)
+
+
+def test_empty_on_speech_rate(tmp_path: Path) -> None:
+    from datetime import UTC, datetime
+
+    from harness.datasets.manifest import Utterance
+
+    def utt(i: int, ref: str) -> Utterance:
+        return Utterance(
+            utt_id=f"x:{i}",
+            dataset="x",
+            subset="s",
+            speaker_id=f"s{i}",
+            audio_path=f"x/{i}.wav",
+            ref_text=ref,
+            sample_rate=16000,
+            license="CC-BY-4.0",
+        )
+
+    manifest = [utt(1, "Yes please."), utt(2, "Um."), utt(3, "No thanks."), utt(4, "Okay.")]
+    meta = RunMeta(
+        run_id="r",
+        config_id="c",
+        provider="p",
+        model_id="m",
+        mode="batch",
+        created_at=datetime(2026, 11, 4, tzinfo=UTC),
+        git_sha="abcdef0",
+        manifest="m",
+    )
+    rows = [
+        ResultRow(utt_id="x:1", hyp_text=""),  # empty on speech
+        ResultRow(utt_id="x:2", hyp_text=""),  # filler: correct, and not in the denominator
+        ResultRow(utt_id="x:3", hyp_text="No thanks."),
+        ResultRow(utt_id="x:4", hyp_text="", error="boom"),  # a failure, counted as failed
+    ]
+    write_run(tmp_path, meta, rows)
+    data = build_report(manifest, read_runs(tmp_path), manifest_label="m", n_resamples=50)
+    [c] = data.groups[0].configs
+    assert (c.empty_on_speech, c.n_speech, c.failed) == (1, 2, 1)
+    assert c.empty_on_speech_rate is not None and c.empty_on_speech_rate.estimate == 0.5

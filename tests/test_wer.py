@@ -3,6 +3,7 @@ import pytest
 from harness.metrics.wer import (
     AlignmentChunk,
     UttScore,
+    empty_on_speech,
     mean_utt_wer,
     pooled_wer,
     score_utterance,
@@ -100,3 +101,17 @@ def test_hypothesis_dates_read_in_the_providers_order() -> None:
         score_utterance(ref2, "the 05/06/1990", date_order="dmy", hyp_date_order="mdy").errors == 0
     )
     assert score_utterance(ref2, "the 05/06/1990", date_order="dmy").errors > 0
+
+
+@pytest.mark.parametrize(
+    ("ref", "hyp", "expected"),
+    [
+        ("Yeah.", "", True),
+        ("Yeah.", "  ", True),
+        ("Um.", "", False),  # filler: normalizes to nothing, so empty is correct
+        ("<UNSURE>Mm</UNSURE>.", "", False),
+        ("Yeah.", "Um.", False),  # the provider wrote something; WER handles it
+    ],
+)
+def test_empty_on_speech(ref: str, hyp: str, expected: bool) -> None:
+    assert empty_on_speech(ref, hyp) is expected

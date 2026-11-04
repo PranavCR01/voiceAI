@@ -109,6 +109,16 @@ def score_utterance(
     )
 
 
+def empty_on_speech(ref_text: str, hyp_text: str) -> bool:
+    """The provider returned nothing where the reference has words.
+
+    "Has words" is after normalization: Whisper drops fillers, so an empty hypothesis for a
+    reference of "Um." or "Mm." is correct, not a failure. The raw hypothesis is checked, so a
+    provider writing only "Um." is not counted as empty.
+    """
+    return not hyp_text.strip() and bool(normalize(ref_text))
+
+
 def pooled_wer(scores: Iterable[UttScore]) -> float:
     """Total errors / total reference words. Empty references contribute their insertions."""
     errors = n = 0

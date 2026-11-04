@@ -28,6 +28,7 @@ from typing import Any
 
 from harness.audio import AudioClip, AudioError, load_clip
 from harness.datasets.manifest import Utterance, read_manifest
+from harness.metrics.wer import empty_on_speech
 from harness.providers.assemblyai_batch import AssemblyAIBatch
 from harness.providers.base import BatchAdapter, PermanentError, RetryableError, Transcript
 from harness.providers.deepgram_batch import DeepgramBatch
@@ -60,6 +61,7 @@ class RunSummary:
     failed: int
     skipped_existing: int
     skipped_excluded: int
+    suspect_empty: int = 0  # succeeded, but empty although the reference has words
 
 
 def git_sha(cwd: Path | None = None) -> str:
@@ -225,6 +227,7 @@ async def run_batch(
                 raw_response_path=f"raw/{raw_name}",
                 started_at=started,
                 finished_at=datetime.now(UTC),
+                suspect_empty=empty_on_speech(utt.ref_text, tr.text),
             )
 
     async def record(utt: Utterance) -> None:
@@ -248,6 +251,7 @@ async def run_batch(
         failed=sum(r.error is not None for r in done),
         skipped_existing=skipped_existing,
         skipped_excluded=skipped_excluded,
+        suspect_empty=sum(r.suspect_empty for r in done),
     )
 
 
@@ -312,7 +316,8 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
     print(
         f"{summary.run_dir}: {summary.succeeded} ok, {summary.failed} failed, "
-        f"{summary.skipped_existing} already done, {summary.skipped_excluded} excluded"
+        f"{summary.skipped_existing} already done, {summary.skipped_excluded} excluded, "
+        f"{summary.suspect_empty} empty on speech (flagged, not retried)"
     )
 
 

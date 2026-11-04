@@ -298,3 +298,22 @@ def test_limit_counts_scorable_utterances(tmp_path: Path) -> None:
 def test_limit_must_be_positive(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="limit"):
         run(tmp_path, FakeAdapter(), utts(2), limit=0)
+
+
+class EmptyAdapter(FakeAdapter):
+    async def transcribe(self, clip: Any, settings: Mapping[str, JsonValue]) -> Transcript:
+        self.calls += 1
+        return Transcript(text="", raw={"id": clip.utt_id})
+
+
+def test_empty_transcript_on_speech_is_flagged_not_retried(tmp_path: Path) -> None:
+    speech, filler = utts(2)
+    filler = filler.model_copy(update={"ref_text": "Um."})
+    adapter = EmptyAdapter()
+    summary = run(tmp_path, adapter, [speech, filler])
+    assert adapter.calls == 2  # one attempt each: an empty 200 is not an error
+    assert (summary.succeeded, summary.failed, summary.suspect_empty) == (2, 0, 1)
+    rows = read_run(summary.run_dir).by_utt()
+    assert rows[speech.utt_id].suspect_empty and rows[speech.utt_id].error is None
+    assert not rows[filler.utt_id].suspect_empty  # empty is correct for a filler
+    assert run(tmp_path, EmptyAdapter(), [speech, filler], retry_failed=True).attempted == 0

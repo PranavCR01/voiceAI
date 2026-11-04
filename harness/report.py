@@ -37,7 +37,7 @@ from harness.metrics.entities import (
     summarize,
 )
 from harness.metrics.normalize import WHISPER_ID, DateOrder, date_order_for, normalizer_id
-from harness.metrics.stats import Interval, holm, paired_bootstrap
+from harness.metrics.stats import Interval, holm, paired_bootstrap, wilson_interval
 from harness.metrics.wer import UttScore, mean_utt_wer, pooled_wer, score_utterance
 from harness.providers.registry import load_registry
 from harness.results import ResultRow, Run, read_runs
@@ -74,6 +74,11 @@ class ConfigStats:
     failed: int
     entities: dict[str, CategorySummary]
     keyterm_false: int
+    # Successful requests returning no text where the reference has words (`empty_on_speech`),
+    # out of successful requests on references with words. Failures are counted in `failed`.
+    empty_on_speech: int
+    n_speech: int
+    empty_on_speech_rate: Interval | None
 
 
 @dataclass(frozen=True)
@@ -215,6 +220,8 @@ def _group_stats(
     stats = []
     for c in configs:
         items = [scored[c][u] for u in utt_ids]
+        speech = [s for s in items if s.row.error is None and s.score.n_ref > 0]
+        empty = sum(not s.row.hyp_text.strip() for s in speech)
         stats.append(
             ConfigStats(
                 config_id=c,
@@ -226,6 +233,9 @@ def _group_stats(
                 failed=sum(s.row.error is not None for s in items),
                 entities=summarize(o for s in items for o in s.entities),
                 keyterm_false=sum(s.keyterm_false for s in items),
+                empty_on_speech=empty,
+                n_speech=len(speech),
+                empty_on_speech_rate=wilson_interval(empty, len(speech)) if speech else None,
             )
         )
     diffs = list(boot.differences.values())

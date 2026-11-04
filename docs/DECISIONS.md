@@ -2,6 +2,12 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-04 — "Empty on speech" metric; runner flags `suspect_empty`
+- **Definition:** a successful request whose raw hypothesis is blank while the *normalized* reference has words (`harness.metrics.wer.empty_on_speech`). Rate = those / successful requests on references with words, Wilson 95% interval (not speaker-clustered). Failed requests are excluded here because they already count in "Failed".
+- **The proposed definition ("an empty hyp on a non-empty reference") overcounts by 2.5×.** Whisper drops fillers, so 88 of the 145 empty hypotheses in the plain run are on references like "Mm.", "Um", "<UNSURE>Um</UNSURE>", where empty is correct. Real rate on PriMock57: plain 1.1% [0.9, 1.4] (57/5,105), keyterms 1.2% [1.0, 1.6] (63/5,105); patient side 1.6–1.8%, doctor 0.6–0.7%. Most are 1-word backchannels ("Yeah", "Okay"); about 7–9 per config are 3+ words, e.g. the 11-word sentence in the #13 entry below.
+- **Runner:** sets `ResultRow.suspect_empty` with the same predicate, counts it in the run summary, and never retries those rows (retrying only the bad rows would be cherry-picking; `--retry-failed` leaves them alone). Runs recorded before today have no column and read as False. The report recomputes from text, so old runs score the same.
+- An agent hears silence on these turns, so for turn-taking this is a missed turn, not just WER. Reported per config so provider differences show up once more vendors run.
+
 ## 2026-11-04 — Dates: provider output order + spoken day-month order (equivalence v3)
 DOB recall on PriMock57 was 2/21 for both Deepgram configs; it is now 17/21 (81.0% [60.0, 92.3]). The 4 still missed are real: wrong month (November → June), wrong day (22 → 27), and two references whose transcript has no day while Deepgram wrote one.
 - **The fix proposed in the #13 entry below (read hypothesis dates month-first) was necessary but not sufficient: on its own it moves DOB recall from 2/21 to 2/21.** Most misses were word order: people say "the twentieth of April", formatters write "April 20, 1980", so a correct date cost two errors. Both changes were needed.

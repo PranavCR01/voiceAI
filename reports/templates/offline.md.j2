@@ -7,6 +7,7 @@
 - **Leaderboard-comparable WER:** `{{ d.whisper_id }}`
 - **Intervals:** 95% paired percentile bootstrap, {{ d.n_resamples }} resamples, seed {{ d.seed }}, {{ "resampling whole speakers" if d.cluster_by == "speaker" else "resampling utterances" }}. Pairwise p-values Holm-adjusted within each table. "Tie" = difference interval includes 0. No winner is called with fewer than {{ d.min_clusters }} {{ "speakers" if d.cluster_by == "speaker" else "utterances" }} in a table.
 - **Failed requests** are scored as empty transcripts (every reference word deleted).
+- **Empty on speech:** successful requests that returned no text although the normalized reference has words (Wilson interval, not clustered). An empty transcript for "Um." is correct and not counted. These rows are scored as they came back, never selectively re-run.
 
 ## Configurations
 
@@ -26,10 +27,10 @@
 
 {{ g.n_clusters }} {{ "speakers" if d.cluster_by == "speaker" else "utterances" }}.
 
-| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed |
-|---|---|---|---|---|---|---|
+| Config | WER [95% CI] | WER, Whisper-only | Mean utterance WER | Utterances | Ref words | Failed | Empty on speech [95% CI] |
+|---|---|---|---|---|---|---|---|
 {% for c in g.configs %}
-| {{ c.config_id }} | {{ c.wer | interval }} | {{ c.wer_whisper | pct }} | {{ c.mean_utt_wer | pct }} | {{ c.n_utts }} | {{ c.n_words }} | {{ c.failed }} |
+| {{ c.config_id }} | {{ c.wer | interval }} | {{ c.wer_whisper | pct }} | {{ c.mean_utt_wer | pct }} | {{ c.n_utts }} | {{ c.n_words }} | {{ c.failed }} | {{ (c.empty_on_speech_rate | interval) ~ " (" ~ c.empty_on_speech ~ "/" ~ c.n_speech ~ ")" if c.empty_on_speech_rate else "-" }} |
 {% endfor %}
 {% if g.pairs %}
 

@@ -70,3 +70,28 @@ def test_corrupt_run_dir(tmp_path: Path) -> None:
     (tmp_path / "r" / "run.json").write_text("{}")
     with pytest.raises(ResultsError):
         read_run(tmp_path / "r")
+
+
+def test_runs_recorded_before_suspect_empty_still_read(tmp_path: Path) -> None:
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    run_dir = tmp_path / "old"
+    run_dir.mkdir()
+    (run_dir / "run.json").write_text(
+        '{"run_id": "old", "config_id": "old", "provider": "p", "model_id": "m", "mode": "batch",'
+        ' "created_at": "2026-11-04T00:00:00Z", "git_sha": "abcdef0", "manifest": "m"}'
+    )
+    pq.write_table(
+        pa.table({"run_id": ["old"], "config_id": ["old"], "utt_id": ["x:1"], "hyp_text": [""]}),
+        run_dir / "results.parquet",
+    )
+    [row] = read_run(run_dir).rows
+    assert row.suspect_empty is False
+
+
+def test_suspect_empty_only_on_successful_empty_rows() -> None:
+    with pytest.raises(ValueError, match="suspect_empty"):
+        ResultRow(utt_id="x:1", hyp_text="hi", suspect_empty=True)
+    with pytest.raises(ValueError, match="suspect_empty"):
+        ResultRow(utt_id="x:1", hyp_text="", error="boom", suspect_empty=True)

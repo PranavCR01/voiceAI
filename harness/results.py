@@ -55,11 +55,17 @@ class ResultRow(BaseModel):
     started_at: datetime | None = None
     finished_at: datetime | None = None
     error: str | None = None  # set when the request failed; hyp_text is then ""
+    # The request succeeded but returned no text although the reference has words
+    # (`empty_on_speech`). Flagged, never retried: retrying only bad rows is cherry-picking.
+    # Absent (False) in runs recorded before 2026-11-04; the report recomputes it.
+    suspect_empty: bool = False
 
     @model_validator(mode="after")
     def _check(self) -> ResultRow:
         if self.error is not None and self.hyp_text:
             raise ValueError("a failed request (error set) must have an empty hyp_text")
+        if self.suspect_empty and (self.error is not None or self.hyp_text.strip()):
+            raise ValueError("suspect_empty marks a successful request with an empty hyp_text")
         if self.started_at and self.finished_at and self.finished_at < self.started_at:
             raise ValueError("finished_at is before started_at")
         return self
@@ -84,6 +90,7 @@ _FIELDS: list[pa.Field[Any]] = [
     pa.field("started_at", pa.timestamp("us", tz="UTC")),
     pa.field("finished_at", pa.timestamp("us", tz="UTC")),
     pa.field("error", pa.string()),
+    pa.field("suspect_empty", pa.bool_()),
 ]
 _SCHEMA = pa.schema(_FIELDS)
 
