@@ -2,6 +2,9 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-04 — Commit run results, not raw responses
+`results/<run_id>/run.json` and `results.parquet` are tracked; everything else under `results/` (the `raw/` provider responses) stays local and ignored. Reason: cloud containers are reclaimed, and the scoring follow-ups to #13 (per-provider date order, empty-transcript rate, equivalence-rule breakdown) need the hypotheses to re-score without paying for new runs. The two Deepgram runs are ~600 KB together. Raw responses are kept out because they carry provider request ids and are ~46 MB uncompressed; the cost is that anything needing word timings or confidences (e.g. telling a provider's empty response apart from a correctly empty transcript) can't be recomputed from the repo. Replaced: all of `results/` gitignored.
+
 ## 2026-11-04 — First live Deepgram batch run (#13): how to read the numbers
 Ran in a cloud session, not on the owner's machine: batch accuracy needs only the API key and audio, no latency or mic. Report: `reports/generated/primock57_batch.md` (both configs, 5,255 scorable utterances, 114 speakers, 0 failed). Read it with these caveats:
 - **Keyterm gain is an oracle upper bound.** Medication recall goes 74.2% → 87.7% (121 → 143 of 163) with WER unchanged (tie, ±0.1 pp), and false keyterm insertions go 3 → 9. But the keyterm list is `data/lexicons/medications.txt`, built from drugs *observed in PriMock57*, so the model was told the test set's exact vocabulary. A real intake line won't know which drugs callers will say. Before the recommender uses this gain, rerun with a lexicon not derived from the test set (openFDA list, or held-out consultations).

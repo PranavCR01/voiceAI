@@ -9,7 +9,12 @@
 *.ulaw
 data/raw/
 data/cache/
-results/
+# Run results: only run.json + results.parquet are tracked (re-scoring without new API spend);
+# raw provider responses stay local (they carry request ids). See docs/DECISIONS.md 2026-11-04.
+results/**
+!results/*/
+!results/*/run.json
+!results/*/results.parquet
 
 # Python
 __pycache__/
