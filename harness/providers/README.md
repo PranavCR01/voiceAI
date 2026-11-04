@@ -9,10 +9,11 @@
 
 The adapters were written from recollection of each API because vendor docs are blocked from the cloud environment. Check each item against current docs, fix code and fixtures, then set `verify: false` in the registry and record the doc URL and date in `docs/RESEARCH.md`.
 
-**Deepgram** (`deepgram_batch.py`)
-- [ ] `POST https://api.deepgram.com/v1/listen`, header `Authorization: Token <key>`, raw audio body with `Content-Type: audio/wav`.
-- [ ] Query params `model=nova-3`, `smart_format`, `punctuate`, `language`; Nova-3 keyterm prompting as a repeated `keyterm` param (and whether it costs extra).
-- [ ] Transcript at `results.channels[0].alternatives[0].transcript`.
+**Deepgram** (`deepgram_batch.py`) — checked against the live API on 2026-11-04 (docs host still blocked from the cloud environment, so by probing, not reading docs; details in `docs/RESEARCH.md`)
+- [x] `POST https://api.deepgram.com/v1/listen`, header `Authorization: Token <key>`, raw audio body with `Content-Type: audio/wav`. (200 with a real key; a bad key gives 401 `INVALID_AUTH`.)
+- [x] Query params `model=nova-3`, `smart_format`, `punctuate`, `language`; Nova-3 keyterm prompting as a repeated `keyterm` param. (`keyterm` is recognized: on `nova-2` it is rejected with 400 "only supported for Nova-3 and Flux"; an unknown `language` is a 400.) Unknown params are **silently ignored**, so a misspelled setting would not fail on Deepgram's side; `check_settings` is the only guard.
+- [ ] Whether keyterm prompting costs extra: still open (the key has no `usage:read` scope, docs unreachable). Check the pricing page on the owner's machine.
+- [x] Transcript at `results.channels[0].alternatives[0].transcript`.
 
 **AssemblyAI** (`assemblyai_batch.py`)
 - [ ] `POST /v2/upload` (raw bytes, header `authorization: <key>`) → `upload_url`.

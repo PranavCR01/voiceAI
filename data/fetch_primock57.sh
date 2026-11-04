@@ -23,7 +23,18 @@ fi
 mkdir -p "$(dirname "$DEST")"
 git clone https://github.com/babylonhealth/primock57.git "$DEST"
 git -C "$DEST" checkout --quiet "$COMMIT"
-if [ "${SKIP_AUDIO:-0}" != 1 ]; then
-  git -C "$DEST" lfs pull
+if [ "${SKIP_AUDIO:-0}" != 1 ] && ! git -C "$DEST" lfs pull; then
+  # Cloud sessions: the git proxy serves public clones but not LFS objects. GitHub's media
+  # host serves the same objects; each file is checked against its LFS pointer's sha256.
+  echo "git lfs pull failed; fetching LFS objects from media.githubusercontent.com" >&2
+  git -C "$DEST" lfs ls-files -l | awk '{print $1, $3}' | while read -r oid path; do
+    out="$DEST/$path"
+    curl -fsSL --retry 4 -o "$out.part" \
+      "https://media.githubusercontent.com/media/babylonhealth/primock57/$COMMIT/$path"
+    if [ "$(sha256sum "$out.part" | cut -d' ' -f1)" != "$oid" ]; then
+      echo "sha256 mismatch for $path" >&2; rm -f "$out.part"; exit 1
+    fi
+    mv "$out.part" "$out"
+  done
 fi
 echo "PriMock57 at $COMMIT -> $DEST"

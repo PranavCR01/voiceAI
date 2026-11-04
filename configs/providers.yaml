@@ -34,7 +34,9 @@ configs:
       as_of: 2026-10-06
     env_key: DEEPGRAM_API_KEY
     verify: true
-    notes: Same as deepgram_nova3_batch plus the profile's keyterms (keyterm prompting may cost extra; verify).
+    notes: >-
+      Same as deepgram_nova3_batch plus the profile's keyterms. API params live-checked
+      2026-11-04 (docs/RESEARCH.md); price and any keyterm surcharge still unverified.
 
   - config_id: assemblyai_batch
     provider: assemblyai
