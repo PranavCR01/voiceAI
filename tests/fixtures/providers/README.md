@@ -2,7 +2,9 @@
 
 **Deepgram: captured 2026-11-04** from the live API (PriMock57 `day2_consultation10:patient:0054`, CC BY 4.0; `error_401` from a deliberately invalid key; `error_400_keyterm` from `keyterm` on `model=nova-2`). Scrubbed: `request_id` zeroed, `metadata.sha256` (audio hash) zeroed, `metadata.created` set to midnight. Everything else is verbatim.
 
-**AssemblyAI, ElevenLabs: doc-derived, not captured.** First written from recollection; on 2026-11-05 they were aligned with each vendor's API reference (ElevenLabs `words[]` with `spacing` entries and `logprob`; AssemblyAI `speech_model_used`). They are still hand-written, because the API hosts are blocked from cloud sessions. On the first live run (#13), replace each with a real captured response (remove API keys, request ids and account ids) and note the capture date here. Until then, the parser tests prove our parsing logic, not that the vendor's format is current.
+**ElevenLabs: captured 2026-11-05** from the live API (PriMock57 `day1_consultation01:doctor:0008`, CC BY 4.0). Scrubbed: `transcription_id` zeroed; everything else verbatim.
+
+**AssemblyAI: doc-derived, not captured.** First written from recollection, then aligned with the API reference on 2026-11-05 (`speech_model_used`). Still hand-written, because `api.assemblyai.com` is blocked from cloud sessions. On the first live run (#13), replace each with a real captured response (remove API keys, request ids and account ids) and note the capture date here. Until then, the parser tests prove our parsing logic, not that the vendor's format is current.
 
 | Provider | File | Endpoint |
 |---|---|---|

@@ -7,7 +7,7 @@
 
 ## VERIFY before the first live run
 
-The adapters were first written from recollection of each API, because vendor docs were blocked from the cloud environment. Check each item against current docs, fix code and fixtures, then set `verify: false` in the registry and record the doc URL and date in `docs/RESEARCH.md`. As of 2026-11-05 the ElevenLabs and AssemblyAI **docs** are reachable from cloud sessions, but their **API hosts** (`api.elevenlabs.io`, `api.assemblyai.com`) are not (proxy 403), so both are checked against docs and still unrun.
+The adapters were first written from recollection of each API, because vendor docs were blocked from the cloud environment. Check each item against current docs, fix code and fixtures, then set `verify: false` in the registry and record the doc URL and date in `docs/RESEARCH.md`. As of 2026-11-05 the ElevenLabs and AssemblyAI docs are reachable from cloud sessions. `api.elevenlabs.io` is reachable too (ElevenLabs was run live); `api.assemblyai.com` is still refused (proxy 403), so AssemblyAI is checked against docs only.
 
 **Deepgram** (`deepgram_batch.py`) — checked against the live API on 2026-11-04 (docs host still blocked from the cloud environment, so by probing, not reading docs; details in `docs/RESEARCH.md`)
 - [x] `POST https://api.deepgram.com/v1/listen`, header `Authorization: Token <key>`, raw audio body with `Content-Type: audio/wav`. (200 with a real key; a bad key gives 401 `INVALID_AUTH`.)
@@ -22,13 +22,13 @@ The adapters were first written from recollection of each API, because vendor do
 - [x] Batch price: Universal-3.5 Pro $0.21/h, keyterms +$0.05/h (pricing page). Billed per second of audio.
 - [ ] Live run: `api.assemblyai.com` blocked from cloud sessions. Replace the fixtures with captured responses on the first run.
 
-**ElevenLabs** (`elevenlabs_batch.py`) — checked against the API reference 2026-11-05 (docs only; details in `docs/RESEARCH.md`)
+**ElevenLabs** (`elevenlabs_batch.py`) — checked against the API reference and the live API 2026-11-05 (details in `docs/RESEARCH.md`)
 - [x] `POST https://api.elevenlabs.io/v1/speech-to-text`, header `xi-api-key`, multipart with `file` and `model_id` (`scribe_v2`; `scribe_v2_medical` also exists).
 - [x] `tag_audio_events` (boolean) is still the field; sent as `false`.
 - [x] `keyterms` is a list of strings: ≤1000 terms, ≤50 chars, ≤5 words each, none of `<>{}[]\`; +20% (reference) / +$0.05/h (pricing page). **More than 100 keyterms bill every request for at least 20 s**, so the adapter refuses >100 and checks the other limits before any request.
-- [ ] Multipart encoding of the `keyterms` list. We send repeated fields; the reference says "list of string" but shows no multipart example with values. Confirm on the first live request: a keyterm should change the output, or a malformed one should give a 422.
-- [x] Text at top-level `text`; `words[]` entries have `type` `word`/`spacing`/`audio_event` and `logprob`. The fixture now follows the documented shape but is still hand-written.
-- [ ] Live run: `api.elevenlabs.io` blocked from cloud sessions. Cost: 330 subscription credits per audio minute (19,800/h), so PriMock57 (5.5 h) needs ~109k credits.
+- [x] Multipart encoding of the `keyterms` list: repeated fields work (live). A nonsense keyterm changed the output ("One side" → "Wonside"), and a bad character in the second of two terms was rejected with **400** `invalid_keyword` (not the documented 422).
+- [x] Text at top-level `text`; `words[]` entries have `type` `word`/`spacing`/`audio_event` and `logprob`; `language_code` comes back as `eng`; `audio_duration_secs` equals the clip length. Fixture replaced with a captured response.
+- [x] Cost, measured from the `character-cost` and `fiat-cost-before-overages` response headers: **18 credits per audio minute**, $0.0036/min ($0.216/h), linear (30 s → 9, 60 s → 18), and a 1.95 s clip cost 1 credit, i.e. rounded up per request. The pricing page's "330 credits per minute" does not match. PriMock57 (5.5 h) costs ≤ ~8.8k credits.
 
 ## First live run
 

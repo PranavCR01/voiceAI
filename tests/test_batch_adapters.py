@@ -238,7 +238,7 @@ def test_elevenlabs_multipart_request_and_parse() -> None:
 
     cfg = config("elevenlabs", language_code="en", keyterms=["paracetamol", "ventolin"])
     tr = run(ElevenLabsBatch(cfg, "KEY", client=client(handler)).transcribe(CLIP, cfg.settings))
-    assert tr.text == "I take 500 mg of paracetamol."
+    assert tr.text.startswith("Okay. And how many times a day are you going")
     [req] = seen
     assert req.headers["xi-api-key"] == "KEY" and req.url.path == "/v1/speech-to-text"
     assert multipart_fields(req) == [
