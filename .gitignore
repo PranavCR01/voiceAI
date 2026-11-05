@@ -25,6 +25,12 @@ results_superseded/**
 !results_superseded/*/
 !results_superseded/*/run.json
 !results_superseded/*/results.parquet
+# Runs on augmented manifests, one directory per recipe (harness/augment/README.md).
+results_augmented/**
+!results_augmented/*/
+!results_augmented/*/*/
+!results_augmented/*/*/run.json
+!results_augmented/*/*/results.parquet
 
 # Python
 __pycache__/
