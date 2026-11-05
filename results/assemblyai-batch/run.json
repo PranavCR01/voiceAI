@@ -1,0 +1,16 @@
+{
+  "run_id": "assemblyai-batch",
+  "config_id": "assemblyai_batch",
+  "provider": "assemblyai",
+  "model_id": "universal-3-5-pro",
+  "mode": "batch",
+  "settings": {
+    "format_text": true,
+    "punctuate": true,
+    "language_code": "en"
+  },
+  "created_at": "2026-11-05T03:10:02.557420Z",
+  "git_sha": "a0f7da9887a0095078eeb17166d19b34f767f098-dirty",
+  "manifest": "data/manifests/primock57.jsonl",
+  "keyterms": null
+}

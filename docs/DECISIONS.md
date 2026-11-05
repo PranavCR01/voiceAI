@@ -2,6 +2,24 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-05 — Six-config PriMock57 batch comparison: AssemblyAI, Scribe keyterms, Scribe Medical, Deepgram re-run (#13)
+Four new runs, 5,255 scorable utterances each, 0 failed: `assemblyai_batch` (Universal-3.5 Pro; every transcript reports `speech_model_used: universal-3-5-pro`), `elevenlabs_scribe_v2_batch_keyterms_common`, `elevenlabs_scribe_v2_medical_batch`, and `deepgram_nova3_batch_keyterms_common` re-run with the openFDA boost list. The old `_common` run (hand-written UK list) moved to `results_superseded/`, tracked like `results_retest/`, because a report takes one run per config. Report: `reports/generated/primock57_batch.md`.
+
+| Config | WER [95% CI] | Medication recall | Empty on speech | False keyterms |
+|---|---|---|---|---|
+| Scribe v2 + openFDA list | **5.5%** [5.0, 6.0] | **87.7%** (143/163) | 15 | 12 |
+| Scribe v2 | 5.7% [5.1, 6.2] | 82.8% (135) | 17 | 3 |
+| Scribe v2 Medical | 5.8% [5.3, 6.4] | 82.8% (135) | 43 | 5 |
+| AssemblyAI Universal-3.5 Pro | 6.6% [6.0, 7.1] | 84.7% (138) | 19 | 1 |
+| Deepgram Nova-3 (all three configs) | 7.4% [6.8, 8.1] | 74.2% / 87.7% oracle / 73.6% openFDA | 57–63 | 1–9 |
+
+- **Ranking on WER, all distinguishable except Scribe vs Scribe Medical:** Scribe family < AssemblyAI (−0.9 pp vs Deepgram, +0.9 pp vs Scribe) < Deepgram. Same order on the patient side (6.7 / 7.0 / 7.1 / 8.1 / 8.7%); pairwise verdicts per side are in the report.
+- **The same boost list helps Scribe and does nothing for Deepgram.** With the openFDA list, Scribe medication recall goes 135 → 143 (equal to Deepgram's *oracle* lexicon) and WER drops 0.2 pp [0.1, 0.3]. Deepgram goes 121 → 120 and WER is unchanged. Deepgram with the old hand-written UK list had gained 7 (78.5%), so for Deepgram the list's overlap with what speakers say matters, and the openFDA list (15 of 49 scoring-lexicon terms) has too little. The cost on Scribe: false keyterm insertions 3 → 12.
+- **Caveat on the Scribe keyterm gain: no noise floor yet.** Raw transcripts differ between the plain and boosted Scribe runs on 1,075 of 5,255 utterances (20%). Deepgram's identical-config retest differed on 1.6%. Either keyterms change Scribe's output broadly or Scribe at `temperature: 0` is much less repeatable than Deepgram. A retest of `elevenlabs_scribe_v2_batch` (~$1.20) would tell. Until then the +8 medication entities (overlapping intervals: 82.8% [76.3, 87.8] vs 87.7% [81.8, 91.9]) are suggestive, not established.
+- **Scribe v2 Medical shows no benefit here.** Medication recall is identical (135/163), WER is a tie with Scribe v2, and it drops 2.5× more short backchannels (43 vs 17 empty on speech, all 1–2-word "OK"/"Yeah"). The vendor's "35% fewer errors on clinical audio" isn't visible on patient-doctor conversation. PriMock57 has few drug names, so this is weak evidence either way.
+- **AssemblyAI:** 6.6% WER, medication 84.7% unboosted, and the only provider that writes dosages as digits (formatted 87.5% vs 0–25% for the others). It reported a 4.32 s clip as `audio_duration: 5`, consistent with billing rounded up to whole seconds (+~13% on short clips). Its run records `git_sha a0f7da9…-dirty`. The uncommitted changes were the new ElevenLabs registry entries and the `.gitignore` line, committed next (6ad3640), and they don't touch AssemblyAI requests.
+- **Spend for the four runs:** ≈ $1.20 (AssemblyAI) + ~6–9k ElevenLabs credits each (~$1.20–1.50) + Deepgram ≈ $1.85 (5.5 h × $0.0056/min).
+
 ## 2026-11-05 — First ElevenLabs Scribe v2 batch run on PriMock57 (#13)
 Run `results/elevenlabs-scribe-v2-batch` (settings `language_code: en`, `temperature: 0`; git `beb7ab9`): 5,255 scorable utterances, 0 failed, 17 empty on speech. Report: `reports/generated/primock57_batch.md`.
 - **Scribe v2 beats every Deepgram config on WER:** 5.7% [5.1, 6.2] vs 7.4% [6.8, 8.1], difference +1.8 pp [+1.4, +2.1] (Holm p = 0.001, 114 speakers). The gap holds on both sides: doctor 4.7% vs 6.5%, patient 7.0% vs 8.7%. Whisper-only WER moves the same way (8.4% vs 10.2%), so the gap is not an artifact of the equivalence layer. It is one dataset (UK English, consultation-room audio, 16 kHz), and Deepgram ran without `language=en-GB` hints; nothing here says how they compare on 8 kHz telephony.
