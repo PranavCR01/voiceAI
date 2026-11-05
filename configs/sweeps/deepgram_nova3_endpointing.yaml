@@ -1,0 +1,5 @@
+# Nova-3 `endpointing`: ms of silence before speech_final (docs default 10; 300-500 suggested for
+# conversation). Each value is one streaming run (harness/providers/sweep.py).
+config: deepgram_nova3_stream
+knob: endpointing
+values: [100, 200, 300, 500, 800, 1200]

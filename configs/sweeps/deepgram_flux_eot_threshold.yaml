@@ -1,0 +1,4 @@
+# Flux end-of-turn confidence threshold (docs: 0.5-1.0, default 0.7).
+config: deepgram_flux_stream
+knob: eot_threshold
+values: [0.5, 0.6, 0.7, 0.8, 0.9]

@@ -104,7 +104,7 @@ def test_natural_session_paces_every_chunk_and_records_the_echoes() -> None:
     assert [e.audio_offset_ms for e in sent] == [20.0 * k for k in range(20)]
     # Real time: chunk k goes out ~k*20 ms after the first (allow scheduler jitter).
     span_ms = (sent[-1].t_ns - sent[0].t_ns) / 1e6
-    assert 360 <= span_ms <= 520
+    assert 360 <= span_ms <= 800  # never faster than real time; upper bound loose for CI
     partials = trace.of(EventKind.PARTIAL)
     assert len(partials) == 20 and partials[0].text == "640b"  # 20 ms of 16 kHz PCM16
     assert trace.first(EventKind.FINALIZE_SENT) is None

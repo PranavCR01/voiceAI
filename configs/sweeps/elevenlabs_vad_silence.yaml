@@ -1,0 +1,5 @@
+# Scribe Realtime VAD commit after this much silence (s; SDK default 1.5, server range 0.192-3.0).
+# The config streams 3 s of trailing silence so every value can fire before our closing commit.
+config: elevenlabs_scribe_v2_rt_stream
+knob: vad_silence_threshold_secs
+values: [0.3, 0.5, 0.8, 1.0, 1.5]

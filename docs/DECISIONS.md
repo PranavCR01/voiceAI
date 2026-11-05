@@ -2,6 +2,19 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-05 — Endpointing outcomes and knob sweeps (#20, code half)
+- **One outcome per natural-mode session** (`harness/metrics/endpointing.py`), judged against the send time of the chunk containing the true speech end (the TTFS anchor):
+  - *premature*: any provider endpoint before it. That includes one fired during a mid-sentence pause.
+  - *correct*: the first endpoint after it, within `late_after_ms` (default 3 s).
+  - *late*: none within that window.
+  - For a turn labelled *incomplete* (smart-turn's incomplete samples), any endpoint is premature, because the caller never finished.
+  - Forced-mode or ground-truth-less sessions are *unscorable* and counted, not rated.
+  - Premature takes precedence: an agent that interrupted once has failed that turn even if it endpointed again at the right time.
+- **Rates use Wilson intervals, not clustered**, like the empty-on-speech rate. Delay percentiles use the speaker-clustered bootstrap. Weakness: if premature endpoints cluster by speaker (fast talkers, long pausers), the Wilson interval is too narrow. A clustered rate interval is a follow-up once real sweep data shows how much speakers matter.
+- **Sweeps** (`harness/providers/sweep.py`, `configs/sweeps/*.yaml`): every knob value is an ordinary streaming run (`<config>-<knob>-<value>`, the value in `RunMeta.settings`, forced to `finalization: natural`), so each curve point resumes and re-scores like any run. Sweeps read run directories directly, because `read_runs` (reports) allows one run per config. `summarize` writes one CSV row per point for the report (#22).
+- Committed sweeps: Nova-3 `endpointing` 100–1200 ms, Flux `eot_threshold` 0.5–0.9, AssemblyAI `max_turn_silence` 400–2000 ms (streaming host currently unreachable), Scribe `vad_silence_threshold_secs` 0.3–1.5 s. A test checks every value is a setting the adapter accepts.
+- **Not done here (owner):** the smart-turn data loader (Hugging Face) and the mid-utterance pause set (needs synthesized audio, #17), plus the live sweeps. Turn labels are read from `<manifest>.turns.jsonl` when present; unlabelled utterances count as complete turns.
+
 ## 2026-11-05 — Streaming adapters (#18): one session loop, thin protocols, live-probed
 - **Design:** `harness/streaming/session.py` runs any session (connect, pace, forced finalize right after the chunk containing the true speech end, close after trailing silence, record everything). Each provider is a `StreamProtocol` whose `handle(message)` maps one message to trace events, so the mapping is replay-tested on recorded messages. `harness/providers/stream_runner.py` runs sessions one at a time, because overlapping sessions would distort latency (concurrency is #21). It writes `traces/` plus a `results.parquet` of concatenated finals, which the offline report scores unchanged.
 - **New trace kind `info`** for every message that isn't a transcript/endpoint/VAD/error event (session start, metadata, warnings). Without it those raw messages were dropped, against hard rule 5. Metrics ignore it.
