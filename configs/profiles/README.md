@@ -34,6 +34,7 @@ A category's **signature** is its builtin type (so `date_of_birth` and `due_date
 ## Other fields
 - `keyterms` / `keyterms_path` (one or neither): explicit STT boost list, inline or as a lexicon-format file. If both are absent, `keyterm_list()` uses every lexicon term. If a scoring lexicon was drawn from the evaluation audio's own transcripts, boosting with it is an oracle upper bound: give an independent `keyterms_path` (healthcare_intake does). Registry configs pick the source with `keyterms: profile` (this list) or `keyterms: lexicon` (the scoring lexicon, `lexicon_terms()`), and runs record the exact list in `run.json`.
 - `conversation_scripts`: path to scripted conversations for LLM checks (format defined in M3).
+- `synthetic_templates`: YAML with `templates` (carrier sentences whose `{placeholders}` are entity category names or `slots`) and `slots` (free fill-ins). Used by `harness.synthetic.scripts` to generate synthetic caller utterances; domain wording lives here, never in the generator.
 - `audio.manifest_path`: customer audio manifest (`harness/datasets/README.md`). Absent → no-audio mode.
 - `reference_suite`: force a suite instead of matching.
 

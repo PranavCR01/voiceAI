@@ -16,6 +16,7 @@ Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anythin
 - Types: `uv run mypy harness recommender`
 - Offline report: `uv run python -m harness.report --results <runs dir> --manifest <manifest> [--profile <profile>] --out reports/generated/offline.md`
 - VAD speech bounds (needs audio + `python data/fetch_silero_vad.py`): `uv run python -m harness.vad --manifest <manifest> --data-root data/raw`
+- Synthetic caller scripts: `uv run python -m harness.synthetic.scripts --profile <profile> --out data/manifests/synthetic_<name>.jsonl`
 - Equivalence-rule diagnostic: `uv run python -m harness.metrics.equivalence_breakdown --results <runs dir> --manifest <manifest> --out reports/generated/equivalence_breakdown.md`
 - Regenerate the report golden file (only for intended output changes): `UPDATE_GOLDEN=1 uv run pytest tests/test_report.py`
 

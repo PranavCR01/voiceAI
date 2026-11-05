@@ -1,0 +1,26 @@
+# Synthetic caller utterances for the healthcare_intake profile (#17). Patient side of a clinic
+# intake call. `{name}` placeholders are entity categories from the profile (rendered in spoken
+# form by harness/synthetic/scripts.py) or slots below. All people and numbers are fictional.
+templates:
+  - "my date of birth is {date_of_birth}"
+  - "I was born on {date_of_birth}"
+  - "it's {date_of_birth}"
+  - "date of birth, {date_of_birth}"
+  - "my name is {name} and my date of birth is {date_of_birth}"
+  - "I take {dosage} of {medication} {frequency}"
+  - "I'm on {medication}, {dosage} {frequency}"
+  - "the doctor put me on {dosage} of {medication}"
+  - "I've been taking {dosage} of {medication} for {period}"
+  - "I need a refill of my {medication}, I take {dosage} {frequency}"
+  - "I'm allergic to {medication}"
+  - "I ran out of my {medication} last week"
+  - "I use {medication} when I need it"
+  - "you can call me back on {phone}"
+  - "my number is {phone}"
+  - "the best number to reach me is {phone}"
+  - "it's {name}, born {date_of_birth}, and my number is {phone}"
+  - "my cell is {phone}, and I take {medication} {frequency}"
+slots:
+  frequency: [once a day, twice a day, every morning, at night, three times a day, as needed]
+  period: [two weeks, about a month, three months, a year, a long time]
+  name: [Sam Taylor, Maria Lopez, James Carter, Priya Shah, Tom Becker, Grace Kim, Leo Novak, Ana Ruiz]

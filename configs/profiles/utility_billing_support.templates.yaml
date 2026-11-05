@@ -1,0 +1,15 @@
+# Synthetic caller utterances for the utility_billing_support example profile (#17).
+# Placeholders: entity categories from the profile, or slots below. All numbers are fictional.
+templates:
+  - "my account number is {account_number}"
+  - "the account number is {account_number}"
+  - "it's account {account_number}"
+  - "I paid {amount} on {due_date}"
+  - "my bill says {amount} but it's usually less"
+  - "my payment of {amount} is due {due_date}"
+  - "it's due on {due_date}"
+  - "I want to set up {billing_term}"
+  - "I'm calling about {billing_term}"
+  - "can I get {billing_term} for the {amount}"
+  - "account {account_number}, I owe {amount}"
+slots: {}

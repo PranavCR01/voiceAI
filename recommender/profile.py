@@ -159,6 +159,7 @@ class Profile(_Strict):
     keyterms: list[str] | None = None
     keyterms_path: str | None = None  # lexicon-format boost list; exclusive with `keyterms`
     conversation_scripts: str | None = None
+    synthetic_templates: str | None = None  # carrier sentences for synthetic scripts (#17)
     audio: AudioSource | None = None
     reference_suite: str | None = None
 
@@ -191,6 +192,7 @@ class Profile(_Strict):
         refs = [(f"entities.{e.name}.lexicon_path", e.lexicon_path) for e in self.entities]
         refs.append(("keyterms_path", self.keyterms_path))
         refs.append(("conversation_scripts", self.conversation_scripts))
+        refs.append(("synthetic_templates", self.synthetic_templates))
         refs.append(("audio.manifest_path", self.audio.manifest_path if self.audio else None))
         return [(field, path) for field, path in refs if path is not None]
 

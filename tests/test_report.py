@@ -62,7 +62,7 @@ def test_header_states_date_models_and_normalizer(
     text = run_cli(tmp_path)
     assert "**Generated:** 2026-10-06 12:00 UTC" in text
     assert "`fake-a-2026-10`" in text and "`fake-b-v3`" in text
-    assert "equiv-v3/dmy" in text and "equiv-v3/mdy" in text  # en-GB real, en-US synthetic
+    assert "equiv-v4/dmy" in text and "equiv-v4/mdy" in text  # en-GB real, en-US synthetic
     assert "whisper-normalizer==" in text
 
 

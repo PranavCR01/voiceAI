@@ -24,6 +24,8 @@ constraints:
       verify_account_before_balance: 0.99
     require_tool_calling: true
 
+synthetic_templates: utility_billing_support.templates.yaml
+
 entities:
   - name: account_number
     kind: regex

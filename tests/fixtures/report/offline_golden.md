@@ -3,7 +3,7 @@
 - **Generated:** 2026-10-06 12:00 UTC
 - **Manifest:** `tests/fixtures/report/manifest.jsonl` (9 utterances; excluded from scoring: unintelligible 1)
 - **Profile:** `configs/profiles/healthcare_intake.yaml`
-- **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v3/dmy`, `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v3/mdy`
+- **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v4/dmy`, `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v4/mdy`
 - **Leaderboard-comparable WER:** `whisper-normalizer==0.1.15/EnglishTextNormalizer`
 - **Intervals:** 95% paired percentile bootstrap, 2000 resamples, seed 0, resampling whole speakers. Pairwise p-values Holm-adjusted within each table. "Tie" = difference interval includes 0. No winner is called with fewer than 10 speakers in a table.
 - **Failed requests** are scored as empty transcripts (every reference word deleted).

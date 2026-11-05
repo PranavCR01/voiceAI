@@ -7,11 +7,11 @@ Two layers, applied identically to both sides:
    "whisper-only" WER column for comparability.
 2. An equivalence layer (`EQUIVALENCE_VERSION`) for formatting differences Whisper leaves apart
    but a customer would call identical (unit abbreviations, numeric dates, ordinal suffixes,
-   "O.K."/"ok", spoken day-month order), and works around Whisper's digit handling: it rewrites
-   the digit 1 as "one"
-   (breaking decimals and digit runs), drops leading zeros, and deletes parenthesized text such
-   as a phone area code. Each rule has a fixture in tests/fixtures/normalization_cases.jsonl
-   and a reason in docs/DECISIONS.md. Rules are domain-neutral: no healthcare terms here.
+   "O.K."/"ok", spoken day-month order, "ninth"), and works around Whisper's digit handling:
+   it rewrites the digit 1 as "one" (breaking decimals and digit runs), drops leading zeros,
+   and deletes parenthesized text such as a phone area code. Each rule has a fixture in
+   tests/fixtures/normalization_cases.jsonl and a reason in docs/DECISIONS.md. Rules are
+   domain-neutral: no healthcare terms here.
 
 The normalizer id (`normalizer_id()`) goes into every result's metadata because changing any
 of this changes WER.
@@ -33,7 +33,7 @@ with warnings.catch_warnings():
 DateOrder = Literal["mdy", "dmy"]
 
 WHISPER_ID = f"whisper-normalizer=={version('whisper-normalizer')}/EnglishTextNormalizer"
-EQUIVALENCE_VERSION = "3"
+EQUIVALENCE_VERSION = "4"
 
 # Transcriber markup such as <UNSURE>word</UNSURE> or <UNIN/>. Paired tags are unwrapped (the
 # transcriber's best guess is kept); self-closing tags are dropped. Utterances that should not be
@@ -43,6 +43,8 @@ _TAG = re.compile(r"</?[A-Za-z][A-Za-z0-9_-]*\s*/?>")
 # --- equivalence rules applied before Whisper (need the raw punctuation) ----------------------
 
 _OK = re.compile(r"\bo\.\s?k\.?(?![a-z])", re.IGNORECASE)
+# Whisper's ordinal table spells it "nineth", so "ninth" (and "twenty ninth") stay words.
+_NINTH = re.compile(r"\bninth\b", re.IGNORECASE)
 # Same separator twice, "/" or "-" only: dotted forms collide with version numbers (1.2.2026).
 _NUMERIC_DATE = re.compile(r"\b(\d{1,2})([/-])(\d{1,2})\2(\d{4})\b")
 # Digits in parentheses, e.g. a phone area code "(555)": Whisper deletes parenthesized text.
@@ -95,6 +97,7 @@ _MIN_SINGLE_DIGIT_RUN = 3
 # Scoring always uses all of them; `normalizer_id` does not cover disabled sets.
 RULES = (
     "okay",  # O.K. / ok -> okay
+    "ninth",  # ninth -> nineth, which Whisper turns into 9th
     "numeric_dates",  # 03/04/1980 -> march 4 1980
     "paren_digits",  # (555) -> 555
     "leading_zero",  # 07700 -> zero seven seven zero zero
@@ -159,6 +162,8 @@ def _spell_digits(m: re.Match[str]) -> str:
 def _pre(text: str, date_order: DateOrder, off: frozenset[str] = frozenset()) -> str:
     if "okay" not in off:
         text = _OK.sub("okay", text)
+    if "ninth" not in off:
+        text = _NINTH.sub("nineth", text)
     if "numeric_dates" not in off:
         text = _NUMERIC_DATE.sub(lambda m: _spell_date(m, date_order), text)
     if "paren_digits" not in off:

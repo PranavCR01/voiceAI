@@ -45,3 +45,5 @@
 {"a": "2 May 1990", "b": "May 2nd, 1990", "a_whisper": "2 may 1990", "b_whisper": "may 2nd 1990", "a_norm": "may 2 1990", "b_norm": "may 2 1990", "note": "EQUIVALENCE: day-month with an ambiguous month name, read as a date because a year follows"}
 {"a": "one may be late", "b": "1 may be late", "a_whisper": "one may be late", "b_whisper": "one may be late", "a_norm": "one may be late", "b_norm": "one may be late", "note": "'may' as a verb is never read as a month without 'of' or a following year"}
 {"a": "we march 2 miles", "b": "we march two miles", "a_whisper": "we march 2 miles", "b_whisper": "we march 2 miles", "a_norm": "we march 2 miles", "b_norm": "we march 2 miles", "note": "'march' as a verb is never read as a month without 'of' or a following year"}
+{"a": "twenty ninth of April", "b": "April 29th", "a_whisper": "20 ninth of april", "b_whisper": "april 29th", "a_norm": "april 29", "b_norm": "april 29", "note": "EQUIVALENCE: Whisper converts every ordinal word except 'ninth' (its table spells 'nineth')"}
+{"a": "ninth", "b": "9th", "a_whisper": "ninth", "b_whisper": "9th", "a_norm": "9", "b_norm": "9", "note": "EQUIVALENCE: lone 'ninth'"}

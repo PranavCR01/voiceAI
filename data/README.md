@@ -38,3 +38,10 @@ uv run python -m harness.datasets.common_voice --root data/raw/<release>/en --da
     --release <release> -n 400 --seed 0 --out data/manifests/common_voice_en.jsonl
 ```
 Defaults: 400 clips, at most 10 per speaker, accents with under 5 clips pooled into one "other" stratum. Record the release, seed and flags in `docs/RESEARCH.md` when you commit a manifest.
+
+## Synthetic caller scripts (#17)
+```
+uv run python -m harness.synthetic.scripts --profile configs/profiles/healthcare_intake.yaml \
+    --out data/manifests/synthetic_healthcare_intake.jsonl [--voice vendor:voice_id:en-US ...]
+```
+Seeded and deterministic. Writes a manifest of `synthetic: true` utterances (spoken-form references, `speaker_id` = TTS voice, `audio_path` where synthesis will write) and `<name>.entities.jsonl` (inserted entities and disfluency per utterance). The committed manifests use 10 placeholder voices (`tts_a.voice1` … `tts_b.voice5`); regenerate with real voice ids before synthesizing (owner's machine). Phone numbers are from fiction-reserved ranges.
