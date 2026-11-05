@@ -82,6 +82,11 @@ def config() -> AugmentConfig:
                 ],
                 "reverb": [{"kind": "reverb"}],
                 "opus": [{"kind": "opus", "bitrate": "12k"}],
+                "g712": [
+                    {"kind": "resample", "rate": 8000},
+                    {"kind": "bandpass", "low_hz": 300, "high_hz": 3400, "sections": 2},
+                    {"kind": "mulaw"},
+                ],
             },
         }
     )
@@ -376,5 +381,57 @@ def test_missing_sources_and_unknown_recipe_fail_early(
 
 def test_committed_recipes_load() -> None:
     cfg = load_config(ROOT / "configs" / "augment.yaml")
-    assert {"telephony_mulaw", "opus_12k", "reverb", "phone_noisy_snr10"} <= set(cfg.recipes)
+    assert {"telephony_mulaw", "telephony_g712", "opus_12k", "reverb", "phone_noisy_snr10"} <= set(
+        cfg.recipes
+    )
     assert {f"noise_snr{s}" for s in (20, 10, 5, 0)} <= set(cfg.recipes)
+
+
+def test_bandpass_passes_the_voice_band_and_cuts_both_edges() -> None:
+    rate = 8000
+
+    def gain_db(freq: float) -> float:
+        t = np.arange(rate * 2) / rate
+        x = (8000 * np.sin(2 * np.pi * freq * t)).astype(np.int16)
+        y, _ = codec.bandpass(x, rate, 300, 3400, 2)
+        assert len(y) == len(x)
+        mid = slice(rate // 2, -rate // 2)  # skip filter start-up
+        return 10 * np.log10(noise.power(y[mid]) / noise.power(x[mid]))
+
+    assert abs(gain_db(1000)) < 0.5
+    assert gain_db(100) < -30
+    assert gain_db(3900) < -4  # gentle near Nyquist, like the G.712 mask
+    assert gain_db(300) == pytest.approx(-6, abs=1.5)  # two Butterworth sections at cutoff
+
+
+def test_g712_recipe_records_the_filter_chain(data_root: Path, config: AugmentConfig) -> None:
+    [a, _] = run_recipe(data_root, config, "g712")
+    assert [s.kind for s in a.augmentation] == ["resample", "bandpass", "mulaw"]
+    bp = a.augmentation[1].params
+    assert (bp["low_hz"], bp["high_hz"], bp["sections"], bp["rate"]) == (300, 3400, 2, 8000)
+    [args] = bp["ffmpeg_args"]  # type: ignore[misc]
+    assert "highpass=f=300:p=2,highpass=f=300:p=2,lowpass=f=3400:p=2,lowpass=f=3400:p=2" in args
+
+
+def test_bandpass_above_nyquist_is_rejected(data_root: Path) -> None:
+    cfg = AugmentConfig.model_validate(
+        {"recipes": {"bad": [{"kind": "bandpass", "low_hz": 300, "high_hz": 9000}]}}
+    )
+    with pytest.raises(ValueError, match="invalid at 16000 Hz"):
+        run_recipe(data_root, cfg, "bad")
+
+
+def test_worker_count_does_not_change_the_output(data_root: Path, config: AugmentConfig) -> None:
+    serial = run_recipe(data_root, config, "phone_noisy")
+    wavs = [(data_root / c.audio_path).read_bytes() for c in serial]
+    parallel = augment_manifest(
+        manifest(),
+        recipe="phone_noisy",
+        config=config,
+        data_root=data_root,
+        seed=0,
+        spans=SPANS,
+        workers=4,
+    )
+    assert parallel == serial
+    assert [(data_root / c.audio_path).read_bytes() for c in parallel] == wavs

@@ -17,7 +17,9 @@ when it has the utterance, else the whole clip; each noise step records which.
 from __future__ import annotations
 
 import argparse
+import os
 from collections.abc import Sequence
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from harness.audio import AudioClip, load_clip, to_wav_bytes
@@ -89,14 +91,20 @@ def augment_manifest(
     spans: dict[str, SpeechSpan],
     limit: int | None = None,
     include_excluded: bool = False,
+    workers: int = 1,
 ) -> list[Utterance]:
+    """`workers` > 1 runs utterances on a thread pool (the work is mostly ffmpeg subprocesses).
+    Output is identical for any worker count: every step's seed depends only on the utterance."""
     config.recipe(recipe)  # fail on an unknown recipe before any work
     todo = [u for u in utts if include_excluded or u.exclude_reason is None]
     if any(u.augmentation for u in todo):
         raise ValueError("manifest already contains augmented utterances; augment the parents")
     todo = todo[:limit] if limit is not None else todo
-    return [
-        augment_one(
+    if workers < 1:
+        raise ValueError("workers must be >= 1")
+
+    def one(u: Utterance) -> Utterance:
+        return augment_one(
             u,
             recipe=recipe,
             config=config,
@@ -104,8 +112,11 @@ def augment_manifest(
             seed=seed,
             span=spans.get(u.utt_id),
         )
-        for u in todo
-    ]
+
+    if workers == 1:
+        return [one(u) for u in todo]
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        return list(pool.map(one, todo))
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -118,6 +129,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--limit", type=int, help="only the first N (scorable) utterances")
     ap.add_argument("--include-excluded", action="store_true")
+    ap.add_argument(
+        "--workers", type=int, default=os.cpu_count() or 1, help="parallel utterances (threads)"
+    )
     args = ap.parse_args(argv)
 
     side = sidecar_path(args.manifest)
@@ -131,6 +145,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         spans=spans,
         limit=args.limit,
         include_excluded=args.include_excluded,
+        workers=args.workers,
     )
     write_manifest(args.out, children)
     vad = sum(1 for c in children for s in c.augmentation if s.params.get("snr_region") == "vad")

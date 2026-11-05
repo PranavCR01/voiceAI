@@ -33,6 +33,13 @@ class ResampleStep(_Step):
     rate: int = Field(gt=0)
 
 
+class BandpassStep(_Step):
+    kind: Literal["bandpass"]
+    low_hz: float = Field(default=300.0, gt=0)
+    high_hz: float = Field(default=3400.0, gt=0)
+    sections: int = Field(default=2, ge=1, le=8)
+
+
 class MulawStep(_Step):
     kind: Literal["mulaw"]
 
@@ -52,7 +59,8 @@ class ReverbStep(_Step):
 
 
 Step = Annotated[
-    ResampleStep | MulawStep | OpusStep | NoiseStep | ReverbStep, Field(discriminator="kind")
+    ResampleStep | BandpassStep | MulawStep | OpusStep | NoiseStep | ReverbStep,
+    Field(discriminator="kind"),
 ]
 
 
@@ -149,6 +157,18 @@ def apply(
             params = {"rate_in": rate, "rate_out": step.rate, "ffmpeg_args": cast(JsonValue, args)}
             params["ffmpeg_version"] = codec.ffmpeg_version()
             rate = step.rate
+        elif isinstance(step, BandpassStep):
+            if not step.low_hz < step.high_hz < rate / 2:
+                raise ValueError(f"bandpass {step.low_hz}-{step.high_hz} Hz invalid at {rate} Hz")
+            samples, args = codec.bandpass(samples, rate, step.low_hz, step.high_hz, step.sections)
+            params = {
+                "rate": rate,
+                "low_hz": step.low_hz,
+                "high_hz": step.high_hz,
+                "sections": step.sections,
+                "ffmpeg_args": cast(JsonValue, args),
+                "ffmpeg_version": codec.ffmpeg_version(),
+            }
         elif isinstance(step, MulawStep):
             samples, args = codec.mulaw(samples, rate)
             params = {

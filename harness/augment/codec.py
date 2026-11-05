@@ -51,6 +51,21 @@ def resample(samples: Int16Array, rate: int, new_rate: int) -> tuple[Int16Array,
     return _samples(run_ffmpeg(args, samples.astype("<i2").tobytes())), [args]
 
 
+def bandpass(
+    samples: Int16Array, rate: int, low_hz: float, high_hz: float, sections: int
+) -> tuple[Int16Array, list[list[str]]]:
+    """Telephone-channel band limit: `sections` cascaded 2-pole Butterworth high-pass filters at
+    `low_hz` and as many low-pass filters at `high_hz` (12 dB/octave per section).
+
+    The default recipe uses 2 sections (24 dB/octave), a rough stand-in for the ITU-T G.712
+    300-3,400 Hz channel mask, not a reproduction of any particular network.
+    """
+    chain = [f"highpass=f={low_hz:g}:p=2"] * sections + [f"lowpass=f={high_hz:g}:p=2"] * sections
+    args = [*_BASE, *_pcm_in(rate), *_BITEXACT, "-af", ",".join(chain), *_pcm_out(rate)]
+    out = _samples(run_ffmpeg(args, samples.astype("<i2").tobytes()))
+    return out[: len(samples)], [args]
+
+
 def mulaw(samples: Int16Array, rate: int) -> tuple[Int16Array, list[list[str]]]:
     """Encode to G.711 mu-law and decode back, at `rate` (8 kHz for a phone line)."""
     enc = [*_BASE, *_pcm_in(rate), *_BITEXACT, "-ar", str(rate), "-acodec", "pcm_mulaw"]

@@ -2,6 +2,12 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-05 — Telephone band-pass step; noisy phone recipes now include it; parallel augmentation
+- **New step `bandpass`** (300–3,400 Hz, two cascaded 2-pole Butterworth sections per edge = 24 dB/octave, via ffmpeg `highpass`/`lowpass`, args recorded). Reason: `telephony_mulaw` keeps 0–4 kHz, while a real phone channel cuts below ~300 Hz and above ~3.4 kHz (ITU-T G.712 mask). Measured on tones at 8 kHz: 0 dB at 1 kHz, −6 dB at the cutoffs, < −30 dB at 100 Hz, ~−5 dB at 3.9 kHz. It's a stand-in for the mask, not a model of any network (no AGC, echo cancellation or packet loss).
+- **New recipe `telephony_g712`** = resample 8 kHz → bandpass → mu-law. `telephony_mulaw` is unchanged, because its manifest and three runs are committed and must keep their meaning.
+- **`phone_noisy_snr10` / `phone_noisy_snr5` now include the band-pass** (noise → resample → bandpass → mu-law). They had never been run, so nothing recorded changes. They compare against `telephony_g712`, which isolates the noise effect from the channel effect.
+- **`--workers`** (thread pool, default CPU count) for `harness.augment.run`. The single-threaded `telephony_mulaw` build took 22 min for 5,255 utterances. Output is identical for any worker count (tested), since every step's seed depends only on the utterance.
+
 ## 2026-11-05 — PriMock57 on a simulated phone line (8 kHz mu-law): the ranking holds, the gaps narrow
 Three configs on `data/manifests/primock57.telephony_mulaw.jsonl` (recipe `telephony_mulaw`, seed 0; 5,255 utterances each, 0 failed), results in `results_augmented/telephony_mulaw/`, report `reports/generated/primock57_telephony_batch.md`. Degradation is paired per utterance against each config's clean run, speaker-clustered bootstrap (10,000 resamples):
 

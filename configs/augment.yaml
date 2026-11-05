@@ -12,9 +12,16 @@ sources:
   rir: augment/RIRS_NOISES/simulated_rirs
 
 recipes:
-  # Phone line: G.711 mu-law at 8 kHz (what Twilio Media Streams carry).
+  # Phone line: G.711 mu-law at 8 kHz (what Twilio Media Streams carry). Keeps 0-4 kHz.
   telephony_mulaw:
     - {kind: resample, rate: 8000}
+    - {kind: mulaw}
+
+  # Phone line with the telephone channel band limit (300-3,400 Hz, 24 dB/octave), a rough
+  # stand-in for the ITU-T G.712 mask. Closer to a real call than telephony_mulaw.
+  telephony_g712:
+    - {kind: resample, rate: 8000}
+    - {kind: bandpass, low_hz: 300, high_hz: 3400, sections: 2}
     - {kind: mulaw}
 
   # Low-bitrate Opus (WebRTC / app calls). Packet loss is out of scope (stretch).
@@ -30,12 +37,15 @@ recipes:
   # Room reverberation.
   reverb: [{kind: reverb}]
 
-  # Noisy caller on a phone line: noise is added at the caller's end, before the codec.
+  # Noisy caller on a phone line: noise is added at the caller's end, before the channel.
+  # Compare with telephony_g712 (same channel, no noise).
   phone_noisy_snr10:
     - {kind: noise, snr_db: 10}
     - {kind: resample, rate: 8000}
+    - {kind: bandpass, low_hz: 300, high_hz: 3400, sections: 2}
     - {kind: mulaw}
   phone_noisy_snr5:
     - {kind: noise, snr_db: 5}
     - {kind: resample, rate: 8000}
+    - {kind: bandpass, low_hz: 300, high_hz: 3400, sections: 2}
     - {kind: mulaw}
