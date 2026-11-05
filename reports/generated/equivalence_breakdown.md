@@ -5,31 +5,45 @@
 
 | Config | Whisper only | Full layer |
 |---|---|---|
-| deepgram_nova3_batch | 10.25% | 7.44% |
-| deepgram_nova3_batch_keyterms | 10.24% | 7.43% |
+| deepgram_nova3_batch | 10.25% | 7.42% |
+| deepgram_nova3_batch_keyterms | 10.24% | 7.42% |
+| deepgram_nova3_batch_keyterms_common | 10.25% | 7.42% |
 
 | Rule | Config | WER without | Change from rule | Utts helped / hurt | Errors removed / added |
 |---|---|---|---|---|---|
-| `okay` | deepgram_nova3_batch | 10.16% | -2.73 pp | 1426 / 0 | 1549 / 0 |
-| `numeric_dates` | deepgram_nova3_batch | 7.51% | -0.08 pp | 18 / 0 | 43 / 0 |
-| `paren_digits` | deepgram_nova3_batch | 7.44% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `leading_zero` | deepgram_nova3_batch | 7.43% | +0.00 pp | 0 / 1 | 0 / 1 |
-| `units` | deepgram_nova3_batch | 7.44% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `ordinals` | deepgram_nova3_batch | 7.51% | -0.07 pp | 17 / 0 | 41 / 0 |
-| `decimals` | deepgram_nova3_batch | 7.44% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `digit_one` | deepgram_nova3_batch | 7.44% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `digit_join` | deepgram_nova3_batch | 7.44% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `spoken_dates` | deepgram_nova3_batch | 7.51% | -0.08 pp | 17 / 0 | 44 / 0 |
-| `okay` | deepgram_nova3_batch_keyterms | 10.16% | -2.72 pp | 1422 / 0 | 1546 / 0 |
-| `numeric_dates` | deepgram_nova3_batch_keyterms | 7.51% | -0.08 pp | 18 / 0 | 43 / 0 |
-| `paren_digits` | deepgram_nova3_batch_keyterms | 7.43% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `leading_zero` | deepgram_nova3_batch_keyterms | 7.43% | +0.00 pp | 0 / 1 | 0 / 1 |
-| `units` | deepgram_nova3_batch_keyterms | 7.43% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `ordinals` | deepgram_nova3_batch_keyterms | 7.50% | -0.07 pp | 17 / 0 | 41 / 0 |
-| `decimals` | deepgram_nova3_batch_keyterms | 7.43% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `digit_one` | deepgram_nova3_batch_keyterms | 7.43% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `digit_join` | deepgram_nova3_batch_keyterms | 7.43% | +0.00 pp | 0 / 0 | 0 / 0 |
-| `spoken_dates` | deepgram_nova3_batch_keyterms | 7.51% | -0.08 pp | 17 / 0 | 44 / 0 |
+| `okay` | deepgram_nova3_batch | 10.15% | -2.73 pp | 1426 / 0 | 1549 / 0 |
+| `ninth` | deepgram_nova3_batch | 7.44% | -0.01 pp | 2 / 0 | 7 / 0 |
+| `numeric_dates` | deepgram_nova3_batch | 7.51% | -0.08 pp | 18 / 0 | 47 / 0 |
+| `paren_digits` | deepgram_nova3_batch | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `leading_zero` | deepgram_nova3_batch | 7.42% | +0.00 pp | 0 / 1 | 0 / 1 |
+| `units` | deepgram_nova3_batch | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `ordinals` | deepgram_nova3_batch | 7.50% | -0.08 pp | 19 / 0 | 47 / 0 |
+| `decimals` | deepgram_nova3_batch | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `digit_one` | deepgram_nova3_batch | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `digit_join` | deepgram_nova3_batch | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `spoken_dates` | deepgram_nova3_batch | 7.51% | -0.09 pp | 19 / 0 | 50 / 0 |
+| `okay` | deepgram_nova3_batch_keyterms | 10.14% | -2.72 pp | 1422 / 0 | 1546 / 0 |
+| `ninth` | deepgram_nova3_batch_keyterms | 7.43% | -0.01 pp | 2 / 0 | 7 / 0 |
+| `numeric_dates` | deepgram_nova3_batch_keyterms | 7.50% | -0.08 pp | 18 / 0 | 47 / 0 |
+| `paren_digits` | deepgram_nova3_batch_keyterms | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `leading_zero` | deepgram_nova3_batch_keyterms | 7.42% | +0.00 pp | 0 / 1 | 0 / 1 |
+| `units` | deepgram_nova3_batch_keyterms | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `ordinals` | deepgram_nova3_batch_keyterms | 7.50% | -0.08 pp | 19 / 0 | 47 / 0 |
+| `decimals` | deepgram_nova3_batch_keyterms | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `digit_one` | deepgram_nova3_batch_keyterms | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `digit_join` | deepgram_nova3_batch_keyterms | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `spoken_dates` | deepgram_nova3_batch_keyterms | 7.51% | -0.09 pp | 19 / 0 | 50 / 0 |
+| `okay` | deepgram_nova3_batch_keyterms_common | 10.15% | -2.73 pp | 1424 / 0 | 1548 / 0 |
+| `ninth` | deepgram_nova3_batch_keyterms_common | 7.44% | -0.01 pp | 2 / 0 | 7 / 0 |
+| `numeric_dates` | deepgram_nova3_batch_keyterms_common | 7.50% | -0.08 pp | 18 / 1 | 47 / 3 |
+| `paren_digits` | deepgram_nova3_batch_keyterms_common | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `leading_zero` | deepgram_nova3_batch_keyterms_common | 7.42% | +0.00 pp | 1 / 1 | 1 / 1 |
+| `units` | deepgram_nova3_batch_keyterms_common | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `ordinals` | deepgram_nova3_batch_keyterms_common | 7.50% | -0.08 pp | 19 / 0 | 47 / 0 |
+| `decimals` | deepgram_nova3_batch_keyterms_common | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `digit_one` | deepgram_nova3_batch_keyterms_common | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `digit_join` | deepgram_nova3_batch_keyterms_common | 7.42% | +0.00 pp | 0 / 0 | 0 / 0 |
+| `spoken_dates` | deepgram_nova3_batch_keyterms_common | 7.51% | -0.09 pp | 19 / 0 | 50 / 0 |
 
 ## Examples (deepgram_nova3_batch; most errors removed first)
 
@@ -46,6 +60,13 @@
 | `primock57:day1_consultation14:doctor:0042` | 2 / 5 | okay okay okay alright fine and in terms of any other symptoms so have you had any nausea have you had any vomiting | okay okay okay alright fine in terms of any other symptoms have you had any nausea have you had any vomiting | ok ok ok alright fine and in terms of any other symptoms so have you had any nausea have you had any vomiting | okay okay okay alright fine in terms of any other symptoms have you had any nausea have you had any vomiting |
 | `primock57:day2_consultation02:doctor:0010` | 0 / 3 | okay okay great okay so tell me a bit about what has been happening you said you mentioned in the notes that you have got a problem with your elbow | okay okay great okay so tell me a bit about what has been happening you said you mentioned in the notes that you have got a problem with your elbow | ok ok great ok so tell me a bit about what has been happening you said you mentioned in the notes that you have got a problem with your elbow | okay okay great okay so tell me a bit about what has been happening you said you mentioned in the notes that you have got a problem with your elbow |
 
+### `ninth`
+
+| Utterance | Errors with / without | Ref (with rule) | Hyp (with rule) | Ref (without) | Hyp (without) |
+|---|---|---|---|---|---|
+| `primock57:day3_consultation08:patient:0008` | 0 / 4 | that is the september 29 1980 | that is the september 29 1980 | that is the 20 ninth of september 1980 | that is the september 29 1980 |
+| `primock57:day4_consultation07:patient:0008` | 0 / 3 | may 9 2016 | may 9 2016 | ninth of may 2016 | may 9 2016 |
+
 ### `numeric_dates`
 
 | Utterance | Errors with / without | Ref (with rule) | Hyp (with rule) | Ref (without) | Hyp (without) |
@@ -53,11 +74,11 @@
 | `primock57:day2_consultation09:patient:0010` | 0 / 3 | august 12 1958 | august 12 1958 | august 12 1958 | 08121958 |
 | `primock57:day2_consultation10:patient:0006` | 1 / 4 | sure so it is ayrton warren and my date of birth is the may 16 1982 | sure so it is aaron warren and my date of birth is the may 16 1982 | sure so it is ayrton warren and my date of birth is the may 16 1982 | sure so it is aaron warren and my date of birth is the 05161982 |
 | `primock57:day3_consultation07:patient:0010` | 0 / 3 | january 17 1987 | january 17 1987 | january 17 1987 | 01171987 |
+| `primock57:day3_consultation08:patient:0008` | 0 / 3 | that is the september 29 1980 | that is the september 29 1980 | that is the september 29 1980 | that is the 09291980 |
 | `primock57:day4_consultation01:patient:0010` | 1 / 4 | it is joe bloggs it is the june 7 1974 | it is joy bloggs it is the june 7 1974 | it is joe bloggs it is the june 7 1974 | it is joy bloggs it is the 06071974 |
 | `primock57:day4_consultation03:patient:0008` | 0 / 3 | my name is sarah smith and my date of birth is the april 20 1980 | my name is sarah smith and my date of birth is the april 20 1980 | my name is sarah smith and my date of birth is the april 20 1980 | my name is sarah smith and my date of birth is the 04201980 |
 | `primock57:day4_consultation05:patient:0009` | 2 / 5 | yes my my name is roberto mendoza and i am i was born on the january 1 of 1992 | yes my my name is roberto mendoza i am i was born on the january 1 1992 | yes my my name is roberto mendoza and i am i was born on the january 1 of 1992 | yes my my name is roberto mendoza i am i was born on the 01011992 |
-| `primock57:day4_consultation08:patient:0010` | 0 / 3 | yeah my date of birth is the august 8 1982 | yeah my date of birth is the august 8 1982 | yeah my date of birth is the august 8 1982 | yeah my date of birth is the 08081982 |
-| `primock57:day4_consultation10:patient:0008` | 0 / 3 | july 23 1995 | july 23 1995 | july 23 1995 | 07231995 |
+| `primock57:day4_consultation07:patient:0008` | 0 / 3 | may 9 2016 | may 9 2016 | may 9 2016 | 05092016 |
 
 ### `paren_digits`
 
@@ -82,9 +103,9 @@ No utterance changes.
 | `primock57:day2_consultation08:patient:0006` | 0 / 3 | yes it is sarah smith and it is the november 2 1992 | yes it is sarah smith and it is the november 2 1992 | yes it is sarah smith and it is the 2nd of november 1992 | yes it is sarah smith and it is the november 2 1992 |
 | `primock57:day2_consultation10:patient:0006` | 1 / 4 | sure so it is ayrton warren and my date of birth is the may 16 1982 | sure so it is aaron warren and my date of birth is the may 16 1982 | sure so it is ayrton warren and my date of birth is the 16th of may 1982 | sure so it is aaron warren and my date of birth is the may 16 1982 |
 | `primock57:day3_consultation01:patient:0010` | 1 / 4 | that is the october 1 99 | that is the october 1 1999 | that is the 1st of october 99 | that is the october 1 1999 |
+| `primock57:day3_consultation08:patient:0008` | 0 / 3 | that is the september 29 1980 | that is the september 29 1980 | that is the 29th of september 1980 | that is the september 29 1980 |
 | `primock57:day4_consultation01:patient:0010` | 1 / 4 | it is joe bloggs it is the june 7 1974 | it is joy bloggs it is the june 7 1974 | it is joe bloggs it is the 7th of june 1974 | it is joy bloggs it is the june 7 1974 |
 | `primock57:day4_consultation03:patient:0008` | 0 / 3 | my name is sarah smith and my date of birth is the april 20 1980 | my name is sarah smith and my date of birth is the april 20 1980 | my name is sarah smith and my date of birth is the 20th of april 1980 | my name is sarah smith and my date of birth is the april 20 1980 |
-| `primock57:day4_consultation08:patient:0010` | 0 / 3 | yeah my date of birth is the august 8 1982 | yeah my date of birth is the august 8 1982 | yeah my date of birth is the 8th of august 1982 | yeah my date of birth is the august 8 1982 |
 
 ### `decimals`
 
@@ -108,6 +129,6 @@ No utterance changes.
 | `primock57:day2_consultation10:patient:0006` | 1 / 4 | sure so it is ayrton warren and my date of birth is the may 16 1982 | sure so it is aaron warren and my date of birth is the may 16 1982 | sure so it is ayrton warren and my date of birth is the 16 of may 1982 | sure so it is aaron warren and my date of birth is the may 16 1982 |
 | `primock57:day3_consultation01:patient:0010` | 1 / 4 | that is the october 1 99 | that is the october 1 1999 | that is the 1 of october 99 | that is the october 1 1999 |
 | `primock57:day3_consultation07:patient:0010` | 0 / 3 | january 17 1987 | january 17 1987 | 17 of january 1987 | january 17 1987 |
+| `primock57:day3_consultation08:patient:0008` | 0 / 3 | that is the september 29 1980 | that is the september 29 1980 | that is the 29 of september 1980 | that is the september 29 1980 |
 | `primock57:day4_consultation01:patient:0010` | 1 / 4 | it is joe bloggs it is the june 7 1974 | it is joy bloggs it is the june 7 1974 | it is joe bloggs it is the 7 of june 1974 | it is joy bloggs it is the june 7 1974 |
-| `primock57:day4_consultation03:patient:0008` | 0 / 3 | my name is sarah smith and my date of birth is the april 20 1980 | my name is sarah smith and my date of birth is the april 20 1980 | my name is sarah smith and my date of birth is the 20 of april 1980 | my name is sarah smith and my date of birth is the april 20 1980 |
 
