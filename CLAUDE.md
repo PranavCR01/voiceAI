@@ -19,6 +19,7 @@ Read `docs/PROJECT.md` for scope and `docs/DECISIONS.md` before changing anythin
 - Synthetic caller scripts: `uv run python -m harness.synthetic.scripts --profile <profile> --out data/manifests/synthetic_<name>.jsonl`
 - Augmentation (needs audio + `./data/fetch_augment_sources.sh`): `uv run python -m harness.augment.run --manifest <manifest> --data-root data/raw --recipe <name> --out data/manifests/<name>.jsonl`
 - Degradation under an augmentation recipe (paired vs clean, speaker-clustered): `uv run python -m harness.metrics.degradation --clean-results results/ --clean-manifest <manifest> --augmented-results results_augmented/<recipe>/ --augmented-manifest <child manifest> --out reports/generated/<name>.md`
+- Streaming latency section: `uv run python -m harness.streaming_report --results <streaming runs dir> --manifest <manifest> --out reports/generated/streaming_latency.md` (golden: `UPDATE_GOLDEN=1 uv run pytest tests/test_streaming_report.py`)
 - Equivalence-rule diagnostic: `uv run python -m harness.metrics.equivalence_breakdown --results <runs dir> --manifest <manifest> --out reports/generated/equivalence_breakdown.md`
 - Regenerate the report golden file (only for intended output changes): `UPDATE_GOLDEN=1 uv run pytest tests/test_report.py`
 
