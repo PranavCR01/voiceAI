@@ -2,6 +2,11 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-05 — Windows: `tzdata` dependency; the GitHub default branch is not `main`
+- First local setup on the owner's Windows machine: every test that reads `results.parquet` failed with "The zoneinfo module or pytz package must be installed". Results store UTC timestamps, and pyarrow needs an IANA time-zone database, which Windows doesn't ship. Added `tzdata` as a Windows-only dependency (`sys_platform == 'win32'`), so Linux installs are unchanged.
+- The repository's GitHub default branch is still `claude/voice-ai-project-exploration-76zctb` (an early session branch at `207cdd3`). A plain `git clone` checks that out, not `main`. The owner should set the default branch to `main` in the repository settings; until then, clone with `--branch main`.
+- The code has otherwise only been run on Linux. Known Windows risk for latency runs: asyncio sleep granularity (~15 ms by default) against 20 ms chunks makes pacing burstier. Metrics anchor on actual send times, so numbers stay honest, but the stream is less even. WSL2 is the fallback.
+
 ## 2026-11-05 — PriMock57 under a phone channel and caller-side noise: AssemblyAI degrades least, and overtakes Scribe in noise
 All 5,255 scorable utterances per run, 0 failed. Recipes: `telephony_g712` (8 kHz, 300–3,400 Hz band-pass, mu-law), `phone_noisy_snr10/5` (SLR28 point-source noise at 10/5 dB SNR on the VAD speech region, then the same channel). Reports: `reports/generated/primock57_degradation_<recipe>.md` (each config vs its clean run, paired, speaker-clustered) and `primock57_<recipe>_batch.md` (head-to-head).
 
