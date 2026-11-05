@@ -12,7 +12,7 @@ The adapters were first written from recollection of each API, because vendor do
 **Deepgram** (`deepgram_batch.py`) — checked against the live API on 2026-11-04 (docs host still blocked from the cloud environment, so by probing, not reading docs; details in `docs/RESEARCH.md`)
 - [x] `POST https://api.deepgram.com/v1/listen`, header `Authorization: Token <key>`, raw audio body with `Content-Type: audio/wav`. (200 with a real key; a bad key gives 401 `INVALID_AUTH`.)
 - [x] Query params `model=nova-3`, `smart_format`, `punctuate`, `language`; Nova-3 keyterm prompting as a repeated `keyterm` param. (`keyterm` is recognized: on `nova-2` it is rejected with 400 "only supported for Nova-3 and Flux"; an unknown `language` is a 400.) Unknown params are **silently ignored**, so a misspelled setting would not fail on Deepgram's side; `check_settings` is the only guard.
-- [ ] Whether keyterm prompting costs extra: still open (the key has no `usage:read` scope, docs unreachable). Check the pricing page on the owner's machine.
+- [x] Keyterm prompting costs extra: +$0.0013/min on Nova-3 pre-recorded ($0.0043/min), i.e. +30% (deepgram.com/pricing, 2026-11-05). Keyterms are capped at 500 tokens per request (developers.deepgram.com/docs/keyterm).
 - [x] Transcript at `results.channels[0].alternatives[0].transcript`.
 
 **AssemblyAI** (`assemblyai_batch.py`) — checked against the API reference 2026-11-05 (docs only; details in `docs/RESEARCH.md`)
