@@ -2,6 +2,12 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-05 — Report charts: deterministic SVG small multiples (#22)
+- `harness/charts.py` draws the endpointing trade-off from the sweep CSV with matplotlib (new dependency): x = p95 endpoint delay, y = premature-endpoint rate, a point per knob value with both 95% intervals as error bars and the value as a direct label.
+- **Small multiples, one config per panel, shared axes, one colour.** Four configs in one plot would need a fourth categorical hue, and the reference palette's fourth slot (yellow beside orange) fails the all-pairs colour checks. Separate panels also avoid a legend lookup. Rates start at 0 and delay at 0, so slopes aren't exaggerated.
+- **Static, light-surface SVG without a hover layer:** the issue asks for charts next to a Markdown report that must read without them, so the CSV/table is the accessible view. Deviates from the dataviz default of interactive charts; revisit if the report moves to HTML.
+- **Determinism:** Agg backend, fixed `svg.hashsalt`, text kept as text, no date metadata. A test asserts byte-identical output for identical input, and different output when the data changes. Determinism holds per matplotlib version (pinned in `uv.lock`), like ffmpeg for augmentation.
+
 ## 2026-11-05 — Endpointing outcomes and knob sweeps (#20, code half)
 - **One outcome per natural-mode session** (`harness/metrics/endpointing.py`), judged against the send time of the chunk containing the true speech end (the TTFS anchor):
   - *premature*: any provider endpoint before it. That includes one fired during a mid-sentence pause.
