@@ -13,6 +13,10 @@ owner's); a cloud session is fine for checking protocols and capturing fixtures.
 Session settings live in the registry entry next to the provider's own settings and are removed
 before the adapter sees them: `chunk_ms` (20), `finalization` (`natural` | `forced`),
 `trailing_silence_ms` (1500), `encoding` (`pcm16` | `mulaw`).
+
+`--subset patient --per-speaker 5 --seed 0` runs a seeded per-speaker sample instead of the whole
+manifest (harness/datasets/sample.py); the spec and a hash of the chosen ids go in `run.json`.
+API keys are read from the environment, then from `.env` (harness/env.py).
 """
 
 from __future__ import annotations
@@ -34,9 +38,12 @@ from pydantic import JsonValue
 
 from harness.audio import AudioClip, Encoding, load_clip
 from harness.datasets.manifest import Utterance, read_manifest
+from harness.datasets.sample import SampleSpec, sample_record, sample_utterances
+from harness.env import load_env
 from harness.metrics.wer import empty_on_speech
 from harness.providers.registry import Mode, ProviderConfig, load_registry
 from harness.providers.runner import (
+    RunConflictError,
     RunSummary,
     _check_resumable,
     _meta_for,
@@ -156,6 +163,7 @@ async def run_streaming(
     sha: str | None = None,
     keyterms: list[str] | None = None,
     rtt_ms: float | None = None,
+    sample: SampleSpec | None = None,
 ) -> RunSummary:
     if config.mode is not Mode.STREAMING:
         raise ValueError(f"{config.config_id} is a {config.mode} config; use the batch runner")
@@ -164,18 +172,31 @@ async def run_streaming(
         raise ValueError(f"{config.config_id}: the provider has no explicit finalize")
     run_id = run_id or config.config_id.replace("_", "-")
     run_dir = results_dir / run_id
+    skipped_excluded = (
+        0 if include_excluded else sum(u.exclude_reason is not None for u in manifest)
+    )
+    if sample is None:
+        candidates = [u for u in manifest if include_excluded or u.exclude_reason is None]
+        sample_meta = None
+    else:
+        candidates = sample_utterances(
+            manifest, sample, spans or None, include_excluded=include_excluded
+        )
+        sample_meta = sample_record(sample, candidates, vad_filtered=bool(spans))
     rows: dict[str, ResultRow] = {}
     if (run_dir / RUN_META).exists():
         existing = read_run(run_dir)
         _check_resumable(existing.meta, config, keyterms)
+        if existing.meta.sample != sample_meta:
+            raise RunConflictError(
+                f"run {run_id} was made with sample {existing.meta.sample}, not {sample_meta}; "
+                "use the same --subset/--per-speaker/--seed, or a new --run-id"
+            )
         meta = existing.meta
         rows = {r.utt_id: r for r in existing.rows if not (retry_failed and r.error is not None)}
     else:
         meta = _meta_for(config, run_id, manifest_label, sha or git_sha(), keyterms)
-    skipped_excluded = (
-        0 if include_excluded else sum(u.exclude_reason is not None for u in manifest)
-    )
-    candidates = [u for u in manifest if include_excluded or u.exclude_reason is None]
+        meta = meta.model_copy(update={"sample": sample_meta})
     candidates = candidates[:limit] if limit is not None else candidates
     todo = [u for u in candidates if u.utt_id not in rows]
     (run_dir / "traces").mkdir(parents=True, exist_ok=True)
@@ -241,6 +262,32 @@ def build_protocol(
     return adapters[config.provider](config, api_key, provider_settings, keyterms, s.encoding)
 
 
+def with_finalization(config: ProviderConfig, mode: str | None) -> ProviderConfig:
+    """The config with `finalization` overridden (None: unchanged). The override lands in
+    `RunMeta.settings`, so natural and forced runs of one config stay distinguishable."""
+    if mode is None:
+        return config
+    return config.model_copy(update={"settings": {**config.settings, "finalization": mode}})
+
+
+def default_run_id(config_id: str, mode: str | None) -> str:
+    base = config_id.replace("_", "-")
+    return base if mode is None else f"{base}-{mode}"
+
+
+def add_sample_args(ap: argparse.ArgumentParser) -> None:
+    g = ap.add_argument_group("seeded sample (harness/datasets/sample.py)")
+    g.add_argument("--subset", help="only utterances of this manifest subset, e.g. patient")
+    g.add_argument("--per-speaker", type=int, help="at most N utterances per speaker")
+    g.add_argument("--seed", type=int, default=0, help="sample seed (default 0)")
+
+
+def sample_spec(args: argparse.Namespace) -> SampleSpec | None:
+    if args.subset is None and args.per_speaker is None:
+        return None
+    return SampleSpec(subset=args.subset, per_speaker=args.per_speaker, seed=args.seed)
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--config", required=True)
@@ -254,11 +301,19 @@ def main(argv: Sequence[str] | None = None) -> None:
     ap.add_argument("--retry-failed", action="store_true")
     ap.add_argument("--profile", type=Path, help="for keyterms: profile / lexicon")
     ap.add_argument("--no-rtt", action="store_true", help="skip the network round-trip probe")
+    ap.add_argument(
+        "--finalization",
+        choices=["natural", "forced"],
+        help="override the config's finalization; the default run id gets a -<mode> suffix",
+    )
+    add_sample_args(ap)
     args = ap.parse_args(argv)
 
-    config = load_registry(args.registry).get(args.config)
+    config = with_finalization(load_registry(args.registry).get(args.config), args.finalization)
+    run_id = args.run_id or default_run_id(config.config_id, args.finalization)
     if config.verify:
         print(f"warning: {config.config_id} has unverified model id/pricing (verify: true)")
+    load_env()
     api_key = os.environ.get(config.env_key, "")
     if not api_key:
         raise SystemExit(f"{config.env_key} is not set")
@@ -280,12 +335,13 @@ def main(argv: Sequence[str] | None = None) -> None:
             spans=spans,
             results_dir=args.results,
             manifest_label=str(args.manifest),
-            run_id=args.run_id,
+            run_id=run_id,
             limit=args.limit,
             include_excluded=args.include_excluded,
             retry_failed=args.retry_failed,
             keyterms=keyterms,
             rtt_ms=None if args.no_rtt else rtt_probe_ms(protocol.url()),
+            sample=sample_spec(args),
         )
     )
     print(

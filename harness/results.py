@@ -48,6 +48,9 @@ class RunMeta(BaseModel):
     # since the profile can change after the run. None: no keyterms, or recorded before
     # 2026-11-04 (see docs/DECISIONS.md for those runs).
     keyterms: list[str] | None = None
+    # Set when the run used a seeded subset of the manifest (harness.datasets.sample): the spec,
+    # the count and a sha256 of the chosen utt ids. None: every (non-excluded) utterance.
+    sample: dict[str, JsonValue] | None = None
 
 
 class ResultRow(BaseModel):

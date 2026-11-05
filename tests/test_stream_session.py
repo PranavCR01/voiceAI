@@ -250,3 +250,47 @@ def test_session_settings_are_split_from_provider_settings() -> None:
     assert provider == {"endpointing": 300}
     with pytest.raises(ValueError, match="finalization"):
         split_settings({"finalization": "eager"})
+
+
+def test_slim_traces_keep_every_metric_and_drop_raw(tmp_path: Any) -> None:
+    from pathlib import Path
+
+    from harness.metrics.endpointing import classify
+    from harness.metrics.latency import session_latency
+    from harness.streaming.slim import slim_runs
+    from harness.streaming.trace import read_trace, slim_path, write_slim_trace
+
+    fixtures = Path(__file__).parent / "fixtures" / "traces"
+    for src in sorted(fixtures.glob("*.jsonl")):
+        full = read_trace(src)
+        out = tmp_path / src.name
+        write_slim_trace(slim_path(out), full)
+        first = slim_path(out).read_bytes()
+        write_slim_trace(slim_path(out), full)
+        assert slim_path(out).read_bytes() == first  # deterministic bytes
+        slim = read_trace(out)  # falls back to the .gz: out itself doesn't exist
+        assert all(e.raw is None for e in slim.events)
+        assert slim.meta == full.meta
+        assert [e.model_copy(update={"raw": None}) for e in full.events] == list(slim.events)
+        assert session_latency(slim) == session_latency(full)
+        assert classify(slim) == classify(full)
+
+    # slim_runs walks a results dir: one slim copy per successful row
+    from harness.results import ResultRow, RunMeta, read_run, write_run
+
+    meta = RunMeta(
+        run_id="r", config_id="c", provider="p", model_id="m", mode="streaming",
+        created_at="2026-11-05T00:00:00Z", git_sha="abcdef0", manifest="t",
+    )  # fmt: skip
+    traces = tmp_path / "res" / "r" / "traces"
+    traces.mkdir(parents=True)
+    (traces / "a.jsonl").write_bytes((fixtures / "clean.jsonl").read_bytes())
+    rows = [
+        ResultRow(utt_id="d:1", hyp_text="x", raw_response_path="traces/a.jsonl"),
+        ResultRow(utt_id="d:2", hyp_text="", error="boom"),
+    ]
+    write_run(tmp_path / "res", meta, rows)
+    written, size, missing = slim_runs(tmp_path / "res")
+    assert (written, missing) == (1, []) and size > 0
+    assert (traces / "a.jsonl.gz").exists()
+    assert read_run(tmp_path / "res" / "r").meta == meta

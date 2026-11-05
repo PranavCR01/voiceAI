@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 import pytest
 
+import harness.audio as audio_mod
 from harness.audio import (
     AudioClip,
     AudioError,
@@ -250,3 +251,175 @@ def test_pace_rejects_bad_arguments() -> None:
     clip = AudioClip(tone(440, 0.1, 16000), 16000, "a:1", 16000)
     with pytest.raises(ValueError):
         asyncio.run(_collect(clip, chunk_ms=0))
+
+
+@pytest.mark.timing
+def test_precise_pacing_on_any_os() -> None:
+    """The Windows path (sleep, then spin) also paces correctly where it isn't the default."""
+    clip = AudioClip(tone(440, 1.0, 16000), 16000, "a:1", 16000)
+    chunks = asyncio.run(_collect(clip, chunk_ms=20, precise=True))
+    lateness = sorted(c.lateness_ms for c in chunks)
+    assert len(chunks) == 50
+    assert all(c.sent_ns >= c.scheduled_ns for c in chunks)  # spin never yields early
+    assert lateness[len(lateness) // 2] < 5
+
+
+# --- precise waits and the Windows timer (logic only: mocked clock, sleep and winmm) --------
+
+
+class FakeClock:
+    """A clock that only moves when the fake sleep says so; records every sleep request."""
+
+    def __init__(self, oversleep_ns: int = 0, undersleep_ns: int = 0) -> None:
+        self.now = 1_000_000_000
+        self.sleeps: list[float] = []
+        self.oversleep_ns = oversleep_ns
+        self.undersleep_ns = undersleep_ns
+
+    def __call__(self) -> int:
+        return self.now
+
+    async def sleep(self, seconds: float) -> None:
+        self.sleeps.append(seconds)
+        if seconds == 0:
+            self.now += 50_000  # one loop iteration while spinning
+        else:
+            self.now += int(seconds * 1e9) + self.oversleep_ns - self.undersleep_ns
+
+
+def _wait(clock: FakeClock, due: int, margin: int) -> None:
+    asyncio.run(audio_mod.wait_until(due, spin_margin_ns=margin, clock=clock, sleep=clock.sleep))
+
+
+def test_wait_until_without_margin_is_one_sleep() -> None:
+    clock = FakeClock()
+    _wait(clock, clock.now + 20_000_000, 0)
+    assert clock.sleeps == [pytest.approx(0.020)]
+
+
+def test_wait_until_sleeps_to_margin_then_spins_to_the_deadline() -> None:
+    clock = FakeClock(oversleep_ns=500_000)  # 0.5 ms wake-up jitter, inside the 2 ms margin
+    due = clock.now + 20_000_000
+    _wait(clock, due, 2_000_000)
+    assert clock.sleeps[0] == pytest.approx(0.018)
+    assert all(s == 0 for s in clock.sleeps[1:])  # the rest is spinning
+    assert len(clock.sleeps) > 1
+    assert due <= clock.now < due + 50_000  # returns within one spin step of the deadline
+
+
+def test_wait_until_early_wakeup_spins_longer_never_returns_early() -> None:
+    clock = FakeClock(undersleep_ns=8_000_000)  # the timer fires 8 ms early
+    due = clock.now + 20_000_000
+    _wait(clock, due, 2_000_000)
+    assert clock.now >= due
+    assert len(clock.sleeps) > 100  # ~10 ms of 50 µs spin steps
+
+
+def test_wait_until_inside_margin_or_past_due_does_not_sleep() -> None:
+    clock = FakeClock()
+    _wait(clock, clock.now + 1_000_000, 2_000_000)  # 1 ms left: spin only
+    assert clock.sleeps and all(s == 0 for s in clock.sleeps)
+    clock = FakeClock()
+    _wait(clock, clock.now - 5_000_000, 2_000_000)  # already late: return at once
+    assert clock.sleeps == []
+
+
+class FakeWinMM:
+    def __init__(self, begin_result: int = 0) -> None:
+        self.calls: list[tuple[str, int]] = []
+        self.begin_result = begin_result
+
+    def timeBeginPeriod(self, period: int, /) -> int:  # noqa: N802
+        self.calls.append(("begin", period))
+        return self.begin_result
+
+    def timeEndPeriod(self, period: int, /) -> int:  # noqa: N802
+        self.calls.append(("end", period))
+        return 0
+
+
+def test_timer_resolution_begins_and_ends_even_on_error() -> None:
+    winmm = FakeWinMM()
+    with audio_mod.timer_resolution_1ms(winmm) as active:
+        assert active
+        assert winmm.calls == [("begin", 1)]
+    assert winmm.calls == [("begin", 1), ("end", 1)]
+    winmm = FakeWinMM()
+    with pytest.raises(RuntimeError), audio_mod.timer_resolution_1ms(winmm):
+        raise RuntimeError
+    assert winmm.calls == [("begin", 1), ("end", 1)]
+
+
+def test_timer_resolution_failure_or_absence_is_a_noop() -> None:
+    winmm = FakeWinMM(begin_result=97)  # TIMERR_NOCANDO
+    with audio_mod.timer_resolution_1ms(winmm) as active:
+        assert not active
+    assert winmm.calls == [("begin", 1)]  # no unmatched timeEndPeriod
+    with audio_mod.timer_resolution_1ms(None) as active:
+        assert not active
+
+
+def test_load_winmm_is_none_off_windows(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(audio_mod, "_IS_WINDOWS", False)
+    assert audio_mod._load_winmm() is None
+
+
+def _patch_windows(monkeypatch: pytest.MonkeyPatch, winmm: FakeWinMM) -> list[int]:
+    """Pretend to be Windows: fake winmm, and record the spin margin each wait uses."""
+    margins: list[int] = []
+    real_wait = audio_mod.wait_until
+
+    async def recording_wait(due_ns: int, *, spin_margin_ns: int = 0) -> None:
+        margins.append(spin_margin_ns)
+        await real_wait(due_ns, spin_margin_ns=spin_margin_ns)
+
+    monkeypatch.setattr(audio_mod, "_IS_WINDOWS", True)
+    monkeypatch.setattr(audio_mod, "_load_winmm", lambda: winmm)
+    monkeypatch.setattr(audio_mod, "wait_until", recording_wait)
+    return margins
+
+
+def test_pace_on_windows_holds_1ms_timer_while_pacing(monkeypatch: pytest.MonkeyPatch) -> None:
+    winmm = FakeWinMM()
+    margins = _patch_windows(monkeypatch, winmm)
+    clip = AudioClip(tone(440, 0.1, 16000), 16000, "a:1", 16000)
+
+    async def run() -> list[list[tuple[str, int]]]:
+        seen = []
+        async for _ in pace(clip, chunk_ms=20):
+            seen.append(list(winmm.calls))
+        return seen
+
+    seen = asyncio.run(run())
+    assert len(seen) == 5
+    assert all(calls == [("begin", 1)] for calls in seen)  # active for every chunk
+    assert winmm.calls == [("begin", 1), ("end", 1)]  # released when pacing ends
+    assert margins == [audio_mod.SPIN_MARGIN_NS] * 5
+
+
+def test_pace_on_windows_releases_timer_when_consumer_stops(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    winmm = FakeWinMM()
+    _patch_windows(monkeypatch, winmm)
+    clip = AudioClip(tone(440, 0.2, 16000), 16000, "a:1", 16000)
+
+    async def run() -> None:
+        gen = pace(clip, chunk_ms=20)
+        async for c in gen:
+            if c.index == 1:
+                break  # the session breaks out when the provider closes early
+        await gen.aclose()
+
+    asyncio.run(run())
+    assert winmm.calls == [("begin", 1), ("end", 1)]
+
+
+def test_pace_off_windows_keeps_plain_sleeps(monkeypatch: pytest.MonkeyPatch) -> None:
+    winmm = FakeWinMM()
+    margins = _patch_windows(monkeypatch, winmm)
+    monkeypatch.setattr(audio_mod, "_IS_WINDOWS", False)
+    clip = AudioClip(tone(440, 0.06, 16000), 16000, "a:1", 16000)
+    asyncio.run(_collect(clip, chunk_ms=20))
+    assert winmm.calls == []
+    assert margins == [0, 0, 0]

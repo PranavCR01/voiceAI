@@ -8,7 +8,9 @@
 A sweep file names a streaming config, one knob and its values. Each value is a normal run
 (`<config>-<knob>-<value>` run id, the value in `RunMeta.settings`, traces on disk), so every
 point on the curve can be re-scored or resumed like any other run. Sweeps force
-`finalization: natural`: endpointing is only measured when the provider decides.
+`finalization: natural`: endpointing is only measured when the provider decides. `--subset`,
+`--per-speaker` and `--seed` sample the manifest as in the stream runner (same utterances for every
+knob value).
 
 The summary has one row per (config, knob value): premature and late rates with Wilson CIs and
 the endpoint-delay p50/p95 with speaker-clustered CIs (`harness.metrics.endpointing`). Turn
@@ -31,10 +33,18 @@ from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
 from harness.audio import AudioClip, load_clip
 from harness.datasets.manifest import Utterance, read_manifest
+from harness.datasets.sample import SampleSpec
+from harness.env import load_env
 from harness.metrics.endpointing import classify, summarize_endpoints
 from harness.providers.registry import Mode, ProviderConfig, load_registry
 from harness.providers.runner import RunSummary
-from harness.providers.stream_runner import build_protocol, rtt_probe_ms, run_streaming
+from harness.providers.stream_runner import (
+    add_sample_args,
+    build_protocol,
+    rtt_probe_ms,
+    run_streaming,
+    sample_spec,
+)
 from harness.results import RUN_META, Run, read_run
 from harness.streaming.session import Connect, StreamProtocol, websockets_connect
 from harness.streaming.trace import read_trace
@@ -86,6 +96,7 @@ async def run_sweep(
     limit: int | None = None,
     sha: str | None = None,
     rtt_ms: float | None = None,
+    sample: SampleSpec | None = None,
 ) -> list[RunSummary]:
     summaries = []
     for run_id, cfg in sweep_points(base, sweep):
@@ -103,6 +114,7 @@ async def run_sweep(
                 connect=connect,
                 sha=sha,
                 rtt_ms=rtt_ms,
+                sample=sample,
             )
         )
     return summaries
@@ -223,6 +235,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     r.add_argument("--results", type=Path, required=True)
     r.add_argument("--registry", type=Path, default=Path("configs/providers.yaml"))
     r.add_argument("--limit", type=int)
+    add_sample_args(r)
     s = sub.add_parser("summarize")
     s.add_argument("--results", type=Path, required=True)
     s.add_argument("--manifest", type=Path, required=True)
@@ -240,6 +253,7 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     sweep = load_sweep(args.sweep)
     base = load_registry(args.registry).get(sweep.config)
+    load_env()
     api_key = os.environ.get(base.env_key, "")
     if not api_key:
         raise SystemExit(f"{base.env_key} is not set")
@@ -258,6 +272,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             manifest_label=str(args.manifest),
             limit=args.limit,
             rtt_ms=rtt_probe_ms(protocol.url()),
+            sample=sample_spec(args),
         )
     )
     for summ in summaries:

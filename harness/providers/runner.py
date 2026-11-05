@@ -28,6 +28,7 @@ from typing import Any
 
 from harness.audio import AudioClip, AudioError, load_clip
 from harness.datasets.manifest import Utterance, read_manifest
+from harness.env import load_env
 from harness.metrics.wer import empty_on_speech
 from harness.providers.assemblyai_batch import AssemblyAIBatch
 from harness.providers.base import BatchAdapter, PermanentError, RetryableError, Transcript
@@ -315,6 +316,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     factory = BATCH_ADAPTERS.get(config.provider)
     if factory is None:
         raise SystemExit(f"no batch adapter for provider {config.provider!r}")
+    load_env()
     api_key = os.environ.get(config.env_key)
     if not api_key:
         raise SystemExit(f"set {config.env_key} (see .env.example)")

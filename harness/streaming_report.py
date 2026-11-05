@@ -25,7 +25,7 @@ from pathlib import Path
 from harness.datasets.manifest import read_manifest
 from harness.metrics.latency import LatencySummary, SessionLatency, session_latency, summarize
 from harness.metrics.stats import Interval
-from harness.results import Run, read_runs
+from harness.results import RUN_META, ResultsError, Run, read_run
 from harness.streaming.trace import read_trace
 
 METRICS = (
@@ -148,6 +148,22 @@ def render(rows: Sequence[ConfigLatency]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def streaming_runs(results_dir: Path) -> list[Run]:
+    """Every streaming run under `results_dir`. A config may have a natural and a forced run
+    (`stream_runner --finalization`), so uniqueness is checked per (config, mode) afterwards."""
+    dirs = sorted(p.parent for p in results_dir.glob(f"*/{RUN_META}"))
+    if not dirs:
+        raise ResultsError(f"no runs (*/{RUN_META}) under {results_dir}")
+    return [r for r in (read_run(d) for d in dirs) if r.meta.mode == "streaming"]
+
+
+def check_one_run_per_config_and_mode(rows: Sequence[ConfigLatency]) -> None:
+    keys = [(r.config_id, r.mode) for r in rows]
+    dupes = sorted({k for k in keys if keys.count(k) > 1})
+    if dupes:
+        raise ResultsError(f"more than one run per (config, mode): {dupes}")
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--results", type=Path, required=True)
@@ -158,9 +174,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     clusters = {u.utt_id: u.speaker_id for u in read_manifest(args.manifest)}
     rows = [
         config_latency(run, args.results / run.meta.run_id, clusters, n_resamples=args.resamples)
-        for run in read_runs(args.results)
-        if run.meta.mode == "streaming"
+        for run in streaming_runs(args.results)
     ]
+    check_one_run_per_config_and_mode(rows)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(render(rows), encoding="utf-8")
     print(f"{len(rows)} streaming runs -> {args.out}")

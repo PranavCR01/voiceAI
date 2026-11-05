@@ -32,6 +32,24 @@ results_augmented/**
 !results_augmented/*/*/run.json
 !results_augmented/*/*/results.parquet
 
+# Streaming latency runs and endpointing sweeps: run.json + results.parquet + slim traces
+# (no provider payloads, gzipped; `python -m harness.streaming.slim`). Full traces stay local.
+results_stream/**
+!results_stream/*/
+!results_stream/*/run.json
+!results_stream/*/results.parquet
+!results_stream/*/traces/
+!results_stream/*/traces/*.jsonl.gz
+results_sweeps/**
+!results_sweeps/*/
+!results_sweeps/*/run.json
+!results_sweeps/*/results.parquet
+!results_sweeps/*/traces/
+!results_sweeps/*/traces/*.jsonl.gz
+# Trial runs are never committed.
+results_stream_trial/
+results_sweeps_trial/
+
 # Python
 __pycache__/
 *.py[cod]

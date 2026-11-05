@@ -37,7 +37,7 @@ Deepgram batch was first run on 2026-11-04 from a cloud session (batch accuracy 
 
 ```bash
 cp .env.example .env   # fill DEEPGRAM_API_KEY etc.; never commit .env
-set -a; source .env; set +a
+# the runners read .env themselves (harness/env.py; CRLF-safe); exported variables win
 ./data/fetch_primock57.sh            # audio needs git-lfs (~1.1 GB)
 
 # 1. Trial: 5 scorable utterances (excluded rows do not count), check the raw responses look like the fixtures

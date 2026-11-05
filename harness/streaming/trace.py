@@ -11,6 +11,7 @@ Schema reference: harness/streaming/README.md.
 
 from __future__ import annotations
 
+import gzip
 import time
 from enum import StrEnum
 from pathlib import Path
@@ -111,8 +112,37 @@ def write_trace(path: Path, trace: SessionTrace) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+SLIM_SUFFIX = ".gz"
+
+
+def slim_path(path: Path) -> Path:
+    """Where the slim copy of a trace lives: `traces/<utt>.jsonl.gz` beside the full trace."""
+    return path.with_name(path.name + SLIM_SUFFIX)
+
+
+def write_slim_trace(path: Path, trace: SessionTrace) -> None:
+    """The trace without provider payloads (`raw`), gzipped, byte-deterministic.
+
+    Every field the metrics read (kinds, times, chunk offsets, text, word timings) is kept, so
+    latency and endpointing results are identical from the slim copy; raw messages (request ids,
+    ~10x the size) stay local, like batch raw responses (DECISIONS 2026-11-04).
+    """
+    lines = [trace.meta.model_dump_json(exclude_none=True)] + [
+        e.model_copy(update={"raw": None}).model_dump_json(exclude_none=True) for e in trace.events
+    ]
+    data = ("\n".join(lines) + "\n").encode("utf-8")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("wb") as f, gzip.GzipFile(filename="", mode="wb", fileobj=f, mtime=0) as gz:
+        gz.write(data)
+
+
 def read_trace(path: Path) -> SessionTrace:
-    lines = [ln for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    """Read `path`; when it is absent (a clone without raw traces), read its slim copy."""
+    if not path.exists() and slim_path(path).exists():
+        text = gzip.decompress(slim_path(path).read_bytes()).decode("utf-8")
+    else:
+        text = path.read_text(encoding="utf-8")
+    lines = [ln for ln in text.splitlines() if ln.strip()]
     if not lines:
         raise ValueError(f"{path}: empty trace")
     return SessionTrace(

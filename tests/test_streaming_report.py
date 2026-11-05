@@ -129,3 +129,46 @@ def test_latency_values(tmp_path: Path) -> None:
     fin = b.summaries["finalize_latency"]
     assert fin.n == 24 and fin.p50 is not None and fin.p50.estimate == 309  # 199 + 10k, k=11
     assert a.rtt_ms == 21.0 and a.premature_rate == 0.0
+
+
+def test_one_config_may_have_a_natural_and_a_forced_run(tmp_path: Path) -> None:
+    import shutil
+
+    import pytest
+
+    from harness.results import ResultsError, read_run
+    from harness.streaming_report import check_one_run_per_config_and_mode, streaming_runs
+
+    results, clusters = build(tmp_path)
+    # Re-label prov_b's forced run as a second run of prov_a (what --finalization forced makes).
+    b = read_run(results / "prov-b-stream")
+    meta = b.meta.model_copy(
+        update={"run_id": "prov-a-stream-forced", "config_id": "prov_a_stream"}
+    )
+    shutil.copytree(results / "prov-b-stream" / "traces", results / meta.run_id / "traces")
+    shutil.rmtree(results / "prov-b-stream")
+    write_run(results, meta, b.rows)
+    rows = [
+        config_latency(r, results / r.meta.run_id, clusters, n_resamples=50)
+        for r in streaming_runs(results)
+    ]
+    assert sorted((r.config_id, r.mode) for r in rows) == [
+        ("prov_a_stream", "forced"),
+        ("prov_a_stream", "natural"),
+    ]
+    check_one_run_per_config_and_mode(rows)
+    with pytest.raises(ResultsError, match="more than one run"):
+        check_one_run_per_config_and_mode([rows[0], rows[0]])
+
+
+def test_finalization_override_and_run_ids() -> None:
+    from harness.providers.registry import load_registry
+    from harness.providers.stream_runner import default_run_id, with_finalization
+
+    cfg = load_registry(Path("configs/providers.yaml")).get("deepgram_nova3_stream")
+    forced = with_finalization(cfg, "forced")
+    assert forced.settings["finalization"] == "forced"
+    assert forced.settings["endpointing"] == cfg.settings["endpointing"]
+    assert with_finalization(cfg, None) is cfg
+    assert default_run_id(cfg.config_id, "forced") == "deepgram-nova3-stream-forced"
+    assert default_run_id(cfg.config_id, None) == "deepgram-nova3-stream"

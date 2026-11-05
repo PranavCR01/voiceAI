@@ -7,7 +7,10 @@ hears identical audio.
 - Encoders: PCM16 little-endian, G.711 µ-law at 8 kHz (what Twilio Media Streams carry), WAV.
 - `pace()`: yields fixed-size chunks at real-time pace on `time.perf_counter_ns` (monotonic and
   high-resolution on every OS; `time.monotonic` ticks every ~15.6 ms on Windows). Chunk k is
-  scheduled at t0 + k * chunk, so lateness never accumulates into drift.
+  scheduled at t0 + k * chunk, so lateness never accumulates into drift. On Windows the default
+  timer tick (~15.6 ms) makes asyncio sleeps wake several ms late, so while pacing it raises the
+  timer resolution to 1 ms (`timeBeginPeriod`) and sleeps until ~2 ms before each deadline, then
+  spin-waits on the clock (yielding to the event loop) until the deadline (docs/DECISIONS.md).
 
 ffmpeg is invoked as an argument list (never through a shell).
 """
@@ -15,17 +18,19 @@ ffmpeg is invoked as an argument list (never through a shell).
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import io
 import json
 import subprocess
+import sys
 import time
 import warnings
 import wave
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal, Protocol, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -281,35 +286,100 @@ def encode_for_stream(clip: AudioClip, encoding: Encoding) -> tuple[bytes, int, 
     return to_pcm16_bytes(clip), clip.sample_rate * 2, 0
 
 
+# Windows only: sleep until this long before a deadline, then spin on the clock. Covers the
+# ~1 ms wake-up jitter left after timeBeginPeriod(1); elsewhere asyncio sleeps are precise enough.
+SPIN_MARGIN_NS = 2_000_000
+_IS_WINDOWS = sys.platform == "win32"
+
+
+class _WinMM(Protocol):
+    def timeBeginPeriod(self, period: int, /) -> int: ...  # noqa: N802 - Win32 names
+    def timeEndPeriod(self, period: int, /) -> int: ...  # noqa: N802
+
+
+def _load_winmm() -> _WinMM | None:
+    if not _IS_WINDOWS:
+        return None
+    import ctypes
+
+    try:
+        winmm: Any = getattr(ctypes, "WinDLL")("winmm")  # noqa: B009 - absent off Windows
+    except OSError:
+        return None
+    return cast(_WinMM, winmm)
+
+
+@contextlib.contextmanager
+def timer_resolution_1ms(winmm: _WinMM | None) -> Iterator[bool]:
+    """Raise the Windows timer resolution to 1 ms for the block; yields whether it took effect.
+
+    No-op (False) without winmm. Windows counts begin/end calls per process, so nesting is safe.
+    """
+    if winmm is None or winmm.timeBeginPeriod(1) != 0:  # 0 = TIMERR_NOERROR
+        yield False
+        return
+    try:
+        yield True
+    finally:
+        winmm.timeEndPeriod(1)
+
+
+async def wait_until(
+    due_ns: int,
+    *,
+    spin_margin_ns: int = 0,
+    clock: Callable[[], int] = time.perf_counter_ns,
+    sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
+) -> None:
+    """Return at or after `due_ns` on `clock`.
+
+    `spin_margin_ns` = 0: one sleep for the remaining time. > 0: sleep until that long before the
+    deadline, then spin, yielding to the event loop (`sleep(0)`) so concurrent tasks (the
+    receiver) keep running. An early wake-up only means a longer spin.
+    """
+    remaining = due_ns - clock()
+    if spin_margin_ns <= 0:
+        if remaining > 0:
+            await sleep(remaining / 1e9)
+        return
+    if remaining > spin_margin_ns:
+        await sleep((remaining - spin_margin_ns) / 1e9)
+    while clock() < due_ns:
+        await sleep(0)
+
+
 async def pace(
     clip: AudioClip,
     *,
     chunk_ms: int = 20,
     encoding: Encoding = "pcm16",
     pad_ms: int = 0,
+    precise: bool | None = None,
 ) -> AsyncIterator[Chunk]:
     """Yield the clip (plus `pad_ms` of trailing silence) in `chunk_ms` chunks at real time.
 
     Deadlines are absolute (t0 + k * chunk_ms), so a late chunk does not delay the next ones.
+    `precise` (default: on Windows only) = 1 ms timer resolution + sleep-then-spin waits.
     """
     if chunk_ms <= 0 or pad_ms < 0:
         raise ValueError("chunk_ms must be > 0 and pad_ms >= 0")
+    precise = _IS_WINDOWS if precise is None else precise
     payload, bytes_per_s, silence = encode_for_stream(clip, encoding)
     width = 2 if encoding == "pcm16" else 1
     pad_bytes = (bytes_per_s * pad_ms // 1000) // width * width
     payload += bytes([silence]) * pad_bytes
     chunk_bytes = (bytes_per_s * chunk_ms // 1000) // width * width
     chunk_ns = chunk_ms * 1_000_000
-    t0 = time.perf_counter_ns()
-    for k, start in enumerate(range(0, len(payload), chunk_bytes)):
-        due = t0 + k * chunk_ns
-        wait = due - time.perf_counter_ns()
-        if wait > 0:
-            await asyncio.sleep(wait / 1e9)
-        yield Chunk(
-            index=k,
-            data=payload[start : start + chunk_bytes],
-            audio_offset_ms=k * chunk_ms,
-            scheduled_ns=due,
-            sent_ns=time.perf_counter_ns(),
-        )
+    margin = SPIN_MARGIN_NS if precise else 0
+    with timer_resolution_1ms(_load_winmm() if precise else None):
+        t0 = time.perf_counter_ns()
+        for k, start in enumerate(range(0, len(payload), chunk_bytes)):
+            due = t0 + k * chunk_ns
+            await wait_until(due, spin_margin_ns=margin)
+            yield Chunk(
+                index=k,
+                data=payload[start : start + chunk_bytes],
+                audio_offset_ms=k * chunk_ms,
+                scheduled_ns=due,
+                sent_ns=time.perf_counter_ns(),
+            )
