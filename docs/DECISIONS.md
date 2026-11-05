@@ -2,6 +2,31 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-05 — PriMock57 under a phone channel and caller-side noise: AssemblyAI degrades least, and overtakes Scribe in noise
+All 5,255 scorable utterances per run, 0 failed. Recipes: `telephony_g712` (8 kHz, 300–3,400 Hz band-pass, mu-law), `phone_noisy_snr10/5` (SLR28 point-source noise at 10/5 dB SNR on the VAD speech region, then the same channel). Reports: `reports/generated/primock57_degradation_<recipe>.md` (each config vs its clean run, paired, speaker-clustered) and `primock57_<recipe>_batch.md` (head-to-head).
+
+| WER (all) | Clean | Band-passed phone | +10 dB noise | +5 dB noise |
+|---|---|---|---|---|
+| Scribe v2 | **5.7%** | not run | 10.7% (+5.1 pp) | 13.3% (+7.7) |
+| AssemblyAI U-3.5 Pro | 6.6% | **7.6%** (+1.1) | **10.3%** (+3.7) | **12.6%** (+6.1) |
+| Deepgram Nova-3 | 7.4% | 9.8% (+2.4) | 17.1% (+9.7) | 22.2% (+14.8) |
+
+| Medication recall /163 | Clean | Band-passed | 10 dB | 5 dB |
+|---|---|---|---|---|
+| Scribe v2 | 135 | – | 111 | 107 |
+| AssemblyAI | 138 | 134 | **124** | **119** |
+| Deepgram | 121 | 110 | 87 | 69 |
+
+- **Scribe's clean-audio lead does not survive noise.** AssemblyAI − Scribe: −0.4 pp [−0.8, −0.0] at 10 dB (p = 0.049, borderline) and −0.7 pp [−1.2, −0.3] at 5 dB (p < 0.001). Patient side: ties at both levels. Medication recall diverges more than WER: +13 and +12 entities for AssemblyAI. For a phone intake line, where callers are often somewhere noisy, the STT recommendation flips from "Scribe" to "AssemblyAI, or Scribe if the line is quiet". That decision rule is what the recommender should encode: rank on the customer's channel and noise, not clean audio.
+- **Deepgram collapses in noise:** +130% relative WER at 10 dB, +199% at 5 dB. Empty transcripts on speech rise from 1.1% (clean) to 2.4% / 3.9%, and medication recall falls to 69/163 at 5 dB. The band-pass alone costs it 2.4 pp, twice what mu-law alone did (+1.1, `telephony_mulaw`), so Deepgram relies on energy outside 300–3,400 Hz.
+- **Empty on speech in noise** (an agent hears silence): AssemblyAI 75 / 125, Scribe 77 / 114, Deepgram 123 / 200 (10 / 5 dB).
+- **Weaknesses:**
+  - One run per config. Scribe varies ~0.1 pp WER and ±3 medication entities between identical clean runs (retest entry below). The 10 dB WER gap (0.4 pp) is about 4× that but borderline in its own interval; the 5 dB gap and the medication gaps are clearer.
+  - The noise is SLR28 point-source noise (MUSAN-derived: assorted sounds, not babble or street), one file per utterance.
+  - Scribe has no band-pass-only run (dropped for credits), so its channel-vs-noise split is unknown.
+  - Studio speech with simulated degradation is still a floor on real-call difficulty (`telephony_mulaw` entry).
+- Spend: AssemblyAI ≈ 3 × $1.30, Deepgram ≈ 3 × $1.40, Scribe 2 runs (the 10 dB run hit the 40k-credit quota after 1,007 utterances and resumed with `--retry-failed` after a top-up; quota failures were never scored).
+
 ## 2026-11-05 — Report charts: deterministic SVG small multiples (#22)
 - `harness/charts.py` draws the endpointing trade-off from the sweep CSV with matplotlib (new dependency): x = p95 endpoint delay, y = premature-endpoint rate, a point per knob value with both 95% intervals as error bars and the value as a direct label.
 - **Small multiples, one config per panel, shared axes, one colour.** Four configs in one plot would need a fourth categorical hue, and the reference palette's fourth slot (yellow beside orange) fails the all-pairs colour checks. Separate panels also avoid a legend lookup. Rates start at 0 and delay at 0, so slopes aren't exaggerated.
