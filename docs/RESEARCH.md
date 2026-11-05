@@ -14,7 +14,7 @@ Coval (open-source benchmarks, perturbation sets incl. phone codec), Pipecat stt
 | Pipecat smart-turn-data v3.x | Open per HF card (verify) | Complete/incomplete turn labels; endpointing eval. |
 | Afrispeech-Dialog | CC BY-NC-SA 4.0 | v2 candidate: accented medical dialogue; non-commercial. |
 
-Augmentation sources: MUSAN (CC BY 4.0, verify), DEMAND (CC BY-SA 3.0, verify), OpenSLR SLR28 RIRs. Augmenting a CC BY-SA source makes share-alike derivatives; ND/NC-ND sources can't be published augmented. Publish recipe + manifest only.
+Augmentation sources: MUSAN (SLR17, **CC BY 4.0, verified on https://www.openslr.org/17/ 2026-11-05**, 11 GB), DEMAND (CC BY-SA 3.0, verify; not used), OpenSLR SLR28 RIRs and noises (**Apache 2.0, verified on https://www.openslr.org/28/ 2026-11-05**, 1.3 GB; its point-source noises are extracted from MUSAN). SLR28 is the default source for both noise and reverb (`configs/augment.yaml`). Augmenting a CC BY-SA source makes share-alike derivatives; ND/NC-ND sources can't be published augmented. Publish recipe + manifest only.
 
 **Medication lexicon (built 2026-10-06):** `data/lexicons/medications.txt`, 49 names observed in PriMock57 transcripts/notes at commit `cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5`, hand-checked. openFDA (public domain) could not be fetched from the cloud environment then; it was reachable on 2026-11-05 and now supplies the boost list (below), not the scoring lexicon. Reference misspellings found in PriMock57 transcripts (fix in the loader, #5): paracetemol, paracetmol → paracetamol; lisonopril → lisinopril; clinil → clenil; stemitil → stemetil; thyrocsin → thyroxine; fexofenatidine → fexofenadine.
 

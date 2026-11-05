@@ -1,0 +1,41 @@
+# Augmentation recipes (#16). A recipe is an ordered list of steps applied to the parent clip
+# (decoded mono at 16 kHz). Run: uv run python -m harness.augment.run --recipe <name> ...
+# Source directories are relative to --data-root and are searched recursively for .wav/.flac,
+# in sorted order, so a seeded choice is reproducible. Where to fetch them: data/README.md.
+# Step kinds and parameters: harness/augment/README.md.
+
+sources:
+  # OpenSLR SLR28 (Apache 2.0): point-source noises (extracted from MUSAN) and simulated room
+  # impulse responses. data/fetch_augment_sources.sh puts them here. MUSAN's own noise set
+  # (augment/musan/noise, CC BY 4.0) works too; change the path and record it in DECISIONS.
+  noise: augment/RIRS_NOISES/pointsource_noises
+  rir: augment/RIRS_NOISES/simulated_rirs
+
+recipes:
+  # Phone line: G.711 mu-law at 8 kHz (what Twilio Media Streams carry).
+  telephony_mulaw:
+    - {kind: resample, rate: 8000}
+    - {kind: mulaw}
+
+  # Low-bitrate Opus (WebRTC / app calls). Packet loss is out of scope (stretch).
+  opus_12k:
+    - {kind: opus, bitrate: 12k}
+
+  # Additive noise, SNR measured on the speech region.
+  noise_snr20: [{kind: noise, snr_db: 20}]
+  noise_snr10: [{kind: noise, snr_db: 10}]
+  noise_snr5: [{kind: noise, snr_db: 5}]
+  noise_snr0: [{kind: noise, snr_db: 0}]
+
+  # Room reverberation.
+  reverb: [{kind: reverb}]
+
+  # Noisy caller on a phone line: noise is added at the caller's end, before the codec.
+  phone_noisy_snr10:
+    - {kind: noise, snr_db: 10}
+    - {kind: resample, rate: 8000}
+    - {kind: mulaw}
+  phone_noisy_snr5:
+    - {kind: noise, snr_db: 5}
+    - {kind: resample, rate: 8000}
+    - {kind: mulaw}

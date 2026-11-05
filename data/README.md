@@ -39,6 +39,12 @@ uv run python -m harness.datasets.common_voice --root data/raw/<release>/en --da
 ```
 Defaults: 400 clips, at most 10 per speaker, accents with under 5 clips pooled into one "other" stratum. Record the release, seed and flags in `docs/RESEARCH.md` when you commit a manifest.
 
+## Augmentation sources (#16)
+`./data/fetch_augment_sources.sh` downloads OpenSLR **SLR28** `rirs_noises.zip` (1.3 GB, **Apache 2.0**, https://www.openslr.org/28/, sha256 pinned in the script) into `data/raw/augment/RIRS_NOISES/`. It holds simulated and real room impulse responses, isotropic noises, and point-source noises that SLR28 extracted from MUSAN. `configs/augment.yaml` uses `pointsource_noises/` for additive noise and `simulated_rirs/` for reverb.
+- MUSAN itself (SLR17, 11 GB, **CC BY 4.0**, https://www.openslr.org/17/) is the alternative noise source; point `sources.noise` at its `noise/` directory.
+- DEMAND (CC BY-SA 3.0, verify) is not used: augmenting with a share-alike source would make share-alike derivatives.
+- Augmented audio is never committed. Augmented manifests (`data/manifests/<parent>.<recipe>.jsonl`) may be, since they record every file, offset, SNR, seed and ffmpeg command.
+
 ## Synthetic caller scripts (#17)
 ```
 uv run python -m harness.synthetic.scripts --profile configs/profiles/healthcare_intake.yaml \
