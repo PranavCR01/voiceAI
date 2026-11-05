@@ -7,7 +7,7 @@
 
 ## VERIFY before the first live run
 
-The adapters were written from recollection of each API because vendor docs are blocked from the cloud environment. Check each item against current docs, fix code and fixtures, then set `verify: false` in the registry and record the doc URL and date in `docs/RESEARCH.md`.
+The adapters were first written from recollection of each API, because vendor docs were blocked from the cloud environment. Check each item against current docs, fix code and fixtures, then set `verify: false` in the registry and record the doc URL and date in `docs/RESEARCH.md`. As of 2026-11-05 the ElevenLabs and AssemblyAI **docs** are reachable from cloud sessions, but their **API hosts** (`api.elevenlabs.io`, `api.assemblyai.com`) are not (proxy 403), so both are checked against docs and still unrun.
 
 **Deepgram** (`deepgram_batch.py`) — checked against the live API on 2026-11-04 (docs host still blocked from the cloud environment, so by probing, not reading docs; details in `docs/RESEARCH.md`)
 - [x] `POST https://api.deepgram.com/v1/listen`, header `Authorization: Token <key>`, raw audio body with `Content-Type: audio/wav`. (200 with a real key; a bad key gives 401 `INVALID_AUTH`.)
@@ -15,17 +15,20 @@ The adapters were written from recollection of each API because vendor docs are 
 - [ ] Whether keyterm prompting costs extra: still open (the key has no `usage:read` scope, docs unreachable). Check the pricing page on the owner's machine.
 - [x] Transcript at `results.channels[0].alternatives[0].transcript`.
 
-**AssemblyAI** (`assemblyai_batch.py`)
-- [ ] `POST /v2/upload` (raw bytes, header `authorization: <key>`) → `upload_url`.
-- [ ] `POST /v2/transcript` with `audio_url`, `speech_model` (is `universal` the right current id?), `format_text`, `punctuate`, `language_code`, keyterms as `keyterms_prompt` (name and whether it's allowed for the chosen model).
-- [ ] Poll `GET /v2/transcript/{id}`; statuses `queued` / `processing` / `completed` / `error`; text in `text`.
-- [ ] Batch price for the chosen model (registry has none).
+**AssemblyAI** (`assemblyai_batch.py`) — checked against the API reference 2026-11-05 (docs only; details in `docs/RESEARCH.md`)
+- [x] `POST /v2/upload` (raw bytes, header `authorization: <key>`) → `upload_url`.
+- [x] `POST /v2/transcript` with `audio_url`, `format_text`, `punctuate`, `language_code`, `keyterms_prompt`. **Fixed:** `speech_model` is deprecated and `universal` is not a valid id. The adapter now sends `speech_models: [<model_id>]` (registry: `universal-3-5-pro`). A one-model list is used because the default list falls back to `universal-2` for unsupported audio; the adapter also refuses a completed transcript whose `speech_model_used` differs from the config.
+- [x] Poll `GET /v2/transcript/{id}`; statuses `queued` / `processing` / `completed` / `error`; text in `text`.
+- [x] Batch price: Universal-3.5 Pro $0.21/h, keyterms +$0.05/h (pricing page). Billed per second of audio.
+- [ ] Live run: `api.assemblyai.com` blocked from cloud sessions. Replace the fixtures with captured responses on the first run.
 
-**ElevenLabs** (`elevenlabs_batch.py`)
-- [ ] `POST https://api.elevenlabs.io/v1/speech-to-text`, header `xi-api-key`, multipart with `file` and `model_id` (`scribe_v2`?).
-- [ ] `tag_audio_events=false` still the way to suppress "(laughter)"-style tags.
-- [ ] Keyterm field name and format for Scribe v2 (sent here as repeated `keyterms` fields), and its add-on price.
-- [ ] Text at top-level `text`.
+**ElevenLabs** (`elevenlabs_batch.py`) — checked against the API reference 2026-11-05 (docs only; details in `docs/RESEARCH.md`)
+- [x] `POST https://api.elevenlabs.io/v1/speech-to-text`, header `xi-api-key`, multipart with `file` and `model_id` (`scribe_v2`; `scribe_v2_medical` also exists).
+- [x] `tag_audio_events` (boolean) is still the field; sent as `false`.
+- [x] `keyterms` is a list of strings: ≤1000 terms, ≤50 chars, ≤5 words each, none of `<>{}[]\`; +20% (reference) / +$0.05/h (pricing page). **More than 100 keyterms bill every request for at least 20 s**, so the adapter refuses >100 and checks the other limits before any request.
+- [ ] Multipart encoding of the `keyterms` list. We send repeated fields; the reference says "list of string" but shows no multipart example with values. Confirm on the first live request: a keyterm should change the output, or a malformed one should give a 422.
+- [x] Text at top-level `text`; `words[]` entries have `type` `word`/`spacing`/`audio_event` and `logprob`. The fixture now follows the documented shape but is still hand-written.
+- [ ] Live run: `api.elevenlabs.io` blocked from cloud sessions. Cost: 330 subscription credits per audio minute (19,800/h), so PriMock57 (5.5 h) needs ~109k credits.
 
 ## First live run
 

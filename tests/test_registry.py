@@ -60,7 +60,7 @@ def test_price_per_minute() -> None:
     reg = load_registry(ROOT / "configs" / "providers.yaml")
     assert reg.get("assemblyai_universal_stream").pricing.usd_per_minute() == pytest.approx(0.0025)
     assert reg.get("deepgram_nova3_stream").pricing.usd_per_minute() == pytest.approx(0.0077)
-    assert reg.get("assemblyai_batch").pricing.usd_per_minute() is None
+    assert reg.get("assemblyai_batch").pricing.usd_per_minute() == pytest.approx(0.0035)
 
 
 def test_get_unknown_config() -> None:

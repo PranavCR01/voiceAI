@@ -265,6 +265,6 @@ def test_keyterms_and_keyterms_path_are_exclusive() -> None:
 
 def test_healthcare_boost_list_is_independent_of_the_scoring_lexicon() -> None:
     p = load_profile(HEALTHCARE)
-    assert p.keyterms_path is not None and "common_uk_generics" in p.keyterms_path
+    assert p.keyterms_path is not None and "openfda_rx_generics" in p.keyterms_path
     assert p.keyterm_list() != p.lexicon_terms()
     assert "ventolin" in p.lexicon_terms() and "ventolin" not in p.keyterm_list()

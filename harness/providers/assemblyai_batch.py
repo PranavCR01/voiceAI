@@ -1,8 +1,7 @@
 """AssemblyAI async transcription: upload the audio, create a transcript, poll until done.
 
-Written from memory of AssemblyAI's v2 API because its docs are unreachable from the cloud
-environment; every item marked VERIFY in harness/providers/README.md must be checked against
-current docs before the first live run.
+Checked against the API reference on 2026-11-05 (docs/RESEARCH.md); not yet run live, because
+api.assemblyai.com is blocked from the cloud environment. Open items: harness/providers/README.md.
 """
 
 from __future__ import annotations
@@ -59,7 +58,9 @@ class AssemblyAIBatch:
         self.poll_timeout_s = poll_timeout_s
 
     def body(self, upload_url: str, settings: Mapping[str, JsonValue]) -> dict[str, Any]:
-        body: dict[str, Any] = {"audio_url": upload_url, "speech_model": self.model_id}
+        # A one-model list: the default list falls back to universal-2 for unsupported audio,
+        # which would silently test a different model than the config names.
+        body: dict[str, Any] = {"audio_url": upload_url, "speech_models": [self.model_id]}
         for name, field in _FIELDS.items():
             if name in settings:
                 body[field] = settings[name]
@@ -97,6 +98,12 @@ class AssemblyAIBatch:
             )
             status = body.get("status") if isinstance(body, dict) else None
             if status == "completed":
+                used = body.get("speech_model_used")
+                if used is not None and used != self.model_id:
+                    raise PermanentError(
+                        f"{PROVIDER}: transcript {transcript_id} used {used!r},"
+                        f" not {self.model_id!r}"
+                    )
                 return Transcript(text=str(body.get("text") or ""), raw=body)
             if status == "error":
                 raise PermanentError(

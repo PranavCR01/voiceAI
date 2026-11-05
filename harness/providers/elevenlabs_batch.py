@@ -1,11 +1,14 @@
 """ElevenLabs Scribe batch transcription (POST /v1/speech-to-text, multipart upload).
 
-Written from memory of ElevenLabs' API because its docs are unreachable from the cloud
-environment; every item marked VERIFY in harness/providers/README.md must be checked against
-current docs before the first live run.
+Checked against the API reference on 2026-11-05 (docs/RESEARCH.md); not yet run live, because
+api.elevenlabs.io is blocked from the cloud environment. Open items: harness/providers/README.md.
 
 Audio-event tagging is forced off: Scribe can insert tags such as "(laughter)" that are not
 speech. The normalizer would drop parenthesized text anyway, but the raw output should be clean.
+
+Keyterms are checked against the documented limits before any request, and more than 100 are
+refused: above 100 the API bills every request for at least 20 s of audio, which on short
+utterances (PriMock57's are a few seconds) multiplies the cost several times over.
 """
 
 from __future__ import annotations
@@ -30,8 +33,37 @@ from harness.providers.registry import ProviderConfig
 
 PROVIDER = "elevenlabs"
 URL = "https://api.elevenlabs.io/v1/speech-to-text"
-_FIELDS = {"language_code": "language_code", "diarize": "diarize"}
+_FIELDS = {
+    name: name for name in ("language_code", "diarize", "no_verbatim", "temperature", "seed")
+}
 SETTINGS = frozenset({*_FIELDS, "keyterms"})
+
+# Documented keyterm limits (batch): at most 1000 terms, 50 characters and 5 words each, none of
+# these characters. MAX_KEYTERMS is ours: the 20 s minimum billable duration starts above 100.
+MAX_KEYTERMS = 100
+_KEYTERM_MAX_CHARS = 50
+_KEYTERM_MAX_WORDS = 5
+_KEYTERM_BAD_CHARS = frozenset("<>{}[]\\")
+
+
+def check_keyterms(terms: list[str]) -> None:
+    if len(terms) > MAX_KEYTERMS:
+        raise ValueError(
+            f"{PROVIDER}: {len(terms)} keyterms; above {MAX_KEYTERMS} every request is billed for"
+            " at least 20 s of audio, so this adapter refuses them"
+        )
+    for term in terms:
+        if (
+            not term.strip()
+            or len(term) > _KEYTERM_MAX_CHARS
+            or len(term.split()) > _KEYTERM_MAX_WORDS
+            or _KEYTERM_BAD_CHARS.intersection(term)
+        ):
+            raise ValueError(
+                f"{PROVIDER}: keyterm {term!r} breaks the documented limits (non-empty,"
+                f" <= {_KEYTERM_MAX_CHARS} chars, <= {_KEYTERM_MAX_WORDS} words,"
+                " none of <>{}[]\\)"
+            )
 
 
 def _form_value(value: JsonValue) -> str:
@@ -51,6 +83,7 @@ class ElevenLabsBatch:
         no_base_url(PROVIDER, config.base_url)
         self.model_id = config.model_id
         self.keyterms = resolve_keyterms(PROVIDER, config.settings, keyterms)
+        check_keyterms(self.keyterms)
         self.api_key = api_key
         self.client = client or httpx.AsyncClient(timeout=DEFAULT_TIMEOUT_S)
 

@@ -15,6 +15,7 @@ from harness.providers.deepgram_batch import DeepgramBatch
 from harness.providers.elevenlabs_batch import ElevenLabsBatch
 from harness.providers.registry import ProviderConfig, load_registry
 from harness.providers.runner import BATCH_ADAPTERS
+from recommender.profile import load_profile
 
 ROOT = Path(__file__).resolve().parent.parent
 FIX = ROOT / "tests" / "fixtures" / "providers"
@@ -165,7 +166,7 @@ def test_profile_keyterms_require_a_profile(cls: Any) -> None:
 
 
 def _assemblyai(
-    statuses: list[str], **kw: Any
+    statuses: list[str], model_id: str = "universal-3-5-pro", **kw: Any
 ) -> tuple[AssemblyAIBatch, list[httpx.Request], list[float]]:
     seen: list[httpx.Request] = []
     waits: list[float] = []
@@ -183,6 +184,7 @@ def _assemblyai(
         waits.append(s)
 
     cfg = config("assemblyai", format_text=True, keyterms=["paracetamol"])
+    cfg = cfg.model_copy(update={"model_id": model_id})
     adapter = AssemblyAIBatch(
         cfg, "KEY", client=client(handler), sleep=sleep, poll_interval_s=2, **kw
     )
@@ -197,12 +199,18 @@ def test_assemblyai_upload_create_poll() -> None:
     assert upload.headers["authorization"] == "KEY" and upload.content[:4] == b"RIFF"
     assert json.loads(create.content) == {
         "audio_url": "https://cdn.assemblyai.com/upload/fixture",
-        "speech_model": "model-x",
+        "speech_models": ["universal-3-5-pro"],
         "format_text": True,
         "keyterms_prompt": ["paracetamol"],
     }
     assert [p.url.path for p in polls] == ["/v2/transcript/fixture-transcript"] * 3
     assert waits == [2, 2]
+
+
+def test_assemblyai_fallback_to_another_model_is_permanent() -> None:
+    adapter, _, _ = _assemblyai(["completed"], model_id="universal-2")
+    with pytest.raises(PermanentError, match="used 'universal-3-5-pro', not 'universal-2'"):
+        run(adapter.transcribe(CLIP, {}))
 
 
 def test_assemblyai_transcript_error_is_permanent() -> None:
@@ -241,6 +249,40 @@ def test_elevenlabs_multipart_request_and_parse() -> None:
         ("keyterms", "ventolin"),
         ("file", "<file>"),
     ]
+
+
+def test_elevenlabs_optional_fields_are_sent_as_documented() -> None:
+    cfg = config("elevenlabs", no_verbatim=False, temperature=0, seed=7)
+    assert ElevenLabsBatch(cfg, "K").form(cfg.settings) == [
+        ("model_id", "model-x"),
+        ("tag_audio_events", "false"),
+        ("no_verbatim", "false"),
+        ("temperature", "0"),
+        ("seed", "7"),
+    ]
+
+
+@pytest.mark.parametrize(
+    "terms",
+    [
+        [f"term{i}" for i in range(101)],  # >100 triggers the 20 s minimum billable duration
+        ["x" * 51],
+        ["one two three four five six"],
+        ["bad<term"],
+        [" "],
+    ],
+)
+def test_elevenlabs_keyterms_outside_documented_limits_are_refused(terms: list[str]) -> None:
+    with pytest.raises(ValueError, match="keyterm"):
+        ElevenLabsBatch(config("elevenlabs", keyterms=terms), "K")
+
+
+def test_elevenlabs_keyterm_limits_allow_every_profile_boost_list() -> None:
+    for path in sorted((ROOT / "configs" / "profiles").glob("*.yaml")):
+        if path.name.endswith(".templates.yaml"):
+            continue
+        terms = load_profile(path).keyterm_list()
+        ElevenLabsBatch(config("elevenlabs", keyterms=terms), "K")
 
 
 def test_elevenlabs_missing_text_is_permanent() -> None:

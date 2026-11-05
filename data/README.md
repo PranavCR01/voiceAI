@@ -2,7 +2,7 @@
 
 The repo holds manifests (`data/manifests/`), lexicons and fetch scripts only. Audio lives under `data/raw/` (gitignored), and manifest `audio_path`s are relative to that data root.
 
-Fetch on your own machine. The cloud dev environment's network policy blocks these hosts (openslr.org, api.fda.gov), and Common Voice needs a logged-in acceptance of terms.
+Fetch on your own machine when a host is blocked. Earlier cloud sessions couldn't reach openslr.org or api.fda.gov; on 2026-11-05 both answered from a cloud session (the openFDA boost list was built then; an openslr.org download wasn't tried). Common Voice needs a logged-in acceptance of terms.
 
 ## PriMock57 (CC BY 4.0)
 ```

@@ -1,0 +1,4008 @@
+{
+"url": "https://api.fda.gov/drug/ndc.json?search=product_type:\"HUMAN+PRESCRIPTION+DRUG\"&count=generic_name.exact&limit=1000",
+"fetched": "2026-11-05",
+"last_updated": "2026-11-04",
+"license": "openFDA, public domain (CC0)",
+"results": [
+{
+"term": "Gabapentin",
+"count": 431
+},
+{
+"term": "Oxygen",
+"count": 372
+},
+{
+"term": "Levothyroxine Sodium",
+"count": 326
+},
+{
+"term": "Pregabalin",
+"count": 291
+},
+{
+"term": "Ibuprofen",
+"count": 290
+},
+{
+"term": "Amoxicillin",
+"count": 266
+},
+{
+"term": "Lisinopril",
+"count": 242
+},
+{
+"term": "PREGABALIN",
+"count": 210
+},
+{
+"term": "Levetiracetam",
+"count": 209
+},
+{
+"term": "Aripiprazole",
+"count": 208
+},
+{
+"term": "Metformin Hydrochloride",
+"count": 207
+},
+{
+"term": "Lamotrigine",
+"count": 204
+},
+{
+"term": "Olanzapine",
+"count": 198
+},
+{
+"term": "Tadalafil",
+"count": 190
+},
+{
+"term": "Amitriptyline Hydrochloride",
+"count": 189
+},
+{
+"term": "Topiramate",
+"count": 188
+},
+{
+"term": "Amoxicillin and Clavulanate Potassium",
+"count": 180
+},
+{
+"term": "Cephalexin",
+"count": 180
+},
+{
+"term": "Celecoxib",
+"count": 173
+},
+{
+"term": "Diclofenac Sodium",
+"count": 172
+},
+{
+"term": "Hydrocodone Bitartrate and Acetaminophen",
+"count": 163
+},
+{
+"term": "ATORVASTATIN CALCIUM",
+"count": 158
+},
+{
+"term": "Naproxen",
+"count": 158
+},
+{
+"term": "Omeprazole",
+"count": 158
+},
+{
+"term": "Rosuvastatin Calcium",
+"count": 158
+},
+{
+"term": "Carvedilol",
+"count": 157
+},
+{
+"term": "Potassium Chloride",
+"count": 153
+},
+{
+"term": "levothyroxine sodium",
+"count": 153
+},
+{
+"term": "Famotidine",
+"count": 149
+},
+{
+"term": "Sodium Fluoride",
+"count": 148
+},
+{
+"term": "Buspirone Hydrochloride",
+"count": 145
+},
+{
+"term": "Diltiazem Hydrochloride",
+"count": 143
+},
+{
+"term": "Lidocaine Hydrochloride",
+"count": 143
+},
+{
+"term": "Losartan Potassium",
+"count": 143
+},
+{
+"term": "Trazodone Hydrochloride",
+"count": 143
+},
+{
+"term": "Glipizide",
+"count": 141
+},
+{
+"term": "Estradiol",
+"count": 140
+},
+{
+"term": "Duloxetine",
+"count": 138
+},
+{
+"term": "Sildenafil",
+"count": 134
+},
+{
+"term": "Fluconazole",
+"count": 133
+},
+{
+"term": "Sertraline Hydrochloride",
+"count": 133
+},
+{
+"term": "Baclofen",
+"count": 131
+},
+{
+"term": "Labetalol Hydrochloride",
+"count": 130
+},
+{
+"term": "Mirtazapine",
+"count": 130
+},
+{
+"term": "Triamcinolone Acetonide",
+"count": 130
+},
+{
+"term": "Haloperidol",
+"count": 126
+},
+{
+"term": "Hydrochlorothiazide",
+"count": 126
+},
+{
+"term": "Prednisone",
+"count": 126
+},
+{
+"term": "bupropion hydrochloride",
+"count": 125
+},
+{
+"term": "Ondansetron",
+"count": 124
+},
+{
+"term": "Venlafaxine Hydrochloride",
+"count": 124
+},
+{
+"term": "Furosemide",
+"count": 123
+},
+{
+"term": "Glycopyrrolate",
+"count": 123
+},
+{
+"term": "Lorazepam",
+"count": 122
+},
+{
+"term": "Acyclovir",
+"count": 119
+},
+{
+"term": "Benzonatate",
+"count": 119
+},
+{
+"term": "Methylphenidate Hydrochloride",
+"count": 116
+},
+{
+"term": "Quetiapine Fumarate",
+"count": 115
+},
+{
+"term": "Methocarbamol",
+"count": 114
+},
+{
+"term": "Dexamethasone",
+"count": 113
+},
+{
+"term": "Allopurinol",
+"count": 112
+},
+{
+"term": "Cyclobenzaprine Hydrochloride",
+"count": 110
+},
+{
+"term": "Doxycycline Hyclate",
+"count": 110
+},
+{
+"term": "Propranolol Hydrochloride",
+"count": 110
+},
+{
+"term": "Metronidazole",
+"count": 109
+},
+{
+"term": "Alprazolam",
+"count": 108
+},
+{
+"term": "Phenobarbital",
+"count": 108
+},
+{
+"term": "topiramate",
+"count": 107
+},
+{
+"term": "Atenolol",
+"count": 106
+},
+{
+"term": "Fluoxetine Hydrochloride",
+"count": 106
+},
+{
+"term": "Bumetanide",
+"count": 105
+},
+{
+"term": "Hydralazine Hydrochloride",
+"count": 105
+},
+{
+"term": "PRAVASTATIN SODIUM",
+"count": 105
+},
+{
+"term": "PREDNISONE",
+"count": 105
+},
+{
+"term": "Valsartan",
+"count": 105
+},
+{
+"term": "Risperidone",
+"count": 104
+},
+{
+"term": "Atorvastatin Calcium",
+"count": 103
+},
+{
+"term": "Fenofibrate",
+"count": 103
+},
+{
+"term": "Azithromycin",
+"count": 102
+},
+{
+"term": "Glimepiride",
+"count": 102
+},
+{
+"term": "Lacosamide",
+"count": 102
+},
+{
+"term": "Quetiapine",
+"count": 102
+},
+{
+"term": "Carbamazepine",
+"count": 101
+},
+{
+"term": "Metoprolol Tartrate",
+"count": 101
+},
+{
+"term": "OXYGEN",
+"count": 101
+},
+{
+"term": "Nitrogen",
+"count": 100
+},
+{
+"term": "Sulfamethoxazole and Trimethoprim",
+"count": 100
+},
+{
+"term": "Bupropion Hydrochloride",
+"count": 99
+},
+{
+"term": "Divalproex Sodium",
+"count": 99
+},
+{
+"term": "METFORMIN HYDROCHLORIDE",
+"count": 99
+},
+{
+"term": "Etodolac",
+"count": 98
+},
+{
+"term": "diltiazem hydrochloride",
+"count": 98
+},
+{
+"term": "Oxycodone and Acetaminophen",
+"count": 96
+},
+{
+"term": "Minocycline Hydrochloride",
+"count": 95
+},
+{
+"term": "Levofloxacin",
+"count": 94
+},
+{
+"term": "Metoprolol succinate",
+"count": 94
+},
+{
+"term": "Pramipexole Dihydrochloride",
+"count": 94
+},
+{
+"term": "Promethazine Hydrochloride",
+"count": 92
+},
+{
+"term": "propranolol hydrochloride",
+"count": 92
+},
+{
+"term": "Hydroxyzine Hydrochloride",
+"count": 90
+},
+{
+"term": "Tacrolimus",
+"count": 90
+},
+{
+"term": "gabapentin",
+"count": 89
+},
+{
+"term": "Nifedipine",
+"count": 88
+},
+{
+"term": "Zolpidem Tartrate",
+"count": 88
+},
+{
+"term": "Enoxaparin Sodium",
+"count": 87
+},
+{
+"term": "Fluoxetine",
+"count": 87
+},
+{
+"term": "Simvastatin",
+"count": 85
+},
+{
+"term": "Tizanidine",
+"count": 85
+},
+{
+"term": "Clonidine Hydrochloride",
+"count": 84
+},
+{
+"term": "Dicyclomine Hydrochloride",
+"count": 84
+},
+{
+"term": "Warfarin Sodium",
+"count": 84
+},
+{
+"term": "Amlodipine Besylate",
+"count": 83
+},
+{
+"term": "Fluphenazine Hydrochloride",
+"count": 83
+},
+{
+"term": "Atomoxetine",
+"count": 82
+},
+{
+"term": "Hydrocortisone",
+"count": 82
+},
+{
+"term": "METOPROLOL TARTRATE",
+"count": 81
+},
+{
+"term": "Morphine Sulfate",
+"count": 81
+},
+{
+"term": "meloxicam",
+"count": 81
+},
+{
+"term": "Benazepril Hydrochloride",
+"count": 80
+},
+{
+"term": "Ketorolac Tromethamine",
+"count": 80
+},
+{
+"term": "estradiol",
+"count": 80
+},
+{
+"term": "Chlorthalidone",
+"count": 78
+},
+{
+"term": "Doxazosin",
+"count": 78
+},
+{
+"term": "Oxycodone Hydrochloride",
+"count": 78
+},
+{
+"term": "Indomethacin",
+"count": 77
+},
+{
+"term": "Metoprolol Succinate",
+"count": 77
+},
+{
+"term": "Doxepin Hydrochloride",
+"count": 76
+},
+{
+"term": "Ondansetron Hydrochloride",
+"count": 76
+},
+{
+"term": "Sacubitril and Valsartan",
+"count": 76
+},
+{
+"term": "Heparin Sodium",
+"count": 75
+},
+{
+"term": "Nortriptyline Hydrochloride",
+"count": 75
+},
+{
+"term": "Pantoprazole Sodium",
+"count": 75
+},
+{
+"term": "Ciprofloxacin Hydrochloride",
+"count": 74
+},
+{
+"term": "clonazepam",
+"count": 74
+},
+{
+"term": "cyclobenzaprine hydrochloride",
+"count": 74
+},
+{
+"term": "LEVOTHYROXINE SODIUM",
+"count": 73
+},
+{
+"term": "Lenalidomide",
+"count": 73
+},
+{
+"term": "Penicillin V Potassium",
+"count": 73
+},
+{
+"term": "Carbidopa and Levodopa",
+"count": 72
+},
+{
+"term": "Paroxetine",
+"count": 72
+},
+{
+"term": "Lidocaine",
+"count": 71
+},
+{
+"term": "Oxybutynin Chloride",
+"count": 71
+},
+{
+"term": "Cefdinir",
+"count": 70
+},
+{
+"term": "Venlafaxine",
+"count": 70
+},
+{
+"term": "spironolactone",
+"count": 70
+},
+{
+"term": "Meloxicam",
+"count": 69
+},
+{
+"term": "Midodrine Hydrochloride",
+"count": 69
+},
+{
+"term": "Oxcarbazepine",
+"count": 69
+},
+{
+"term": "Phentermine Hydrochloride",
+"count": 69
+},
+{
+"term": "Ramipril",
+"count": 69
+},
+{
+"term": "Rosuvastatin",
+"count": 68
+},
+{
+"term": "Vancomycin Hydrochloride",
+"count": 68
+},
+{
+"term": "buspirone hydrochloride",
+"count": 68
+},
+{
+"term": "Atorvastatin calcium",
+"count": 67
+},
+{
+"term": "ketorolac tromethamine",
+"count": 67
+},
+{
+"term": "BACLOFEN",
+"count": 66
+},
+{
+"term": "Dexamethasone Sodium Phosphate",
+"count": 66
+},
+{
+"term": "Erythromycin",
+"count": 66
+},
+{
+"term": "furosemide",
+"count": 66
+},
+{
+"term": "Isotretinoin",
+"count": 65
+},
+{
+"term": "Albuterol Sulfate",
+"count": 64
+},
+{
+"term": "Diazepam",
+"count": 64
+},
+{
+"term": "Doxycycline",
+"count": 63
+},
+{
+"term": "Finasteride",
+"count": 63
+},
+{
+"term": "LIDOCAINE HYDROCHLORIDE",
+"count": 62
+},
+{
+"term": "Lurasidone Hydrochloride",
+"count": 62
+},
+{
+"term": "PredniSONE",
+"count": 62
+},
+{
+"term": "Torsemide",
+"count": 62
+},
+{
+"term": "Valsartan and Hydrochlorothiazide",
+"count": 62
+},
+{
+"term": "Warfarin",
+"count": 62
+},
+{
+"term": "Amlodipine besylate",
+"count": 61
+},
+{
+"term": "Eszopiclone",
+"count": 61
+},
+{
+"term": "GABAPENTIN",
+"count": 61
+},
+{
+"term": "Metaxalone",
+"count": 61
+},
+{
+"term": "Sucralfate",
+"count": 61
+},
+{
+"term": "Tramadol Hydrochloride",
+"count": 61
+},
+{
+"term": "Triamterene and Hydrochlorothiazide",
+"count": 61
+},
+{
+"term": "delandistrogene moxeparvovec-rokl",
+"count": 61
+},
+{
+"term": "Clonazepam",
+"count": 60
+},
+{
+"term": "Esomeprazole Magnesium",
+"count": 60
+},
+{
+"term": "Irbesartan",
+"count": 60
+},
+{
+"term": "SPIRONOLACTONE",
+"count": 60
+},
+{
+"term": "Escitalopram",
+"count": 59
+},
+{
+"term": "Nabumetone",
+"count": 59
+},
+{
+"term": "Lithium Carbonate",
+"count": 58
+},
+{
+"term": "doxycycline",
+"count": 58
+},
+{
+"term": "methocarbamol",
+"count": 58
+},
+{
+"term": "temazepam",
+"count": 58
+},
+{
+"term": "POTASSIUM CHLORIDE",
+"count": 57
+},
+{
+"term": "fenofibrate",
+"count": 57
+},
+{
+"term": "Nebivolol",
+"count": 56
+},
+{
+"term": "Progesterone",
+"count": 56
+},
+{
+"term": "enoxaparin sodium",
+"count": 56
+},
+{
+"term": "Sotalol Hydrochloride",
+"count": 55
+},
+{
+"term": "Tamsulosin Hydrochloride",
+"count": 55
+},
+{
+"term": "Telmisartan",
+"count": 55
+},
+{
+"term": "acyclovir",
+"count": 55
+},
+{
+"term": "tadalafil",
+"count": 55
+},
+{
+"term": "Enalapril Maleate",
+"count": 54
+},
+{
+"term": "Nystatin",
+"count": 54
+},
+{
+"term": "Tretinoin",
+"count": 54
+},
+{
+"term": "Valacyclovir",
+"count": 54
+},
+{
+"term": "tirzepatide",
+"count": 54
+},
+{
+"term": "Chlorpromazine Hydrochloride",
+"count": 53
+},
+{
+"term": "Clarithromycin",
+"count": 53
+},
+{
+"term": "Guanfacine",
+"count": 53
+},
+{
+"term": "Sodium Chloride",
+"count": 53
+},
+{
+"term": "Amlodipine Besylate and Benazepril Hydrochloride",
+"count": 52
+},
+{
+"term": "Ciprofloxacin",
+"count": 52
+},
+{
+"term": "Dextroamphetamine Saccharate, Amphetamine Aspartate, Dextroamphetamine Sulfate and Amphetamine Sulfate",
+"count": 52
+},
+{
+"term": "Meclizine Hydrochloride",
+"count": 52
+},
+{
+"term": "Metoclopramide",
+"count": 52
+},
+{
+"term": "SULFACETAMIDE SODIUM, SULFUR",
+"count": 52
+},
+{
+"term": "dexmethylphenidate hydrochloride",
+"count": 52
+},
+{
+"term": "doxepin hydrochloride",
+"count": 52
+},
+{
+"term": "epinephrine",
+"count": 52
+},
+{
+"term": "risperidone",
+"count": 52
+},
+{
+"term": "Lansoprazole",
+"count": 51
+},
+{
+"term": "Olmesartan Medoxomil",
+"count": 51
+},
+{
+"term": "Prazosin Hydrochloride",
+"count": 51
+},
+{
+"term": "Ropinirole",
+"count": 51
+},
+{
+"term": "SODIUM CHLORIDE",
+"count": 51
+},
+{
+"term": "Spironolactone",
+"count": 51
+},
+{
+"term": "Tobramycin",
+"count": 50
+},
+{
+"term": "Bupropion hydrochloride",
+"count": 49
+},
+{
+"term": "FENOFIBRATE",
+"count": 49
+},
+{
+"term": "Folic Acid",
+"count": 49
+},
+{
+"term": "Temozolomide",
+"count": 49
+},
+{
+"term": "Terazosin Hydrochloride",
+"count": 49
+},
+{
+"term": "lurasidone hydrochloride",
+"count": 49
+},
+{
+"term": "Amlodipine and Atorvastatin",
+"count": 48
+},
+{
+"term": "Citalopram",
+"count": 48
+},
+{
+"term": "Clindamycin hydrochloride",
+"count": 48
+},
+{
+"term": "Digoxin",
+"count": 48
+},
+{
+"term": "Memantine Hydrochloride",
+"count": 48
+},
+{
+"term": "Sumatriptan Succinate",
+"count": 48
+},
+{
+"term": "atorvastatin calcium",
+"count": 48
+},
+{
+"term": "dasatinib",
+"count": 48
+},
+{
+"term": "methylphenidate hydrochloride",
+"count": 48
+},
+{
+"term": "Citalopram Hydrobromide",
+"count": 47
+},
+{
+"term": "Felodipine",
+"count": 47
+},
+{
+"term": "Hydroxyzine hydrochloride",
+"count": 47
+},
+{
+"term": "Modafinil",
+"count": 47
+},
+{
+"term": "SIMVASTATIN",
+"count": 47
+},
+{
+"term": "TRIAMCINOLONE ACETONIDE",
+"count": 47
+},
+{
+"term": "VERAPAMIL HYDROCHLORIDE",
+"count": 47
+},
+{
+"term": "Valacyclovir Hydrochloride",
+"count": 47
+},
+{
+"term": "Zonisamide",
+"count": 47
+},
+{
+"term": "clindamycin phosphate",
+"count": 47
+},
+{
+"term": "everolimus",
+"count": 47
+},
+{
+"term": "losartan potassium and hydrochlorothiazide",
+"count": 47
+},
+{
+"term": "metoprolol succinate",
+"count": 47
+},
+{
+"term": "Buprenorphine and Naloxone",
+"count": 46
+},
+{
+"term": "Deferasirox",
+"count": 46
+},
+{
+"term": "OXCARBAZEPINE",
+"count": 46
+},
+{
+"term": "Phenylephrine Hydrochloride",
+"count": 46
+},
+{
+"term": "quetiapine fumarate",
+"count": 46
+},
+{
+"term": "Acetazolamide",
+"count": 45
+},
+{
+"term": "Deflazacort",
+"count": 45
+},
+{
+"term": "HEPARIN SODIUM",
+"count": 45
+},
+{
+"term": "Pirfenidone",
+"count": 45
+},
+{
+"term": "metronidazole",
+"count": 45
+},
+{
+"term": "olmesartan medoxomil",
+"count": 45
+},
+{
+"term": "Bupivacaine Hydrochloride",
+"count": 44
+},
+{
+"term": "Ceftriaxone Sodium",
+"count": 44
+},
+{
+"term": "Everolimus",
+"count": 44
+},
+{
+"term": "Losartan Potassium and Hydrochlorothiazide",
+"count": 44
+},
+{
+"term": "Mesalamine",
+"count": 44
+},
+{
+"term": "Rizatriptan Benzoate",
+"count": 44
+},
+{
+"term": "Ropivacaine Hydrochloride",
+"count": 44
+},
+{
+"term": "Ursodiol",
+"count": 44
+},
+{
+"term": "cyclophosphamide",
+"count": 44
+},
+{
+"term": "divalproex sodium",
+"count": 44
+},
+{
+"term": "metformin hydrochloride",
+"count": 44
+},
+{
+"term": "quetiapine",
+"count": 44
+},
+{
+"term": "Amiodarone Hydrochloride",
+"count": 43
+},
+{
+"term": "Lovastatin",
+"count": 43
+},
+{
+"term": "Nadolol",
+"count": 43
+},
+{
+"term": "Pioglitazone",
+"count": 43
+},
+{
+"term": "Primidone",
+"count": 43
+},
+{
+"term": "TRAMADOL HYDROCHLORIDE",
+"count": 43
+},
+{
+"term": "levetiracetam",
+"count": 43
+},
+{
+"term": "prazosin hydrochloride",
+"count": 43
+},
+{
+"term": "zolpidem tartrate",
+"count": 43
+},
+{
+"term": "Budesonide",
+"count": 42
+},
+{
+"term": "Buprenorphine",
+"count": 42
+},
+{
+"term": "Clobetasol Propionate",
+"count": 42
+},
+{
+"term": "Docetaxel",
+"count": 42
+},
+{
+"term": "Donepezil Hydrochloride",
+"count": 42
+},
+{
+"term": "Lisinopril and Hydrochlorothiazide",
+"count": 42
+},
+{
+"term": "Pravastatin sodium",
+"count": 42
+},
+{
+"term": "Ticagrelor",
+"count": 42
+},
+{
+"term": "hydroxyzine pamoate",
+"count": 42
+},
+{
+"term": "valsartan and hydrochlorothiazide",
+"count": 42
+},
+{
+"term": "Escitalopram Oxalate",
+"count": 41
+},
+{
+"term": "Nitroglycerin",
+"count": 41
+},
+{
+"term": "aripiprazole",
+"count": 41
+},
+{
+"term": "baclofen",
+"count": 41
+},
+{
+"term": "lisdexamfetamine dimesylate",
+"count": 41
+},
+{
+"term": "vancomycin hydrochloride",
+"count": 41
+},
+{
+"term": "venlafaxine",
+"count": 41
+},
+{
+"term": "AMLODIPINE BESYLATE",
+"count": 40
+},
+{
+"term": "Amlodipine and Benazepril Hydrochloride",
+"count": 40
+},
+{
+"term": "Buspirone hydrochloride",
+"count": 40
+},
+{
+"term": "DULOXETINE HYDROCHLORIDE",
+"count": 40
+},
+{
+"term": "Dexmethylphenidate Hydrochloride",
+"count": 40
+},
+{
+"term": "Diltiazem hydrochloride",
+"count": 40
+},
+{
+"term": "KETOROLAC TROMETHAMINE",
+"count": 40
+},
+{
+"term": "LISDEXAMFETAMINE DIMESYLATE",
+"count": 40
+},
+{
+"term": "Methocarbamol Tablets",
+"count": 40
+},
+{
+"term": "Methotrexate",
+"count": 40
+},
+{
+"term": "VENLAFAXINE HYDROCHLORIDE",
+"count": 40
+},
+{
+"term": "Verapamil Hydrochloride",
+"count": 40
+},
+{
+"term": "allopurinol",
+"count": 40
+},
+{
+"term": "brivaracetam",
+"count": 40
+},
+{
+"term": "escitalopram",
+"count": 40
+},
+{
+"term": "lamotrigine",
+"count": 40
+},
+{
+"term": "treprostinil",
+"count": 40
+},
+{
+"term": "BUPIVACAINE HYDROCHLORIDE",
+"count": 39
+},
+{
+"term": "Cefadroxil",
+"count": 39
+},
+{
+"term": "Clindamycin Hydrochloride",
+"count": 39
+},
+{
+"term": "FAMOTIDINE",
+"count": 39
+},
+{
+"term": "Gemfibrozil",
+"count": 39
+},
+{
+"term": "Lisdexamfetamine dimesylate",
+"count": 39
+},
+{
+"term": "Meropenem",
+"count": 39
+},
+{
+"term": "Montelukast Sodium",
+"count": 39
+},
+{
+"term": "Naproxen Sodium",
+"count": 39
+},
+{
+"term": "Nitrofurantoin (monohydrate/macrocrystals)",
+"count": 39
+},
+{
+"term": "ONDANSETRON",
+"count": 39
+},
+{
+"term": "Oseltamivir Phosphate",
+"count": 39
+},
+{
+"term": "Prochlorperazine Maleate",
+"count": 39
+},
+{
+"term": "VANCOMYCIN HYDROCHLORIDE",
+"count": 39
+},
+{
+"term": "etranacogene dezaparvovec",
+"count": 39
+},
+{
+"term": "nifedipine",
+"count": 39
+},
+{
+"term": "ropinirole",
+"count": 39
+},
+{
+"term": "venlafaxine hydrochloride",
+"count": 39
+},
+{
+"term": "Atropine Sulfate",
+"count": 38
+},
+{
+"term": "Cinacalcet",
+"count": 38
+},
+{
+"term": "Isosorbide Mononitrate",
+"count": 38
+},
+{
+"term": "Lisinopril and Hydrochlorothiazide Tablets",
+"count": 38
+},
+{
+"term": "Paliperidone",
+"count": 38
+},
+{
+"term": "Pemetrexed disodium",
+"count": 38
+},
+{
+"term": "RISPERIDONE",
+"count": 38
+},
+{
+"term": "Zolmitriptan",
+"count": 38
+},
+{
+"term": "tizanidine hydrochloride",
+"count": 38
+},
+{
+"term": "BUPROPION HYDROCHLORIDE",
+"count": 37
+},
+{
+"term": "Colchicine",
+"count": 37
+},
+{
+"term": "Fluocinonide",
+"count": 37
+},
+{
+"term": "Hydroxyzine Pamoate",
+"count": 37
+},
+{
+"term": "Metolazone",
+"count": 37
+},
+{
+"term": "NITROGEN",
+"count": 37
+},
+{
+"term": "PHENYLEPHRINE HYDROCHLORIDE",
+"count": 37
+},
+{
+"term": "Theophylline",
+"count": 37
+},
+{
+"term": "clonidine hydrochloride",
+"count": 37
+},
+{
+"term": "diazepam",
+"count": 37
+},
+{
+"term": "fluticasone propionate and salmeterol",
+"count": 37
+},
+{
+"term": "glycopyrrolate",
+"count": 37
+},
+{
+"term": "onasemnogene abeparvovec-xioi",
+"count": 37
+},
+{
+"term": "phentermine hydrochloride",
+"count": 37
+},
+{
+"term": "Dasatinib",
+"count": 36
+},
+{
+"term": "Divalproex sodium",
+"count": 36
+},
+{
+"term": "Esomeprazole magnesium",
+"count": 36
+},
+{
+"term": "Fluticasone Propionate",
+"count": 36
+},
+{
+"term": "Mupirocin",
+"count": 36
+},
+{
+"term": "Ramelteon",
+"count": 36
+},
+{
+"term": "acetaminophen and codeine phosphate",
+"count": 36
+},
+{
+"term": "diclofenac potassium",
+"count": 36
+},
+{
+"term": "nitroglycerin",
+"count": 36
+},
+{
+"term": "potassium chloride",
+"count": 36
+},
+{
+"term": "Cyclophosphamide",
+"count": 35
+},
+{
+"term": "LAMOTRIGINE",
+"count": 35
+},
+{
+"term": "Metoprolol Succinate ER Tablets",
+"count": 35
+},
+{
+"term": "Ofloxacin",
+"count": 35
+},
+{
+"term": "Paricalcitol",
+"count": 35
+},
+{
+"term": "Pravastatin Sodium",
+"count": 35
+},
+{
+"term": "ciprofloxacin",
+"count": 35
+},
+{
+"term": "hydroxyzine hydrochloride",
+"count": 35
+},
+{
+"term": "memantine hydrochloride",
+"count": 35
+},
+{
+"term": "Captopril",
+"count": 34
+},
+{
+"term": "Methadone Hydrochloride",
+"count": 34
+},
+{
+"term": "Rivastigmine Tartrate",
+"count": 34
+},
+{
+"term": "Selexipag",
+"count": 34
+},
+{
+"term": "celecoxib",
+"count": 34
+},
+{
+"term": "morphine sulfate",
+"count": 34
+},
+{
+"term": "paroxetine hydrochloride hemihydrate",
+"count": 34
+},
+{
+"term": "verapamil hydrochloride",
+"count": 34
+},
+{
+"term": "Air",
+"count": 33
+},
+{
+"term": "Carbon Dioxide",
+"count": 33
+},
+{
+"term": "Dapsone",
+"count": 33
+},
+{
+"term": "Desmopressin Acetate",
+"count": 33
+},
+{
+"term": "Dextroamphetamine Sulfate",
+"count": 33
+},
+{
+"term": "Dicyclomine hydrochloride",
+"count": 33
+},
+{
+"term": "Ezetimibe",
+"count": 33
+},
+{
+"term": "LEVETIRACETAM",
+"count": 33
+},
+{
+"term": "Oxaliplatin",
+"count": 33
+},
+{
+"term": "Pomalidomide",
+"count": 33
+},
+{
+"term": "Potassium Citrate",
+"count": 33
+},
+{
+"term": "Rosuvastatin calcium",
+"count": 33
+},
+{
+"term": "Sertraline",
+"count": 33
+},
+{
+"term": "haloperidol",
+"count": 33
+},
+{
+"term": "lidocaine",
+"count": 33
+},
+{
+"term": "valsartan",
+"count": 33
+},
+{
+"term": "Doxorubicin Hydrochloride",
+"count": 32
+},
+{
+"term": "GLYCOPYRROLATE",
+"count": 32
+},
+{
+"term": "Hyoscyamine Sulfate",
+"count": 32
+},
+{
+"term": "Ketoconazole",
+"count": 32
+},
+{
+"term": "Paclitaxel",
+"count": 32
+},
+{
+"term": "Ranolazine",
+"count": 32
+},
+{
+"term": "paroxetine hydrochloride",
+"count": 32
+},
+{
+"term": "ropinirole hydrochloride",
+"count": 32
+},
+{
+"term": "Azathioprine",
+"count": 31
+},
+{
+"term": "Betamethasone Dipropionate",
+"count": 31
+},
+{
+"term": "CELECOXIB",
+"count": 31
+},
+{
+"term": "Cefazolin",
+"count": 31
+},
+{
+"term": "DOXEPIN HYDROCHLORIDE",
+"count": 31
+},
+{
+"term": "FUROSEMIDE",
+"count": 31
+},
+{
+"term": "Fluorouracil",
+"count": 31
+},
+{
+"term": "Glyburide",
+"count": 31
+},
+{
+"term": "LACOSAMIDE",
+"count": 31
+},
+{
+"term": "Naloxone Hydrochloride",
+"count": 31
+},
+{
+"term": "Nitrous Oxide",
+"count": 31
+},
+{
+"term": "PANTOPRAZOLE",
+"count": 31
+},
+{
+"term": "carbamazepine",
+"count": 31
+},
+{
+"term": "perphenazine",
+"count": 31
+},
+{
+"term": "rebisufligene etisparvovec-hopf",
+"count": 31
+},
+{
+"term": "testosterone cypionate",
+"count": 31
+},
+{
+"term": "tretinoin",
+"count": 31
+},
+{
+"term": "Acetaminophen and Codeine Phosphate",
+"count": 30
+},
+{
+"term": "Armodafinil",
+"count": 30
+},
+{
+"term": "Clindamycin Phosphate",
+"count": 30
+},
+{
+"term": "Clomipramine Hydrochloride",
+"count": 30
+},
+{
+"term": "DEXAMETHASONE SODIUM PHOSPHATE",
+"count": 30
+},
+{
+"term": "Epinephrine",
+"count": 30
+},
+{
+"term": "Imipramine Hydrochloride",
+"count": 30
+},
+{
+"term": "Metformin HCl",
+"count": 30
+},
+{
+"term": "Mometasone Furoate",
+"count": 30
+},
+{
+"term": "Rocuronium Bromide",
+"count": 30
+},
+{
+"term": "Succinylcholine Chloride",
+"count": 30
+},
+{
+"term": "albuterol sulfate",
+"count": 30
+},
+{
+"term": "alprazolam",
+"count": 30
+},
+{
+"term": "methimazole",
+"count": 30
+},
+{
+"term": "triamcinolone acetonide",
+"count": 30
+},
+{
+"term": "Calcitriol",
+"count": 29
+},
+{
+"term": "Carisoprodol",
+"count": 29
+},
+{
+"term": "Carvedilol Phosphate",
+"count": 29
+},
+{
+"term": "Hydromorphone Hydrochloride",
+"count": 29
+},
+{
+"term": "Irbesartan and Hydrochlorothiazide",
+"count": 29
+},
+{
+"term": "Levonorgestrel and Ethinyl Estradiol",
+"count": 29
+},
+{
+"term": "METHYLPHENIDATE HYDROCHLORIDE",
+"count": 29
+},
+{
+"term": "MORPHINE SULFATE",
+"count": 29
+},
+{
+"term": "Naltrexone Hydrochloride",
+"count": 29
+},
+{
+"term": "Perphenazine",
+"count": 29
+},
+{
+"term": "SODIUM BICARBONATE",
+"count": 29
+},
+{
+"term": "Temazepam",
+"count": 29
+},
+{
+"term": "Timolol Maleate",
+"count": 29
+},
+{
+"term": "Tolvaptan",
+"count": 29
+},
+{
+"term": "Tranexamic Acid",
+"count": 29
+},
+{
+"term": "diclofenac sodium",
+"count": 29
+},
+{
+"term": "guanfacine",
+"count": 29
+},
+{
+"term": "hydrocortisone",
+"count": 29
+},
+{
+"term": "lacosamide",
+"count": 29
+},
+{
+"term": "lovastatin",
+"count": 29
+},
+{
+"term": "oseltamivir phosphate",
+"count": 29
+},
+{
+"term": "sodium chloride, sodium lactate, calcium chloride, magnesium chloride and dextrose",
+"count": 29
+},
+{
+"term": "Ciprofolxacin",
+"count": 28
+},
+{
+"term": "Cyclobenzaprine hydrochloride",
+"count": 28
+},
+{
+"term": "ESTRADIOL",
+"count": 28
+},
+{
+"term": "Leucovorin Calcium",
+"count": 28
+},
+{
+"term": "Propafenone Hydrochloride",
+"count": 28
+},
+{
+"term": "SILDENAFIL",
+"count": 28
+},
+{
+"term": "Testosterone Cypionate",
+"count": 28
+},
+{
+"term": "doxycycline hyclate",
+"count": 28
+},
+{
+"term": "methylprednisolone",
+"count": 28
+},
+{
+"term": "metoprolol tartrate",
+"count": 28
+},
+{
+"term": "midodrine hydrochloride",
+"count": 28
+},
+{
+"term": "voriconazole",
+"count": 28
+},
+{
+"term": "Cyclosporine",
+"count": 27
+},
+{
+"term": "Daptomycin",
+"count": 27
+},
+{
+"term": "Gentamicin Sulfate",
+"count": 27
+},
+{
+"term": "Lisdexamfetamine Dimesylate",
+"count": 27
+},
+{
+"term": "Nicardipine Hydrochloride",
+"count": 27
+},
+{
+"term": "Oseltamivir phosphate",
+"count": 27
+},
+{
+"term": "Phytonadione",
+"count": 27
+},
+{
+"term": "Sevelamer Carbonate",
+"count": 27
+},
+{
+"term": "Solifenacin Succinate",
+"count": 27
+},
+{
+"term": "atomoxetine",
+"count": 27
+},
+{
+"term": "clobetasol propionate",
+"count": 27
+},
+{
+"term": "deferasirox",
+"count": 27
+},
+{
+"term": "simvastatin",
+"count": 27
+},
+{
+"term": "tofacitinib",
+"count": 27
+},
+{
+"term": "ACYCLOVIR",
+"count": 26
+},
+{
+"term": "Amantadine Hydrochloride",
+"count": 26
+},
+{
+"term": "DOXYCYCLINE HYCLATE",
+"count": 26
+},
+{
+"term": "Dapagliflozin",
+"count": 26
+},
+{
+"term": "Desoximetasone",
+"count": 26
+},
+{
+"term": "Desvenlafaxine Succinate",
+"count": 26
+},
+{
+"term": "Dofetilide",
+"count": 26
+},
+{
+"term": "Famciclovir",
+"count": 26
+},
+{
+"term": "Haloperidol Decanoate",
+"count": 26
+},
+{
+"term": "Metformin hydrochloride",
+"count": 26
+},
+{
+"term": "OXYCODONE HYDROCHLORIDE",
+"count": 26
+},
+{
+"term": "Phenytoin Sodium",
+"count": 26
+},
+{
+"term": "Teriflunomide",
+"count": 26
+},
+{
+"term": "Voriconazole",
+"count": 26
+},
+{
+"term": "insulin aspart",
+"count": 26
+},
+{
+"term": "phenobarbital",
+"count": 26
+},
+{
+"term": "sumatriptan",
+"count": 26
+},
+{
+"term": "varenicline tartrate",
+"count": 26
+},
+{
+"term": "Amlodipine and Olmesartan Medoxomil",
+"count": 25
+},
+{
+"term": "Butalbital, Acetaminophen, and Caffeine",
+"count": 25
+},
+{
+"term": "CARBAMAZEPINE",
+"count": 25
+},
+{
+"term": "Chlorhexidine Gluconate",
+"count": 25
+},
+{
+"term": "Dextroamphetamine Saccharate, Amphetamine Aspartate Monohydrate, Dextroamphetamine Sulfate, and Amphetamine Sulfate",
+"count": 25
+},
+{
+"term": "EPINEPHRINE",
+"count": 25
+},
+{
+"term": "ESZOPICLONE",
+"count": 25
+},
+{
+"term": "Enalapril maleate",
+"count": 25
+},
+{
+"term": "Ephedrine Sulfate",
+"count": 25
+},
+{
+"term": "Flecainide Acetate",
+"count": 25
+},
+{
+"term": "Fluvoxamine Maleate",
+"count": 25
+},
+{
+"term": "Linezolid",
+"count": 25
+},
+{
+"term": "Liothyronine Sodium",
+"count": 25
+},
+{
+"term": "Medroxyprogesterone Acetate",
+"count": 25
+},
+{
+"term": "Mexiletine Hydrochloride",
+"count": 25
+},
+{
+"term": "Milrinone Lactate",
+"count": 25
+},
+{
+"term": "Minoxidil",
+"count": 25
+},
+{
+"term": "Nitrofurantoin",
+"count": 25
+},
+{
+"term": "Piperacillin and Tazobactam",
+"count": 25
+},
+{
+"term": "Pramipexole dihydrochloride",
+"count": 25
+},
+{
+"term": "Sumatriptan",
+"count": 25
+},
+{
+"term": "Terbinafine Hydrochloride",
+"count": 25
+},
+{
+"term": "Triamcinolone acetonide",
+"count": 25
+},
+{
+"term": "fluocinolone acetonide",
+"count": 25
+},
+{
+"term": "hydromorphone hydrochloride",
+"count": 25
+},
+{
+"term": "lansoprazole",
+"count": 25
+},
+{
+"term": "methotrexate",
+"count": 25
+},
+{
+"term": "nitrofurantoin macrocrystals",
+"count": 25
+},
+{
+"term": "pregabalin",
+"count": 25
+},
+{
+"term": "tizanidine",
+"count": 25
+},
+{
+"term": "Anastrozole",
+"count": 24
+},
+{
+"term": "Bisoprolol Fumarate",
+"count": 24
+},
+{
+"term": "Bisoprolol Fumarate and Hydrochlorothiazide",
+"count": 24
+},
+{
+"term": "Capecitabine",
+"count": 24
+},
+{
+"term": "Clobazam",
+"count": 24
+},
+{
+"term": "Cyanocobalamin",
+"count": 24
+},
+{
+"term": "DASATINIB",
+"count": 24
+},
+{
+"term": "DEXMEDETOMIDINE HYDROCHLORIDE",
+"count": 24
+},
+{
+"term": "DIAZEPAM",
+"count": 24
+},
+{
+"term": "Dextrose Monohydrate",
+"count": 24
+},
+{
+"term": "Doxazosin Mesylate",
+"count": 24
+},
+{
+"term": "Doxepin hydrochloride",
+"count": 24
+},
+{
+"term": "Droxidopa",
+"count": 24
+},
+{
+"term": "FENTANYL",
+"count": 24
+},
+{
+"term": "Lactulose",
+"count": 24
+},
+{
+"term": "Loxapine",
+"count": 24
+},
+{
+"term": "Megestrol Acetate",
+"count": 24
+},
+{
+"term": "Methimazole",
+"count": 24
+},
+{
+"term": "Midazolam",
+"count": 24
+},
+{
+"term": "Neostigmine Methylsulfate",
+"count": 24
+},
+{
+"term": "Perampanel",
+"count": 24
+},
+{
+"term": "ROPIVACAINE HYDROCHLORIDE",
+"count": 24
+},
+{
+"term": "Testosterone",
+"count": 24
+},
+{
+"term": "carbidopa and levodopa",
+"count": 24
+},
+{
+"term": "dextrose monohydrate",
+"count": 24
+},
+{
+"term": "hydrochlorothiazide",
+"count": 24
+},
+{
+"term": "promethazine hydrochloride",
+"count": 24
+},
+{
+"term": "sacubitril and valsartan",
+"count": 24
+},
+{
+"term": "Ampicillin",
+"count": 23
+},
+{
+"term": "Chlordiazepoxide Hydrochloride",
+"count": 23
+},
+{
+"term": "Clonidine hydrochloride",
+"count": 23
+},
+{
+"term": "DAPAGLIFLOZIN",
+"count": 23
+},
+{
+"term": "Dabigatran Etexilate",
+"count": 23
+},
+{
+"term": "Desvenlafaxine",
+"count": 23
+},
+{
+"term": "Dextroamphetamine Saccharate, Amphetamine Aspartate Monohydrate, Dextroamphetamine Sulfate and Amphetamine Sulfate",
+"count": 23
+},
+{
+"term": "Febuxostat",
+"count": 23
+},
+{
+"term": "Ipratropium Bromide",
+"count": 23
+},
+{
+"term": "LEVOTHYROXINE, LIOTHYRONINE",
+"count": 23
+},
+{
+"term": "Lubiprostone",
+"count": 23
+},
+{
+"term": "Mycophenolate Mofetil",
+"count": 23
+},
+{
+"term": "Olmesartan Medoxomil and Hydrochlorothiazide",
+"count": 23
+},
+{
+"term": "Phenazopyridine",
+"count": 23
+},
+{
+"term": "fluticasone propionate",
+"count": 23
+},
+{
+"term": "paliperidone",
+"count": 23
+},
+{
+"term": "pitavastatin calcium",
+"count": 23
+},
+{
+"term": "sertraline hydrochloride",
+"count": 23
+},
+{
+"term": "ALLOPURINOL",
+"count": 22
+},
+{
+"term": "Azithromycin Dihydrate",
+"count": 22
+},
+{
+"term": "Bethanechol Chloride",
+"count": 22
+},
+{
+"term": "CHLORZOXAZONE",
+"count": 22
+},
+{
+"term": "Cefuroxime Axetil",
+"count": 22
+},
+{
+"term": "Desonide",
+"count": 22
+},
+{
+"term": "Doxycycline hyclate",
+"count": 22
+},
+{
+"term": "Hydroxychloroquine Sulfate",
+"count": 22
+},
+{
+"term": "NYSTATIN",
+"count": 22
+},
+{
+"term": "Nystatin and Triamcinolone Acetonide",
+"count": 22
+},
+{
+"term": "PROGESTERONE",
+"count": 22
+},
+{
+"term": "Phenazopyridine Hydrochloride",
+"count": 22
+},
+{
+"term": "ROCURONIUM BROMIDE",
+"count": 22
+},
+{
+"term": "Rivastigmine",
+"count": 22
+},
+{
+"term": "Tolterodine Tartrate",
+"count": 22
+},
+{
+"term": "Vardenafil Hydrochloride",
+"count": 22
+},
+{
+"term": "Varenicline tartrate",
+"count": 22
+},
+{
+"term": "amoxicillin and clavulanate potassium",
+"count": 22
+},
+{
+"term": "atenolol",
+"count": 22
+},
+{
+"term": "benztropine mesylate",
+"count": 22
+},
+{
+"term": "cyanocobalamin",
+"count": 22
+},
+{
+"term": "doxorubicin hydrochloride",
+"count": 22
+},
+{
+"term": "fluconazole",
+"count": 22
+},
+{
+"term": "lenalidomide",
+"count": 22
+},
+{
+"term": "methylprednisolone sodium succinate",
+"count": 22
+},
+{
+"term": "norgestimate and ethinyl estradiol",
+"count": 22
+},
+{
+"term": "prednisone",
+"count": 22
+},
+{
+"term": "sildenafil citrate",
+"count": 22
+},
+{
+"term": "telmisartan",
+"count": 22
+},
+{
+"term": "CYPROHEPTADINE HYDROCHLORIDE",
+"count": 21
+},
+{
+"term": "Calcium Gluconate",
+"count": 21
+},
+{
+"term": "Cefpodoxime Proxetil",
+"count": 21
+},
+{
+"term": "Dutasteride",
+"count": 21
+},
+{
+"term": "IRBESARTAN",
+"count": 21
+},
+{
+"term": "Isosorbide Dinitrate",
+"count": 21
+},
+{
+"term": "LOSARTAN POTASSIUM",
+"count": 21
+},
+{
+"term": "Leucine, Phenylalanine, Lysine, Methionine, Isoleucine, Valine, Histidine, Threonine, Tryptophan, Alanine, Glycine, Arginine, Proline, Serine, Tyrosine, Dextrose",
+"count": 21
+},
+{
+"term": "METOPROLOL",
+"count": 21
+},
+{
+"term": "NITROGLYCERIN",
+"count": 21
+},
+{
+"term": "Naproxen and esomeprazole magnesium",
+"count": 21
+},
+{
+"term": "Nitisinone",
+"count": 21
+},
+{
+"term": "Olmesartan medoxomil",
+"count": 21
+},
+{
+"term": "ROPINIROLE",
+"count": 21
+},
+{
+"term": "SILDENAFIL CITRATE",
+"count": 21
+},
+{
+"term": "Sitagliptin",
+"count": 21
+},
+{
+"term": "Ziprasidone Hydrochloride",
+"count": 21
+},
+{
+"term": "dextroamphetamine sulfate",
+"count": 21
+},
+{
+"term": "leucovorin calcium",
+"count": 21
+},
+{
+"term": "levofloxacin",
+"count": 21
+},
+{
+"term": "sirolimus",
+"count": 21
+},
+{
+"term": "somatropin",
+"count": 21
+},
+{
+"term": "AZITHROMYCIN",
+"count": 20
+},
+{
+"term": "Alendronate Sodium",
+"count": 20
+},
+{
+"term": "Ampicillin Sodium",
+"count": 20
+},
+{
+"term": "Bimatoprost",
+"count": 20
+},
+{
+"term": "CHLORPROMAZINE HYDROCHLORIDE",
+"count": 20
+},
+{
+"term": "Chlorpromazine hydrochloride",
+"count": 20
+},
+{
+"term": "DOXYCYCLINE",
+"count": 20
+},
+{
+"term": "Darunavir",
+"count": 20
+},
+{
+"term": "Dexmedetomidine Hydrochloride",
+"count": 20
+},
+{
+"term": "Eltrombopag",
+"count": 20
+},
+{
+"term": "Eslicarbazepine Acetate",
+"count": 20
+},
+{
+"term": "Felbamate",
+"count": 20
+},
+{
+"term": "HYDROCHLOROTHIAZIDE",
+"count": 20
+},
+{
+"term": "Niacin",
+"count": 20
+},
+{
+"term": "OXYBUTYNIN CHLORIDE",
+"count": 20
+},
+{
+"term": "PHENOBARBITAL",
+"count": 20
+},
+{
+"term": "Piroxicam",
+"count": 20
+},
+{
+"term": "Quetiapine fumarate",
+"count": 20
+},
+{
+"term": "Quinapril",
+"count": 20
+},
+{
+"term": "Rabeprazole Sodium",
+"count": 20
+},
+{
+"term": "Repaglinide",
+"count": 20
+},
+{
+"term": "Sertraline hydrochloride",
+"count": 20
+},
+{
+"term": "Ziprasidone HCl",
+"count": 20
+},
+{
+"term": "bumetanide",
+"count": 20
+},
+{
+"term": "clozapine",
+"count": 20
+},
+{
+"term": "febuxostat",
+"count": 20
+},
+{
+"term": "hydrocodone bitartrate and acetaminophen",
+"count": 20
+},
+{
+"term": "levocetirizine dihydrochloride",
+"count": 20
+},
+{
+"term": "lisinopril",
+"count": 20
+},
+{
+"term": "semaglutide",
+"count": 20
+},
+{
+"term": "testosterone",
+"count": 20
+},
+{
+"term": "ziprasidone",
+"count": 20
+},
+{
+"term": "BUPRENORPHINE",
+"count": 19
+},
+{
+"term": "Cefuroxime axetil",
+"count": 19
+},
+{
+"term": "Clopidogrel Bisulfate",
+"count": 19
+},
+{
+"term": "Clopidogrel bisulfate",
+"count": 19
+},
+{
+"term": "Clorazepate Dipotassium",
+"count": 19
+},
+{
+"term": "GUANFACINE",
+"count": 19
+},
+{
+"term": "Hydrocortisone Acetate",
+"count": 19
+},
+{
+"term": "IBUPROFEN",
+"count": 19
+},
+{
+"term": "LENALIDOMIDE",
+"count": 19
+},
+{
+"term": "Loperamide Hydrochloride",
+"count": 19
+},
+{
+"term": "Losartan potassium",
+"count": 19
+},
+{
+"term": "Methylprednisolone",
+"count": 19
+},
+{
+"term": "Mitomycin",
+"count": 19
+},
+{
+"term": "Multivitamin",
+"count": 19
+},
+{
+"term": "Norgestimate and Ethinyl Estradiol",
+"count": 19
+},
+{
+"term": "OLMESARTAN MEDOXOMIL and HYDROCHLOROTHIAZIDE",
+"count": 19
+},
+{
+"term": "Pantoprazole",
+"count": 19
+},
+{
+"term": "Prednisolone Sodium Phosphate",
+"count": 19
+},
+{
+"term": "RANOLAZINE",
+"count": 19
+},
+{
+"term": "Rasagiline",
+"count": 19
+},
+{
+"term": "Risedronate Sodium",
+"count": 19
+},
+{
+"term": "Silodosin",
+"count": 19
+},
+{
+"term": "Tetracycline Hydrochloride",
+"count": 19
+},
+{
+"term": "amlodipine and valsartan",
+"count": 19
+},
+{
+"term": "atomoxetine hydrochloride",
+"count": 19
+},
+{
+"term": "dantrolene sodium",
+"count": 19
+},
+{
+"term": "imatinib mesylate",
+"count": 19
+},
+{
+"term": "isosorbide dinitrate",
+"count": 19
+},
+{
+"term": "montelukast sodium",
+"count": 19
+},
+{
+"term": "nicardipine hydrochloride",
+"count": 19
+},
+{
+"term": "ofloxacin",
+"count": 19
+},
+{
+"term": "oxycodone and acetaminophen",
+"count": 19
+},
+{
+"term": "sildenafil",
+"count": 19
+},
+{
+"term": "sitagliptin and metformin hydrochloride",
+"count": 19
+},
+{
+"term": "sugammadex",
+"count": 19
+},
+{
+"term": "ATROPINE SULFATE",
+"count": 18
+},
+{
+"term": "Acetaminophen",
+"count": 18
+},
+{
+"term": "Azacitidine",
+"count": 18
+},
+{
+"term": "Calcium Acetate",
+"count": 18
+},
+{
+"term": "Carboplatin",
+"count": 18
+},
+{
+"term": "Cefprozil",
+"count": 18
+},
+{
+"term": "Cisatracurium Besylate",
+"count": 18
+},
+{
+"term": "Clotrimazole and Betamethasone Dipropionate",
+"count": 18
+},
+{
+"term": "DEFERASIROX",
+"count": 18
+},
+{
+"term": "DEXTROAMPHETAMINE SACCHARATE, AMPHETAMINE ASPARTATE MONOHYDRATE, DEXTROAMPHETAMINE SULFATE, and AMPHETAMINE SULFATE",
+"count": 18
+},
+{
+"term": "DICLOFENAC SODIUM",
+"count": 18
+},
+{
+"term": "Dextroamphetamine Sulfate, Dextroamphetamine Saccharate, Amphetamine Sulfate and Amphetamine Aspartate",
+"count": 18
+},
+{
+"term": "Emtricitabine and Tenofovir Disoproxil Fumarate",
+"count": 18
+},
+{
+"term": "FLUOROURACIL",
+"count": 18
+},
+{
+"term": "Flucytosine",
+"count": 18
+},
+{
+"term": "ISOTRETINOIN",
+"count": 18
+},
+{
+"term": "Insulin lispro",
+"count": 18
+},
+{
+"term": "Isoproterenol Hydrochloride",
+"count": 18
+},
+{
+"term": "Lamivudine",
+"count": 18
+},
+{
+"term": "Leucine, Phenylalanine, Lysine, Methionine, Isoleucine, Valine, Histidine, Threonine, Tryptophan, Alanine, Glycine, Arginine, Proline, Serine, Tyrosine, Sodium Acetate, Dibasic Potassium Phosphate, Magnesium Chloride, Sodium Chloride, Calcium Chloride, Dextrose",
+"count": 18
+},
+{
+"term": "METRONIDAZOLE",
+"count": 18
+},
+{
+"term": "Methylphenidate hydrochloride",
+"count": 18
+},
+{
+"term": "Misoprostol",
+"count": 18
+},
+{
+"term": "Mycophenolic Acid",
+"count": 18
+},
+{
+"term": "NALOXONE HYDROCHLORIDE",
+"count": 18
+},
+{
+"term": "Norethindrone Acetate and Ethinyl Estradiol and Ferrous Fumarate",
+"count": 18
+},
+{
+"term": "Paroxetine Hydrochloride",
+"count": 18
+},
+{
+"term": "Prucalopride",
+"count": 18
+},
+{
+"term": "SERTRALINE HYDROCHLORIDE",
+"count": 18
+},
+{
+"term": "SODIUM FLUORIDE",
+"count": 18
+},
+{
+"term": "Sugammadex",
+"count": 18
+},
+{
+"term": "Tapentadol Hydrochloride",
+"count": 18
+},
+{
+"term": "Telmisartan and Hydrochlorothiazide",
+"count": 18
+},
+{
+"term": "Terazosin",
+"count": 18
+},
+{
+"term": "Tizanidine Hydrochloride",
+"count": 18
+},
+{
+"term": "Valproic Acid",
+"count": 18
+},
+{
+"term": "Vasopressin",
+"count": 18
+},
+{
+"term": "Water",
+"count": 18
+},
+{
+"term": "adalimumab-adaz",
+"count": 18
+},
+{
+"term": "adalimumab-atto",
+"count": 18
+},
+{
+"term": "apixaban",
+"count": 18
+},
+{
+"term": "bisoprolol fumarate and hydrochlorothiazide",
+"count": 18
+},
+{
+"term": "cyclosporine",
+"count": 18
+},
+{
+"term": "donepezil hydrochloride",
+"count": 18
+},
+{
+"term": "leflunomide",
+"count": 18
+},
+{
+"term": "lubiprostone",
+"count": 18
+},
+{
+"term": "mexiletine hydrochloride",
+"count": 18
+},
+{
+"term": "nilotinib",
+"count": 18
+},
+{
+"term": "olmesartan medoxomil / amlodipine besylate / hydrochlorothiazide",
+"count": 18
+},
+{
+"term": "oxycodone hydrochloride",
+"count": 18
+},
+{
+"term": "timolol maleate",
+"count": 18
+},
+{
+"term": "ARIPIPRAZOLE",
+"count": 17
+},
+{
+"term": "Acetylcysteine",
+"count": 17
+},
+{
+"term": "Amphetamine Sulfate",
+"count": 17
+},
+{
+"term": "Argatroban",
+"count": 17
+},
+{
+"term": "Bisoprolol fumarate",
+"count": 17
+},
+{
+"term": "Bortezomib",
+"count": 17
+},
+{
+"term": "CARVEDILOL",
+"count": 17
+},
+{
+"term": "Cyproheptadine Hydrochloride",
+"count": 17
+},
+{
+"term": "Emtricitabine and tenofovir disoproxil fumarate",
+"count": 17
+},
+{
+"term": "Ezetimibe and Simvastatin",
+"count": 17
+},
+{
+"term": "HALOPERIDOL DECANOATE",
+"count": 17
+},
+{
+"term": "HYDROMORPHONE HYDROCHLORIDE",
+"count": 17
+},
+{
+"term": "Hydroxychloroquine sulfate",
+"count": 17
+},
+{
+"term": "ILOPERIDONE",
+"count": 17
+},
+{
+"term": "ISOSORBIDE MONONITRATE",
+"count": 17
+},
+{
+"term": "Icosapent Ethyl",
+"count": 17
+},
+{
+"term": "Indapamide",
+"count": 17
+},
+{
+"term": "Iohexol",
+"count": 17
+},
+{
+"term": "Ipratropium Bromide and Albuterol Sulfate",
+"count": 17
+},
+{
+"term": "Lidocaine hydrochloride",
+"count": 17
+},
+{
+"term": "Lurasidone hydrochloride",
+"count": 17
+},
+{
+"term": "Montelukast",
+"count": 17
+},
+{
+"term": "Mycophenolate mofetil",
+"count": 17
+},
+{
+"term": "Octreotide Acetate",
+"count": 17
+},
+{
+"term": "PIRFENIDONE",
+"count": 17
+},
+{
+"term": "PROPOFOL",
+"count": 17
+},
+{
+"term": "Posaconazole",
+"count": 17
+},
+{
+"term": "Potassium Chloride Extended-release",
+"count": 17
+},
+{
+"term": "Roflumilast",
+"count": 17
+},
+{
+"term": "TRAZODONE HYDROCHLORIDE",
+"count": 17
+},
+{
+"term": "Tamoxifen Citrate",
+"count": 17
+},
+{
+"term": "Trospium Chloride",
+"count": 17
+},
+{
+"term": "atorvastatin calcium, film coated",
+"count": 17
+},
+{
+"term": "azithromycin",
+"count": 17
+},
+{
+"term": "buprenorphine and naloxone",
+"count": 17
+},
+{
+"term": "desmopressin acetate",
+"count": 17
+},
+{
+"term": "dexamethasone",
+"count": 17
+},
+{
+"term": "estrogens, conjugated",
+"count": 17
+},
+{
+"term": "flecainide acetate",
+"count": 17
+},
+{
+"term": "gadobutrol",
+"count": 17
+},
+{
+"term": "leuprolide acetate",
+"count": 17
+},
+{
+"term": "losartan potassium",
+"count": 17
+},
+{
+"term": "medroxyprogesterone acetate",
+"count": 17
+},
+{
+"term": "minocycline hydrochloride",
+"count": 17
+},
+{
+"term": "paliperidone palmitate",
+"count": 17
+},
+{
+"term": "phenylephrine hydrochloride",
+"count": 17
+},
+{
+"term": "rivaroxaban",
+"count": 17
+},
+{
+"term": "rizatriptan benzoate",
+"count": 17
+},
+{
+"term": "Aminocaproic Acid",
+"count": 16
+},
+{
+"term": "Articaine Hydrochloride and Epinephrine",
+"count": 16
+},
+{
+"term": "Atovaquone",
+"count": 16
+},
+{
+"term": "BENZTROPINE MESYLATE",
+"count": 16
+},
+{
+"term": "BUSPIRONE HYDROCHLORIDE",
+"count": 16
+},
+{
+"term": "CARBOPLATIN",
+"count": 16
+},
+{
+"term": "CLOBETASOL PROPIONATE",
+"count": 16
+},
+{
+"term": "Candesartan cilexetil",
+"count": 16
+},
+{
+"term": "DEXTROSE MONOHYDRATE, SODIUM CHLORIDE, and POTASSIUM CHLORIDE",
+"count": 16
+},
+{
+"term": "Diphenhydramine Hydrochloride",
+"count": 16
+},
+{
+"term": "Dopamine Hydrochloride",
+"count": 16
+},
+{
+"term": "ENALAPRIL MALEATE",
+"count": 16
+},
+{
+"term": "Entecavir",
+"count": 16
+},
+{
+"term": "Erythromycin Ethylsuccinate",
+"count": 16
+},
+{
+"term": "Etomidate",
+"count": 16
+},
+{
+"term": "HYDROCODONE BITARTRATE AND ACETAMINOPHEN",
+"count": 16
+},
+{
+"term": "Ibuprofen and famotidine",
+"count": 16
+},
+{
+"term": "Iomeprol Injection",
+"count": 16
+},
+{
+"term": "LEVOTHYROXINE SODIUM ANHYDROUS",
+"count": 16
+},
+{
+"term": "LORAZEPAM",
+"count": 16
+},
+{
+"term": "Leflunomide",
+"count": 16
+},
+{
+"term": "Liothyronine sodium",
+"count": 16
+},
+{
+"term": "MILSAPERIDONE",
+"count": 16
+},
+{
+"term": "Maraviroc",
+"count": 16
+},
+{
+"term": "Methazolamide",
+"count": 16
+},
+{
+"term": "PROPAFENONE HYDROCHLORIDE",
+"count": 16
+},
+{
+"term": "Phenobarbital Sodium",
+"count": 16
+},
+{
+"term": "Processed nerve allograft",
+"count": 16
+},
+{
+"term": "Silver Sulfadiazine",
+"count": 16
+},
+{
+"term": "Sunitinib Malate",
+"count": 16
+},
+{
+"term": "WATER",
+"count": 16
+},
+{
+"term": "amiodarone hydrochloride",
+"count": 16
+},
+{
+"term": "amlodipine and atorvastatin",
+"count": 16
+},
+{
+"term": "azithromycin dihydrate",
+"count": 16
+},
+{
+"term": "buprenorphine hydrochloride",
+"count": 16
+},
+{
+"term": "bupropion Hydrochloride",
+"count": 16
+},
+{
+"term": "fondaparinux sodium",
+"count": 16
+},
+{
+"term": "isoniazid",
+"count": 16
+},
+{
+"term": "mesalamine",
+"count": 16
+},
+{
+"term": "methylphenidate",
+"count": 16
+},
+{
+"term": "nebivolol hydrochloride",
+"count": 16
+},
+{
+"term": "octreotide acetate",
+"count": 16
+},
+{
+"term": "sodium chloride",
+"count": 16
+},
+{
+"term": "sumatriptan succinate",
+"count": 16
+},
+{
+"term": "AMITRIPTYLINE HYDROCHLORIDE",
+"count": 15
+},
+{
+"term": "Adalimumab",
+"count": 15
+},
+{
+"term": "Adenosine",
+"count": 15
+},
+{
+"term": "Atenolol and Chlorthalidone",
+"count": 15
+},
+{
+"term": "Azithromycin dihydrate",
+"count": 15
+},
+{
+"term": "CARISOPRODOL",
+"count": 15
+},
+{
+"term": "CHLORTHALIDONE",
+"count": 15
+},
+{
+"term": "Clozapine",
+"count": 15
+},
+{
+"term": "DEXAMETHASONE",
+"count": 15
+},
+{
+"term": "Dextroamphetamine saccharate, Amphetamine aspartate, Dextroamphetamine sulfate, and Amphetamine sulfate",
+"count": 15
+},
+{
+"term": "Ergocalciferol",
+"count": 15
+},
+{
+"term": "Fentanyl Citrate",
+"count": 15
+},
+{
+"term": "Fluvoxamine maleate",
+"count": 15
+},
+{
+"term": "Fulvestrant",
+"count": 15
+},
+{
+"term": "Glyburide and Metformin Hydrochloride",
+"count": 15
+},
+{
+"term": "HYDRALAZINE HYDROCHLORIDE",
+"count": 15
+},
+{
+"term": "Imatinib Mesylate",
+"count": 15
+},
+{
+"term": "Isosorbide dinitrate",
+"count": 15
+},
+{
+"term": "LEVOTHYROXINE and LIOTHYRONINE",
+"count": 15
+},
+{
+"term": "LOSARTAN POTASSIUM AND HYDROCHLOROTHIAZIDE",
+"count": 15
+},
+{
+"term": "Levalbuterol Hydrochloride",
+"count": 15
+},
+{
+"term": "MITOMYCIN",
+"count": 15
+},
+{
+"term": "Midazolam Hydrochloride",
+"count": 15
+},
+{
+"term": "Norethindrone Acetate and Ethinyl Estradiol",
+"count": 15
+},
+{
+"term": "OSELTAMIVIR PHOSPHATE",
+"count": 15
+},
+{
+"term": "Phendimetrazine Tartrate",
+"count": 15
+},
+{
+"term": "Phenytoin",
+"count": 15
+},
+{
+"term": "Rivaroxaban",
+"count": 15
+},
+{
+"term": "SEVELAMER CARBONATE",
+"count": 15
+},
+{
+"term": "VARENICLINE",
+"count": 15
+},
+{
+"term": "citalopram",
+"count": 15
+},
+{
+"term": "diphenoxylate hydrochloride and atropine sulfate",
+"count": 15
+},
+{
+"term": "droxidopa",
+"count": 15
+},
+{
+"term": "hyoscyamine sulfate",
+"count": 15
+},
+{
+"term": "lamotrigine extended-release",
+"count": 15
+},
+{
+"term": "lidocaine hydrochloride",
+"count": 15
+},
+{
+"term": "loteprednol etabonate",
+"count": 15
+},
+{
+"term": "methylprednisolone acetate",
+"count": 15
+},
+{
+"term": "metolazone",
+"count": 15
+},
+{
+"term": "olmesartan medoxomil-hydrochlorothiazide",
+"count": 15
+},
+{
+"term": "omeprazole",
+"count": 15
+},
+{
+"term": "ondansetron hydrochloride",
+"count": 15
+},
+{
+"term": "rocuronium bromide",
+"count": 15
+},
+{
+"term": "solifenacin succinate",
+"count": 15
+},
+{
+"term": "tramadol hydrochloride",
+"count": 15
+},
+{
+"term": "vilazodone hydrochloride",
+"count": 15
+},
+{
+"term": "ALBUTEROL SULFATE",
+"count": 14
+},
+{
+"term": "Abiraterone acetate",
+"count": 14
+},
+{
+"term": "Amphetamine",
+"count": 14
+},
+{
+"term": "Ampicillin sodium",
+"count": 14
+},
+{
+"term": "Brimonidine Tartrate and Timolol Maleate",
+"count": 14
+},
+{
+"term": "Cefepime",
+"count": 14
+},
+{
+"term": "Ceftriaxone",
+"count": 14
+},
+{
+"term": "Cisplatin",
+"count": 14
+},
+{
+"term": "DESVENLAFAXINE",
+"count": 14
+},
+{
+"term": "Dapagliflozin and Metformin Hydrochloride",
+"count": 14
+},
+{
+"term": "Decitabine",
+"count": 14
+},
+{
+"term": "Dexmethylphenidate hydrochloride",
+"count": 14
+},
+{
+"term": "Diethylpropion Hydrochloride",
+"count": 14
+},
+{
+"term": "Dimethyl Fumarate",
+"count": 14
+},
+{
+"term": "Doxercalciferol",
+"count": 14
+},
+{
+"term": "Esterified Estrogens and Methyltestosterone",
+"count": 14
+},
+{
+"term": "Flecainide Acetate Tablet",
+"count": 14
+},
+{
+"term": "GEMCITABINE",
+"count": 14
+},
+{
+"term": "GLYBURIDE",
+"count": 14
+},
+{
+"term": "Glipizide and Metformin Hydrochloride",
+"count": 14
+},
+{
+"term": "Ivermectin",
+"count": 14
+},
+{
+"term": "Ketamine Hydrochloride",
+"count": 14
+},
+{
+"term": "LIDOCAINE",
+"count": 14
+},
+{
+"term": "Levocetirizine Dihydrochloride",
+"count": 14
+},
+{
+"term": "Lidocaine Hydrochloride and Epinephrine Bitartrate",
+"count": 14
+},
+{
+"term": "Lonapegsomatropin-tcgd",
+"count": 14
+},
+{
+"term": "MECLIZINE",
+"count": 14
+},
+{
+"term": "Memantine hydrochloride",
+"count": 14
+},
+{
+"term": "Methylprednisolone Sodium Succinate",
+"count": 14
+},
+{
+"term": "NAPROXEN",
+"count": 14
+},
+{
+"term": "Norethindrone and Ethinyl Estradiol",
+"count": 14
+},
+{
+"term": "Oxycodone",
+"count": 14
+},
+{
+"term": "Oxymorphone hydrochloride",
+"count": 14
+},
+{
+"term": "PANTOPRAZOLE SODIUM",
+"count": 14
+},
+{
+"term": "PHENTERMINE HYDROCHLORIDE",
+"count": 14
+},
+{
+"term": "PRUCALOPRIDE",
+"count": 14
+},
+{
+"term": "Pilocarpine Hydrochloride",
+"count": 14
+},
+{
+"term": "Pindolol",
+"count": 14
+},
+{
+"term": "Prasugrel",
+"count": 14
+},
+{
+"term": "RIVAROXABAN",
+"count": 14
+},
+{
+"term": "Sevoflurane",
+"count": 14
+},
+{
+"term": "Sirolimus",
+"count": 14
+},
+{
+"term": "Sitagliptin and Metformin Hydrochloride",
+"count": 14
+},
+{
+"term": "Sulfasalazine",
+"count": 14
+},
+{
+"term": "Tenofovir Disoproxil Fumarate",
+"count": 14
+},
+{
+"term": "Terbutaline Sulfate",
+"count": 14
+},
+{
+"term": "Tofacitinib",
+"count": 14
+},
+{
+"term": "Tramadol Hydrochloride and Acetaminophen",
+"count": 14
+},
+{
+"term": "Urea",
+"count": 14
+},
+{
+"term": "Vancomycin",
+"count": 14
+},
+{
+"term": "Zoledronic Acid",
+"count": 14
+},
+{
+"term": "abiraterone acetate",
+"count": 14
+},
+{
+"term": "budesonide",
+"count": 14
+},
+{
+"term": "buprenorphine hydrochloride and naloxone hydrochloride",
+"count": 14
+},
+{
+"term": "butalbital, acetaminophen and caffeine",
+"count": 14
+},
+{
+"term": "carboprost tromethamine",
+"count": 14
+},
+{
+"term": "daptomycin",
+"count": 14
+},
+{
+"term": "darbepoetin alfa",
+"count": 14
+},
+{
+"term": "desipramine hydrochloride",
+"count": 14
+},
+{
+"term": "dimethyl fumarate",
+"count": 14
+},
+{
+"term": "esomeprazole magnesium",
+"count": 14
+},
+{
+"term": "fluphenazine hydrochloride",
+"count": 14
+},
+{
+"term": "gadoterate meglumine",
+"count": 14
+},
+{
+"term": "hydrocortisone acetate and pramoxine hydrochloride",
+"count": 14
+},
+{
+"term": "isotretinoin",
+"count": 14
+},
+{
+"term": "liraglutide",
+"count": 14
+},
+{
+"term": "mycophenolate mofetil",
+"count": 14
+},
+{
+"term": "naloxone hydrochloride",
+"count": 14
+},
+{
+"term": "nintedanib",
+"count": 14
+},
+{
+"term": "oxcarbazepine",
+"count": 14
+},
+{
+"term": "oxybutynin chloride",
+"count": 14
+},
+{
+"term": "pantoprazole sodium",
+"count": 14
+},
+{
+"term": "perampanel",
+"count": 14
+},
+{
+"term": "pomalidomide",
+"count": 14
+},
+{
+"term": "posaconazole",
+"count": 14
+},
+{
+"term": "prednisolone acetate",
+"count": 14
+},
+{
+"term": "tazarotene",
+"count": 14
+},
+{
+"term": "trifluoperazine hydrochloride",
+"count": 14
+},
+{
+"term": "Acitretin",
+"count": 13
+},
+{
+"term": "Amlodipine and Valsartan",
+"count": 13
+},
+{
+"term": "Arsenic Trioxide",
+"count": 13
+},
+{
+"term": "Betamethasone Valerate",
+"count": 13
+},
+{
+"term": "Brivaracetam",
+"count": 13
+},
+{
+"term": "Budesonide and Formoterol Fumarate Dihydrate",
+"count": 13
+},
+{
+"term": "CLOZAPINE",
+"count": 13
+},
+{
+"term": "DABIGATRAN ETEXILATE",
+"count": 13
+},
+{
+"term": "Diclofenac Sodium Topical",
+"count": 13
+},
+{
+"term": "Duloxetine Hydrochloride",
+"count": 13
+},
+{
+"term": "Etoposide",
+"count": 13
+},
+{
+"term": "Ferrous Fumarate, Folic Acid",
+"count": 13
+},
+{
+"term": "Fingolimod",
+"count": 13
+},
+{
+"term": "Helium",
+"count": 13
+},
+{
+"term": "HydrOXYzine Hydrochloride",
+"count": 13
+},
+{
+"term": "Hydrocodone Bitartrate",
+"count": 13
+},
+{
+"term": "Hydroquinone",
+"count": 13
+},
+{
+"term": "Levalbuterol",
+"count": 13
+},
+{
+"term": "Levothyroxine sodium",
+"count": 13
+},
+{
+"term": "Lidocaine 5%",
+"count": 13
+},
+{
+"term": "MAGNESIUM SULFATE HEPTAHYDRATE",
+"count": 13
+},
+{
+"term": "METHYLPREDNISOLONE",
+"count": 13
+},
+{
+"term": "MONTELUKAST SODIUM",
+"count": 13
+},
+{
+"term": "Moxifloxacin",
+"count": 13
+},
+{
+"term": "OLANZAPINE",
+"count": 13
+},
+{
+"term": "Oxazepam",
+"count": 13
+},
+{
+"term": "PERPHENAZINE",
+"count": 13
+},
+{
+"term": "Phenylephrine hydrochloride",
+"count": 13
+},
+{
+"term": "THYROID",
+"count": 13
+},
+{
+"term": "TRANEXAMIC ACID",
+"count": 13
+},
+{
+"term": "Technetium Tc-99m",
+"count": 13
+}
+]
+}

@@ -1,6 +1,6 @@
 # Offline STT accuracy report
 
-- **Generated:** 2026-11-05 00:21 UTC
+- **Generated:** 2026-11-05 01:24 UTC
 - **Manifest:** `data/manifests/primock57.jsonl` (7108 utterances; excluded from scoring: inaudible 706, unintelligible 1147)
 - **Profile:** `configs/profiles/healthcare_intake.yaml`
 - **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v4/dmy,hyp-mdy`
@@ -52,7 +52,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | deepgram_nova3_batch_keyterms_common | date_of_birth | 90.5% [71.1, 97.3] | 19/21 | 3.5% | 90.5% [71.1, 97.3] |
 | deepgram_nova3_batch_keyterms_common | phone | 50.0% [9.5, 90.5] | 1/2 | 26.7% | 0.0% [0.0, 65.8] |
 
-Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 4, deepgram_nova3_batch_keyterms 9, deepgram_nova3_batch_keyterms_common 9.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 1, deepgram_nova3_batch_keyterms 9, deepgram_nova3_batch_keyterms_common 9.
 
 ### doctor (real)
 
@@ -122,7 +122,7 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | deepgram_nova3_batch_keyterms_common | date_of_birth | 90.5% [71.1, 97.3] | 19/21 | 3.5% | 90.5% [71.1, 97.3] |
 | deepgram_nova3_batch_keyterms_common | phone | 50.0% [9.5, 90.5] | 1/2 | 26.7% | 0.0% [0.0, 65.8] |
 
-Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 3, deepgram_nova3_batch_keyterms 5, deepgram_nova3_batch_keyterms_common 5.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 0, deepgram_nova3_batch_keyterms 5, deepgram_nova3_batch_keyterms_common 5.
 
 ## Worst utterances
 

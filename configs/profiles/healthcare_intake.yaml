@@ -42,7 +42,7 @@ constraints:
 
 # STT boost list, independent of the test audio (the medication lexicon below is for scoring and
 # was drawn from PriMock57's transcripts; boosting with it is an oracle upper bound).
-keyterms_path: ../../data/lexicons/common_uk_generics.txt
+keyterms_path: ../../data/lexicons/openfda_rx_generics.txt
 
 synthetic_templates: healthcare_intake.templates.yaml
 

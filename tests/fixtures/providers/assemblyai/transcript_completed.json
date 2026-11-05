@@ -1,1 +1,1 @@
-{"id": "fixture-transcript", "status": "completed", "text": "I take 500 mg of paracetamol.", "confidence": 0.97, "words": [], "audio_duration": 2}
+{"id": "fixture-transcript", "status": "completed", "text": "I take 500 mg of paracetamol.", "confidence": 0.97, "words": [], "audio_duration": 2, "speech_model_used": "universal-3-5-pro"}

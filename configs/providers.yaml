@@ -1,7 +1,8 @@
 # STT provider configurations. One entry per configuration being compared.
 # Every value below comes from docs/RESEARCH.md (research dated October 2026, mostly third-party
 # price trackers) and is marked `verify: true` until checked against the vendor's own docs and
-# pricing page on the owner's machine (vendor sites are blocked from the cloud environment).
+# pricing page. Vendor docs became reachable from cloud sessions on 2026-11-05; the ElevenLabs and
+# AssemblyAI API hosts still are not, so those entries are doc-checked but unrun.
 # When verifying: update model_id/settings/pricing, set pricing.source to the vendor page,
 # pricing.as_of to the check date, and verify: false. Field reference: harness/providers/registry.py
 
@@ -56,37 +57,46 @@ configs:
     env_key: DEEPGRAM_API_KEY
     verify: true
     notes: >-
-      Boosts the profile's keyterm list (healthcare_intake: data/lexicons/common_uk_generics.txt,
-      written without reference to the test set): what a deployment could know in advance.
+      Boosts the profile's keyterm list (healthcare_intake: data/lexicons/openfda_rx_generics.txt
+      since 2026-11-05, before that common_uk_generics.txt; run.json records which), written
+      without reference to the test set: what a deployment could know in advance.
 
   - config_id: assemblyai_batch
     provider: assemblyai
-    model_id: universal  # research didn't cover AssemblyAI batch model names; verify
+    model_id: universal-3-5-pro  # sent as speech_models: [id]; "universal" is not a valid id
     mode: batch
-    settings: {format_text: true, punctuate: true}
+    # language_code: without it the language is auto-detected (API reference 2026-11-05).
+    settings: {format_text: true, punctuate: true, language_code: en}
     pricing:
-      amount: null  # not in the research; fill from the vendor pricing page
+      amount: 0.21
       unit: hour
-      billing_basis: audio_duration
+      billing_basis: audio_duration  # pro-rated per second (docs: billing-and-pricing)
       source: https://www.assemblyai.com/pricing
-      as_of: 2026-10-06
+      as_of: 2026-11-05
     env_key: ASSEMBLYAI_API_KEY
-    verify: true
+    verify: true  # request shape checked against the API reference 2026-11-05; no live run yet
+    notes: Keyterms prompting adds $0.05/hour on Universal-3.5 Pro (pricing page, 2026-11-05).
 
   - config_id: elevenlabs_scribe_v2_batch
     provider: elevenlabs
     model_id: scribe_v2
     mode: batch
-    settings: {}
+    # language_code: Scribe auto-detects language by default (Deepgram defaults to en); pinned so
+    # one-word backchannels can't be read as another language. temperature: the default is
+    # "based on the model, usually 0"; pinned so a default change can't alter a re-run.
+    settings: {language_code: en, temperature: 0}
     pricing:
       amount: 0.22
       unit: hour
       billing_basis: audio_duration
-      source: https://www.therundown.ai/tools/scribe-v2
-      as_of: 2026-10-06
+      source: https://elevenlabs.io/pricing/api
+      as_of: 2026-11-05
     env_key: ELEVENLABS_API_KEY
-    verify: true
-    notes: Keyterm boosting is a paid add-on (price not in research).
+    verify: true  # request shape checked against the API reference 2026-11-05; no live run yet
+    notes: >-
+      Subscription credits: 330 per minute of audio (elevenlabs.io/pricing, 2026-11-05).
+      Keyterms add $0.05/hour (pricing page) / 20% (API reference); more than 100 keyterms bill
+      each request for at least 20 s, which the adapter refuses.
 
   # --- streaming (the v1 comparison set) ---------------------------------------------------
   - config_id: deepgram_nova3_stream
@@ -143,8 +153,8 @@ configs:
       amount: 0.39
       unit: hour
       billing_basis: audio_duration
-      source: https://ominigate.ai/en/models/elevenlabs/scribe-v2-realtime
-      as_of: 2026-10-06
+      source: https://elevenlabs.io/pricing/api
+      as_of: 2026-11-05
     env_key: ELEVENLABS_API_KEY
     verify: true
-    notes: Third-party listing reports billing on audio pushed and a 10-minute session cap; verify both.
+    notes: Price confirmed on the vendor page 2026-11-05; billing on audio pushed and the 10-minute session cap are still third-party claims (verify).
