@@ -30,6 +30,7 @@ Every streaming adapter (#18) and the hand-written client (#19) records one `Ses
 | `endpoint` | Provider end-of-turn signal (speech_final, utterance end, end of turn) | `raw` |
 | `vad_event` | Provider speech start/end events, if any | `raw` |
 | `error`, `closed` | Errors and session close | `raw` |
+| `info` | Any other provider message (session start, metadata, warnings, replies to our own commits); kept so every received message is in the trace | `raw` |
 
 Use `Recorder` during a live session: `start()`, then `record(kind, at_ns=..., **fields)`.
 
@@ -43,4 +44,15 @@ Use `Recorder` during a live session: `start()`, then `record(kind, at_ns=..., *
 Statuses: `ok`, `timeout`, `not_applicable`, `not_supported`, `missing_ground_truth`. Aggregates (`summarize`) report p50/p95/p99 with bootstrap CIs, treating timeouts as +inf, plus the timeout rate. Pass `clusters` (utt_id → speaker) to resample whole speakers, as the WER intervals do; the summary then reports `cluster_effect`, the clustered p50 interval width divided by the iid one (≈1: speakers don't matter; well above 1: they do, and iid intervals would have been too narrow).
 
 ## Provider message mapping
-Filled in per provider by #18 (which vendor flag becomes `partial` / `final` / `endpoint`).
+Adapters: `harness/providers/{deepgram,assemblyai,elevenlabs}_stream.py` (protocols checked against vendor docs 2026-11-05, sources in `docs/RESEARCH.md`). Session settings in the registry: `chunk_ms` (20), `finalization` (`natural`/`forced`), `trailing_silence_ms` (1500), `encoding` (`pcm16` 16 kHz / `mulaw` 8 kHz). Runner: `uv run python -m harness.providers.stream_runner` (one session at a time).
+
+| Provider | `partial` | `final` (+ words) | `endpoint` | Forced finalize | Close |
+|---|---|---|---|---|---|
+| Deepgram Nova-3 (`/v1/listen`) | `Results`, `is_final: false`, non-empty | `Results`, `is_final: true`; words in s from stream start | `speech_final: true`; `UtteranceEnd` (not `last_word_end: -1`) | `{"type":"Finalize"}` | `CloseStream`, ends at `Metadata` |
+| Deepgram Flux (`/v2/listen`) | `TurnInfo` `Update`/`StartOfTurn`/`EagerEndOfTurn`/`TurnResumed` | `TurnInfo` `EndOfTurn` | `EndOfTurn` unless `trigger: manual` (that's our ForceEndTurn) | `{"type":"ForceEndTurn"}` | ForceEndTurn then `CloseStream` (CloseStream alone sends no final turn) |
+| AssemblyAI v3 | `Turn`, `end_of_turn: false` | the formatted end-of-turn `Turn` (first one for Universal Streaming without `format_turns`); words in ms from stream start | first `end_of_turn: true` per `turn_order` | `{"type":"ForceEndpoint"}` | `Terminate`, ends at `Termination` |
+| ElevenLabs Scribe Realtime | `partial_transcript`, non-empty | `committed_transcript_with_timestamps` (`type: word`); s → ms | `committed_transcript` from the provider's own VAD commit; replies to our commits are `info` | empty chunk with `commit: true` | a commit; ends at its timestamped transcript |
+
+**Word timings** are present for all four. Measured on a live session (2026-11-05): Nova-3 and Scribe words fall inside the VAD speech span, which confirms stream-start reference points (Scribe's isn't stated in its docs). Flux word *start* times are contiguous on an ~80 ms grid (the first word starts at 0 although speech started at 256 ms), so only Flux end times are precise; TTFS uses end times. AssemblyAI is docs-only so far.
+
+**Endpointing knobs** (registry settings, names from the docs): Nova-3 `endpointing` (ms, default 10), `utterance_end_ms` (1000–5000, needs `interim_results`), `vad_events`; Flux `eot_threshold` (0.5–1.0, 0.7), `eager_eot_threshold`, `eot_timeout_ms` (500–60000, 5000); AssemblyAI `mode`, `min_turn_silence`, `max_turn_silence`, `vad_threshold`, `end_of_turn_confidence_threshold` (Universal Streaming); Scribe `commit_strategy` (`vad` here), `vad_silence_threshold_secs` (default 1.5 s per the SDK), `vad_threshold`, `min_speech_duration_ms`, `min_silence_duration_ms`. Scribe's VAD needs `trailing_silence_ms` above its silence threshold, or the closing commit comes first and natural mode has no provider endpoint (the registry entry uses 3000).

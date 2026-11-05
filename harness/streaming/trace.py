@@ -30,6 +30,7 @@ class EventKind(StrEnum):
     VAD_EVENT = "vad_event"
     ERROR = "error"
     CLOSED = "closed"
+    INFO = "info"  # any other provider message (session start, metadata, warnings): kept raw
 
 
 FinalizationMode = Literal["natural", "forced"]

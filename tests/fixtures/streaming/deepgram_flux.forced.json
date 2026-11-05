@@ -1,0 +1,1420 @@
+{
+ "source": "live capture 2026-11-05, PriMock57 day1_consultation01:doctor:0008 (CC BY 4.0), forced mode; ids zeroed",
+ "config_id": "deepgram_flux_stream",
+ "steps": [
+  {
+   "recv": {
+    "type": "Connected",
+    "request_id": "0",
+    "sequence_id": 0
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 0.24,
+    "transcript": "",
+    "words": [],
+    "end_of_turn_confidence": 0.0043,
+    "sequence_id": 1
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 0.48,
+    "transcript": "two",
+    "words": [
+     {
+      "word": "two",
+      "confidence": 0.9146,
+      "start": 0.0,
+      "end": 0.48
+     }
+    ],
+    "end_of_turn_confidence": 0.0214,
+    "sequence_id": 2
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "StartOfTurn",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 0.72,
+    "transcript": "Okay.",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 1.0,
+      "start": 0.0,
+      "end": 0.08
+     }
+    ],
+    "end_of_turn_confidence": 0.2676,
+    "sequence_id": 3
+   },
+   "expect": [
+    "vad_event",
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 0.96,
+    "transcript": "Okay.",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 1.0,
+      "start": 0.0,
+      "end": 0.08
+     }
+    ],
+    "end_of_turn_confidence": 0.2747,
+    "sequence_id": 4
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 1.2,
+    "transcript": "Okay.",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 1.0,
+      "start": 0.0,
+      "end": 0.96
+     }
+    ],
+    "end_of_turn_confidence": 0.0148,
+    "sequence_id": 5
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 1.44,
+    "transcript": "Okay. And how",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 1.0,
+      "start": 0.0,
+      "end": 0.96
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.96,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 0.998,
+      "start": 1.2,
+      "end": 1.44
+     }
+    ],
+    "end_of_turn_confidence": 0.0076,
+    "sequence_id": 6
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 1.6800001,
+    "transcript": "Okay. And how many times",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 1.0,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.52
+     },
+     {
+      "word": "times",
+      "confidence": 0.9927,
+      "start": 1.52,
+      "end": 1.6800000000000002
+     }
+    ],
+    "end_of_turn_confidence": 0.0133,
+    "sequence_id": 7
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 1.9200001,
+    "transcript": "Okay. And how many times a day",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 0.9434,
+      "start": 1.6800000000000002,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "day",
+      "confidence": 0.9966,
+      "start": 1.8399999999999999,
+      "end": 1.92
+     }
+    ],
+    "end_of_turn_confidence": 0.0232,
+    "sequence_id": 8
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 2.16,
+    "transcript": "Okay. And how many times a day are you",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 2.0
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.08
+     },
+     {
+      "word": "you",
+      "confidence": 0.9893,
+      "start": 2.0,
+      "end": 2.16
+     }
+    ],
+    "end_of_turn_confidence": 0.0298,
+    "sequence_id": 9
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 2.4,
+    "transcript": "Okay. And how many times a day are you good?",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "good?",
+      "confidence": 0.981,
+      "start": 2.24,
+      "end": 2.4
+     }
+    ],
+    "end_of_turn_confidence": 0.2861,
+    "sequence_id": 10
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 2.6399999,
+    "transcript": "Okay. And how many times a day are you going? It's",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "going?",
+      "confidence": 1.0,
+      "start": 2.24,
+      "end": 2.56
+     },
+     {
+      "word": "It's",
+      "confidence": 0.999,
+      "start": 2.56,
+      "end": 2.64
+     }
+    ],
+    "end_of_turn_confidence": 0.0339,
+    "sequence_id": 11
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 2.88,
+    "transcript": "Okay. And how many times a day are you going, let's say,",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "going,",
+      "confidence": 1.0,
+      "start": 2.24,
+      "end": 2.56
+     },
+     {
+      "word": "let's",
+      "confidence": 1.0,
+      "start": 2.56,
+      "end": 2.7199999999999998
+     },
+     {
+      "word": "say,",
+      "confidence": 1.0,
+      "start": 2.64,
+      "end": 2.88
+     }
+    ],
+    "end_of_turn_confidence": 0.2487,
+    "sequence_id": 12
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 3.12,
+    "transcript": "Okay. And how many times a day are you going, let's say?",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "going,",
+      "confidence": 1.0,
+      "start": 2.24,
+      "end": 2.56
+     },
+     {
+      "word": "let's",
+      "confidence": 1.0,
+      "start": 2.56,
+      "end": 2.7199999999999998
+     },
+     {
+      "word": "say?",
+      "confidence": 0.9976,
+      "start": 2.64,
+      "end": 2.96
+     }
+    ],
+    "end_of_turn_confidence": 0.1115,
+    "sequence_id": 13
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 3.3600001,
+    "transcript": "Okay. And how many times a day are you going, let's say, for the",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "going,",
+      "confidence": 1.0,
+      "start": 2.24,
+      "end": 2.56
+     },
+     {
+      "word": "let's",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "say,",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "for",
+      "confidence": 0.9785,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "the",
+      "confidence": 0.9995,
+      "start": 3.2,
+      "end": 3.36
+     }
+    ],
+    "end_of_turn_confidence": 0.1078,
+    "sequence_id": 14
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 3.6,
+    "transcript": "Okay. And how many times a day are you going, let's say, for the last couple",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "going,",
+      "confidence": 1.0,
+      "start": 2.24,
+      "end": 2.56
+     },
+     {
+      "word": "let's",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "say,",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "for",
+      "confidence": 0.998,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "the",
+      "confidence": 1.0,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "last",
+      "confidence": 0.9995,
+      "start": 3.2,
+      "end": 3.52
+     },
+     {
+      "word": "couple",
+      "confidence": 0.9375,
+      "start": 3.52,
+      "end": 3.6
+     }
+    ],
+    "end_of_turn_confidence": 0.1779,
+    "sequence_id": 15
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 3.84,
+    "transcript": "Okay. And how many times a day are you going, let's say, for the last couple of days",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "going,",
+      "confidence": 1.0,
+      "start": 2.24,
+      "end": 2.56
+     },
+     {
+      "word": "let's",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "say,",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "for",
+      "confidence": 0.9966,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "the",
+      "confidence": 1.0,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "last",
+      "confidence": 1.0,
+      "start": 3.2,
+      "end": 3.52
+     },
+     {
+      "word": "couple",
+      "confidence": 1.0,
+      "start": 3.52,
+      "end": 3.6
+     },
+     {
+      "word": "of",
+      "confidence": 0.9995,
+      "start": 3.6,
+      "end": 3.68
+     },
+     {
+      "word": "days",
+      "confidence": 0.9194,
+      "start": 3.68,
+      "end": 3.84
+     }
+    ],
+    "end_of_turn_confidence": 0.1327,
+    "sequence_id": 16
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "send": "finalize"
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 4.08,
+    "transcript": "Okay. And how many times a day are you going, let's say, for the last couple of days?",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "going,",
+      "confidence": 1.0,
+      "start": 2.24,
+      "end": 2.56
+     },
+     {
+      "word": "let's",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "say,",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "for",
+      "confidence": 0.9966,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "the",
+      "confidence": 1.0,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "last",
+      "confidence": 1.0,
+      "start": 3.2,
+      "end": 3.2800000000000002
+     },
+     {
+      "word": "couple",
+      "confidence": 1.0,
+      "start": 3.52,
+      "end": 3.68
+     },
+     {
+      "word": "of",
+      "confidence": 0.998,
+      "start": 3.68,
+      "end": 3.76
+     },
+     {
+      "word": "days?",
+      "confidence": 1.0,
+      "start": 3.68,
+      "end": 3.84
+     }
+    ],
+    "end_of_turn_confidence": 0.7856,
+    "sequence_id": 17
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "EndOfTurn",
+    "turn_index": 0,
+    "audio_window_start": 0.0,
+    "audio_window_end": 4.08,
+    "transcript": "Okay. And how many times a day are you going, let's say, for the last couple of days?",
+    "words": [
+     {
+      "word": "Okay.",
+      "confidence": 0.999,
+      "start": 0.0,
+      "end": 0.88
+     },
+     {
+      "word": "And",
+      "confidence": 1.0,
+      "start": 0.88,
+      "end": 1.2
+     },
+     {
+      "word": "how",
+      "confidence": 1.0,
+      "start": 1.2,
+      "end": 1.28
+     },
+     {
+      "word": "many",
+      "confidence": 1.0,
+      "start": 1.28,
+      "end": 1.44
+     },
+     {
+      "word": "times",
+      "confidence": 1.0,
+      "start": 1.44,
+      "end": 1.6800000000000002
+     },
+     {
+      "word": "a",
+      "confidence": 1.0,
+      "start": 1.6800000000000002,
+      "end": 1.76
+     },
+     {
+      "word": "day",
+      "confidence": 1.0,
+      "start": 1.76,
+      "end": 1.8399999999999999
+     },
+     {
+      "word": "are",
+      "confidence": 1.0,
+      "start": 1.8399999999999999,
+      "end": 2.0
+     },
+     {
+      "word": "you",
+      "confidence": 1.0,
+      "start": 2.0,
+      "end": 2.24
+     },
+     {
+      "word": "going,",
+      "confidence": 1.0,
+      "start": 2.24,
+      "end": 2.56
+     },
+     {
+      "word": "let's",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "say,",
+      "confidence": 1.0,
+      "start": 3.12,
+      "end": 3.2
+     },
+     {
+      "word": "for",
+      "confidence": 0.9966,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "the",
+      "confidence": 1.0,
+      "start": 3.2,
+      "end": 3.2
+     },
+     {
+      "word": "last",
+      "confidence": 1.0,
+      "start": 3.2,
+      "end": 3.2800000000000002
+     },
+     {
+      "word": "couple",
+      "confidence": 1.0,
+      "start": 3.52,
+      "end": 3.68
+     },
+     {
+      "word": "of",
+      "confidence": 0.998,
+      "start": 3.68,
+      "end": 3.76
+     },
+     {
+      "word": "days?",
+      "confidence": 1.0,
+      "start": 3.68,
+      "end": 3.84
+     }
+    ],
+    "end_of_turn_confidence": 0.7856,
+    "trigger": "manual",
+    "sequence_id": 18
+   },
+   "expect": [
+    "final"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 1,
+    "audio_window_start": 4.08,
+    "audio_window_end": 4.32,
+    "transcript": "",
+    "words": [],
+    "end_of_turn_confidence": 0.2747,
+    "sequence_id": 19
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 1,
+    "audio_window_start": 4.08,
+    "audio_window_end": 4.56,
+    "transcript": "",
+    "words": [],
+    "end_of_turn_confidence": 0.5718,
+    "sequence_id": 20
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 1,
+    "audio_window_start": 4.08,
+    "audio_window_end": 4.8,
+    "transcript": "",
+    "words": [],
+    "end_of_turn_confidence": 0.686,
+    "sequence_id": 21
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 1,
+    "audio_window_start": 4.08,
+    "audio_window_end": 5.04,
+    "transcript": "",
+    "words": [],
+    "end_of_turn_confidence": 0.647,
+    "sequence_id": 22
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 1,
+    "audio_window_start": 4.08,
+    "audio_window_end": 5.28,
+    "transcript": "",
+    "words": [],
+    "end_of_turn_confidence": 0.6084,
+    "sequence_id": 23
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 1,
+    "audio_window_start": 4.08,
+    "audio_window_end": 5.52,
+    "transcript": "",
+    "words": [],
+    "end_of_turn_confidence": 0.5444,
+    "sequence_id": 24
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "send": "close"
+  },
+  {
+   "recv": {
+    "type": "TurnInfo",
+    "request_id": "0",
+    "event": "Update",
+    "turn_index": 1,
+    "audio_window_start": 4.08,
+    "audio_window_end": 5.76,
+    "transcript": "",
+    "words": [],
+    "end_of_turn_confidence": 0.4617,
+    "sequence_id": 25
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "type": "Warning",
+    "request_id": "0",
+    "code": "FORCE_END_TURN_NO_ACTIVE_TURN",
+    "description": "Received ForceEndTurn while no turn was active; the request was ignored.",
+    "sequence_id": 26
+   },
+   "expect": [
+    "info"
+   ]
+  }
+ ]
+}

@@ -143,11 +143,11 @@ configs:
       amount: 0.0077
       unit: minute
       billing_basis: audio_duration
-      source: https://flexprice.io/pricing-index/deepgram
-      as_of: 2026-10-06
+      source: https://deepgram.com/pricing
+      as_of: 2026-11-05
     env_key: DEEPGRAM_API_KEY
-    verify: true
-    notes: Regular rate; a promotional $0.0048/min was also listed. Model both in cost analysis.
+    verify: false  # docs + live probe 2026-11-05 (docs/RESEARCH.md)
+    notes: Pay-as-you-go streaming rate (Growth $0.0065). Keyterm prompting +$0.0013/min.
 
   - config_id: deepgram_flux_stream
     provider: deepgram
@@ -155,35 +155,39 @@ configs:
     mode: streaming
     settings: {}
     pricing:
-      amount: 0.0065
+      amount: 0.0077
       unit: minute
       billing_basis: audio_duration
-      source: https://www.happyrobot.ai/hub/deepgram-pricing
-      as_of: 2026-10-06
+      source: https://deepgram.com/pricing
+      as_of: 2026-11-05
     env_key: DEEPGRAM_API_KEY
-    verify: true
-    notes: Built-in end-of-turn detection; end-of-turn thresholds are the endpointing knobs.
+    verify: false  # docs + live probe 2026-11-05 (docs/RESEARCH.md)
+    notes: >-
+      Pay-as-you-go rate (Growth $0.0065). Built-in end-of-turn detection; knobs eot_threshold,
+      eager_eot_threshold, eot_timeout_ms. Word start times are contiguous on an ~80 ms grid
+      (only end times are precise), observed 2026-11-05.
 
   - config_id: assemblyai_universal_stream
     provider: assemblyai
-    model_id: universal-streaming
+    model_id: universal-streaming-english  # docs 2026-11-05: valid ids are universal-3-6-pro, universal-3-5-pro, universal-streaming-english/-multilingual
     mode: streaming
     settings: {}
     pricing:
       amount: 0.15
       unit: hour
       billing_basis: session_duration
-      source: https://www.assemblyai.com/blog/introducing-universal-streaming
-      as_of: 2026-10-06
+      source: https://www.assemblyai.com/pricing
+      as_of: 2026-11-05
     env_key: ASSEMBLYAI_API_KEY
-    verify: true
+    verify: true  # checked against docs 2026-11-05; streaming.assemblyai.com not reachable for a live probe
     notes: Billed while the session is open, including while the agent talks. Keyterms +$0.04/hr.
 
   - config_id: elevenlabs_scribe_v2_rt_stream
     provider: elevenlabs
     model_id: scribe_v2_realtime
     mode: streaming
-    settings: {}
+    # trailing silence > Scribe's 1.5 s default VAD silence, so its own commit can fire (probe 2026-11-05)
+    settings: {trailing_silence_ms: 3000}
     pricing:
       amount: 0.39
       unit: hour
@@ -191,5 +195,7 @@ configs:
       source: https://elevenlabs.io/pricing/api
       as_of: 2026-11-05
     env_key: ELEVENLABS_API_KEY
-    verify: true
-    notes: Price confirmed on the vendor page 2026-11-05; billing on audio pushed and the 10-minute session cap are still third-party claims (verify).
+    verify: false  # docs + live probe 2026-11-05 (docs/RESEARCH.md)
+    notes: >-
+      Billed on audio sent, silence included (docs). Session cap value not stated in the docs;
+      the server reports session_time_limit_exceeded. Keyterms: <= 50 terms of <= 20 chars.

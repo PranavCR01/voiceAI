@@ -48,9 +48,9 @@ def test_committed_registry_loads_and_flags_unverified() -> None:
         "assemblyai_universal_stream",
         "elevenlabs_scribe_v2_rt_stream",
     } <= ids
-    # Batch configs: checked against vendor docs and run live (#13). Streaming: not yet (#18).
-    streaming = {c.config_id for c in reg.configs if c.mode is Mode.STREAMING}
-    assert set(reg.unverified()) == streaming
+    # Batch configs: checked against vendor docs and run live (#13). Streaming (#18): Deepgram and
+    # ElevenLabs probed live; AssemblyAI's streaming host was unreachable from the cloud session.
+    assert set(reg.unverified()) == {"assemblyai_universal_stream"}
     assert all(c.pricing.amount is not None for c in reg.configs if not c.verify)
     assert (
         reg.get("assemblyai_universal_stream").pricing.billing_basis

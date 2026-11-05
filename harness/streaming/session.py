@@ -44,6 +44,10 @@ class StreamProtocol(Protocol):
     finalize_supported: bool
     encoding: Encoding
 
+    def reset(self) -> None:
+        """Called at the start of every session (protocols may track per-session state)."""
+        ...
+
     def url(self) -> str: ...
 
     def headers(self) -> dict[str, str]: ...
@@ -54,8 +58,8 @@ class StreamProtocol(Protocol):
         """Explicit finalize / force end of turn / manual commit; None if unsupported."""
         ...
 
-    def close_frame(self) -> str | None:
-        """Tells the provider no more audio is coming (it should flush and close)."""
+    def close_frames(self) -> list[str]:
+        """Sent in order after the last audio: no more audio is coming (flush and close)."""
         ...
 
     def handle(self, message: Message) -> list[Mapped]:
@@ -115,6 +119,7 @@ async def stream_session(
             raise SessionError(f"{meta.config_id}: forced finalization is not supported")
         if meta.speech_end_ms is None:
             raise SessionError(f"{meta.utt_id}: forced mode needs speech_end_ms (#15)")
+    protocol.reset()
     rec = Recorder(meta)
     rec.start()
     ws = await connect(protocol.url(), protocol.headers())
@@ -127,7 +132,8 @@ async def stream_session(
                 msg = await ws.recv()
                 at = time.monotonic_ns()
                 raw = raw_of(msg)
-                for m in protocol.handle(msg):
+                mapped = protocol.handle(msg) or [Mapped(EventKind.INFO)]
+                for m in mapped:
                     rec.record(m.kind, at_ns=at, raw=raw, **m.fields)
                 if protocol.is_terminal(msg):
                     return
@@ -167,8 +173,9 @@ async def stream_session(
                 rec.record(EventKind.FINALIZE_SENT, audio_offset_ms=end, raw=raw_of(frame))
                 finalized = True
         rec.record(EventKind.AUDIO_END)
-        close = protocol.close_frame()
-        if close is not None and not done.is_set():
+        for close in protocol.close_frames():
+            if done.is_set():
+                break
             with contextlib.suppress(Exception):
                 await ws.send(close)
         with contextlib.suppress(TimeoutError):
@@ -187,9 +194,10 @@ async def stream_session(
 
 def replay(protocol: StreamProtocol, messages: Sequence[Message]) -> list[Mapped]:
     """Map a recorded message sequence (a fixture) the way a live session would."""
+    protocol.reset()
     out: list[Mapped] = []
     for msg in messages:
-        out.extend(protocol.handle(msg))
+        out.extend(protocol.handle(msg) or [Mapped(EventKind.INFO)])
         if protocol.is_terminal(msg):
             break
     return out

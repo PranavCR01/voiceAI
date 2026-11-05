@@ -37,8 +37,11 @@ class EchoProtocol:
     def finalize_frame(self) -> str | None:
         return json.dumps({"type": "Finalize"})
 
-    def close_frame(self) -> str | None:
-        return json.dumps({"type": "Close"})
+    def reset(self) -> None:
+        pass
+
+    def close_frames(self) -> list[str]:
+        return [json.dumps({"type": "Close"})]
 
     def handle(self, message: Message) -> list[Mapped]:
         m = json.loads(message)
@@ -149,3 +152,102 @@ def test_replay_stops_at_the_terminal_message() -> None:
         EventKind.FINAL,
         EventKind.CLOSED,
     ]
+
+
+# --- run loop -----------------------------------------------------------------------------
+
+
+def _config(**settings: Any) -> Any:
+    from harness.providers.registry import ProviderConfig
+
+    return ProviderConfig.model_validate(
+        {
+            "config_id": "echo_stream",
+            "provider": "echo",
+            "model_id": "m",
+            "mode": "streaming",
+            "settings": settings,
+            "env_key": "X",
+            "pricing": {
+                "amount": 1,
+                "unit": "hour",
+                "billing_basis": "audio_duration",
+                "source": "t",
+                "as_of": "2026-11-05",
+            },
+        }
+    )
+
+
+def _utts(n: int) -> list[Any]:
+    from harness.datasets.manifest import Utterance
+
+    return [
+        Utterance(
+            utt_id=f"d:{i}",
+            dataset="d",
+            subset="s",
+            speaker_id="spk",
+            audio_path=f"{i}.wav",
+            ref_text="done",
+            sample_rate=SR,
+            license="CC0-1.0",
+        )
+        for i in range(n)
+    ]
+
+
+def test_run_loop_writes_traces_and_rows_and_resumes(tmp_path: Any) -> None:
+    from harness.providers.stream_runner import run_streaming
+    from harness.results import read_run
+    from harness.streaming.trace import read_trace
+    from harness.vad import SpeechSpan
+
+    spans = {
+        "d:0": SpeechSpan(
+            utt_id="d:0", speech_start_ms=0, speech_end_ms=60, clip_ms=100, coverage=0.6, vad_id="t"
+        ),
+    }
+
+    async def go(cfg: Any, utts: list[Any]) -> Any:
+        async with websockets.serve(echo_server, "127.0.0.1", 0) as server:
+            port = server.sockets[0].getsockname()[1]
+            return await run_streaming(
+                cfg,
+                EchoProtocol(f"ws://127.0.0.1:{port}"),
+                utts,
+                load=lambda u: clip(0.1),
+                spans=spans,
+                results_dir=tmp_path,
+                manifest_label="t",
+                sha="abcdef0",
+            )
+
+    cfg = _config(finalization="forced", trailing_silence_ms=40)
+    first = asyncio.run(go(cfg, _utts(2)))
+    # d:0 has a speech end; d:1 has none, which forced mode records as a failure.
+    assert (first.succeeded, first.failed) == (1, 1)
+    run = read_run(tmp_path / "echo-stream").by_utt()
+    assert run["d:0"].hyp_text == "done" and run["d:0"].raw_response_path == "traces/d__0.jsonl"
+    assert "no VAD speech end" in (run["d:1"].error or "")
+    trace = read_trace(tmp_path / "echo-stream" / "traces" / "d__0.jsonl")
+    assert trace.meta.finalization_mode == "forced" and trace.meta.speech_end_ms == 60
+    assert len(trace.of(EventKind.FINALIZE_SENT)) == 1
+
+    again = asyncio.run(go(cfg, _utts(2)))
+    assert (again.attempted, again.skipped_existing) == (0, 2)
+
+
+def test_session_settings_are_split_from_provider_settings() -> None:
+    from harness.providers.stream_runner import split_settings
+
+    s, provider = split_settings({"chunk_ms": 40, "endpointing": 300, "encoding": "mulaw"})
+    assert (s.chunk_ms, s.encoding, s.finalization, s.trailing_silence_ms) == (
+        40,
+        "mulaw",
+        "natural",
+        1500,
+    )
+    assert provider == {"endpointing": 300}
+    with pytest.raises(ValueError, match="finalization"):
+        split_settings({"finalization": "eager"})
