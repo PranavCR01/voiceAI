@@ -1,17 +1,23 @@
 {
- "source": "verbatim examples from https://www.assemblyai.com/docs/streaming/message-sequence.md (2026-11-05); NOT a live capture: api/streaming hosts blocked from the cloud session. Replace with a captured session.",
+ "source": "live capture 2026-11-05, PriMock57 day1_consultation01:doctor:0008 (CC BY 4.0), forced mode, universal-streaming-english with format_turns; ids zeroed",
  "config_id": "assemblyai_universal_stream",
- "model_id": "universal-3-6-pro",
+ "model_id": "universal-streaming-english",
+ "format_turns": true,
  "steps": [
   {
    "recv": {
     "type": "Begin",
-    "id": "3207b601-2054-48df-ba77-8784dfcf9fb8",
-    "expires_at": 1772570132,
+    "id": "0",
+    "expires_at": 1793881328,
     "configuration": {
-     "model": "universal-3-6-pro",
-     "mode": "balanced",
-     "api_version": "2025-05-12"
+     "model": "universal-streaming-english",
+     "mode": null,
+     "api_version": "2025-05-12",
+     "speaker_labels": false,
+     "redact_pii": false,
+     "filter_profanity": false,
+     "domain": null,
+     "voice_focus": null
     }
    },
    "expect": [
@@ -21,30 +27,1222 @@
   {
    "recv": {
     "turn_order": 0,
-    "turn_is_formatted": false,
+    "turn_is_formatted": true,
     "end_of_turn": false,
-    "transcript": "My name is",
-    "end_of_turn_confidence": 0,
+    "transcript": "",
+    "end_of_turn_confidence": 0.210512,
     "words": [
      {
-      "start": 1216,
-      "end": 1627,
-      "text": "My",
-      "confidence": 0.956314,
+      "start": 1040,
+      "end": 1120,
+      "text": "Okay",
+      "confidence": 0.685775,
       "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay,",
+    "end_of_turn_confidence": 0.0,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
      },
      {
-      "start": 1668,
-      "end": 2490,
-      "text": "name",
-      "confidence": 0.999393,
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
       "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and",
+    "end_of_turn_confidence": 1e-06,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
      },
      {
-      "start": 2531,
-      "end": 3067,
-      "text": "is",
-      "confidence": 0.753325,
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how",
+    "end_of_turn_confidence": 1e-06,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many",
+    "end_of_turn_confidence": 0.000199,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times",
+    "end_of_turn_confidence": 2e-06,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a",
+    "end_of_turn_confidence": 0.00752,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day",
+    "end_of_turn_confidence": 1.3e-05,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day are",
+    "end_of_turn_confidence": 0.000323,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day are you",
+    "end_of_turn_confidence": 0.020948,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": true
+     },
+     {
+      "start": 2400,
+      "end": 2480,
+      "text": "going",
+      "confidence": 0.827878,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day are you going,",
+    "end_of_turn_confidence": 1e-06,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": true
+     },
+     {
+      "start": 2400,
+      "end": 3040,
+      "text": "going,",
+      "confidence": 0.820894,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3040,
+      "text": "let's",
+      "confidence": 0.989529,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day are you going, let's",
+    "end_of_turn_confidence": 0.00228,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": true
+     },
+     {
+      "start": 2400,
+      "end": 3040,
+      "text": "going,",
+      "confidence": 0.820894,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3040,
+      "text": "let's",
+      "confidence": 0.989529,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3120,
+      "text": "say",
+      "confidence": 0.952495,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day are you going, let's say",
+    "end_of_turn_confidence": 0.0,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": true
+     },
+     {
+      "start": 2400,
+      "end": 3040,
+      "text": "going,",
+      "confidence": 0.820894,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3040,
+      "text": "let's",
+      "confidence": 0.989529,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3120,
+      "text": "say",
+      "confidence": 0.952495,
+      "word_is_final": true
+     },
+     {
+      "start": 3520,
+      "end": 3600,
+      "text": "over",
+      "confidence": 0.338535,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day are you going, let's say over the",
+    "end_of_turn_confidence": 8e-06,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": true
+     },
+     {
+      "start": 2400,
+      "end": 3040,
+      "text": "going,",
+      "confidence": 0.820894,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3040,
+      "text": "let's",
+      "confidence": 0.989529,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3120,
+      "text": "say",
+      "confidence": 0.952495,
+      "word_is_final": true
+     },
+     {
+      "start": 3520,
+      "end": 3600,
+      "text": "over",
+      "confidence": 0.338535,
+      "word_is_final": true
+     },
+     {
+      "start": 3680,
+      "end": 3760,
+      "text": "the",
+      "confidence": 0.994376,
+      "word_is_final": true
+     },
+     {
+      "start": 3760,
+      "end": 3760,
+      "text": "last",
+      "confidence": 0.999849,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day are you going, let's say over the last",
+    "end_of_turn_confidence": 3e-05,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": true
+     },
+     {
+      "start": 2400,
+      "end": 3040,
+      "text": "going,",
+      "confidence": 0.820894,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3040,
+      "text": "let's",
+      "confidence": 0.989529,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3120,
+      "text": "say",
+      "confidence": 0.952495,
+      "word_is_final": true
+     },
+     {
+      "start": 3520,
+      "end": 3600,
+      "text": "over",
+      "confidence": 0.338535,
+      "word_is_final": true
+     },
+     {
+      "start": 3680,
+      "end": 3760,
+      "text": "the",
+      "confidence": 0.994376,
+      "word_is_final": true
+     },
+     {
+      "start": 3760,
+      "end": 3760,
+      "text": "last",
+      "confidence": 0.999849,
+      "word_is_final": true
+     },
+     {
+      "start": 3760,
+      "end": 3840,
+      "text": "couple",
+      "confidence": 0.999865,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "partial"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 0,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "Okay, and how many times a day are you going, let's say over the last couple",
+    "end_of_turn_confidence": 2e-06,
+    "words": [
+     {
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
+      "word_is_final": true
+     },
+     {
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
+      "word_is_final": true
+     },
+     {
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
+      "word_is_final": true
+     },
+     {
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": true
+     },
+     {
+      "start": 2400,
+      "end": 3040,
+      "text": "going,",
+      "confidence": 0.820894,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3040,
+      "text": "let's",
+      "confidence": 0.989529,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3120,
+      "text": "say",
+      "confidence": 0.952495,
+      "word_is_final": true
+     },
+     {
+      "start": 3520,
+      "end": 3600,
+      "text": "over",
+      "confidence": 0.338535,
+      "word_is_final": true
+     },
+     {
+      "start": 3680,
+      "end": 3760,
+      "text": "the",
+      "confidence": 0.994376,
+      "word_is_final": true
+     },
+     {
+      "start": 3760,
+      "end": 3760,
+      "text": "last",
+      "confidence": 0.999849,
+      "word_is_final": true
+     },
+     {
+      "start": 3760,
+      "end": 3840,
+      "text": "couple",
+      "confidence": 0.999865,
+      "word_is_final": true
+     },
+     {
+      "start": 3840,
+      "end": 3920,
+      "text": "of",
+      "confidence": 0.996537,
       "word_is_final": false
      }
     ],
@@ -63,39 +1261,177 @@
     "turn_order": 0,
     "turn_is_formatted": true,
     "end_of_turn": true,
-    "transcript": "My name is Sonny.",
-    "end_of_turn_confidence": 1,
+    "transcript": "Okay, and how many times a day are you going, let's say over the last couple of.",
+    "end_of_turn_confidence": 0.204148,
     "words": [
      {
-      "start": 1216,
-      "end": 1635,
-      "text": "My",
-      "confidence": 0.956583,
+      "start": 1040,
+      "end": 1360,
+      "text": "Okay,",
+      "confidence": 0.612737,
       "word_is_final": true
      },
      {
-      "start": 1676,
-      "end": 2515,
-      "text": "name",
-      "confidence": 0.999199,
+      "start": 1360,
+      "end": 1360,
+      "text": "and",
+      "confidence": 0.938075,
       "word_is_final": true
      },
      {
-      "start": 2556,
-      "end": 2975,
-      "text": "is",
-      "confidence": 0.999535,
+      "start": 1440,
+      "end": 1520,
+      "text": "how",
+      "confidence": 0.528057,
       "word_is_final": true
      },
      {
-      "start": 3016,
-      "end": 4155,
-      "text": "Sonny.",
-      "confidence": 0.316031,
+      "start": 1600,
+      "end": 1680,
+      "text": "many",
+      "confidence": 0.999941,
+      "word_is_final": true
+     },
+     {
+      "start": 1680,
+      "end": 1760,
+      "text": "times",
+      "confidence": 0.947034,
+      "word_is_final": true
+     },
+     {
+      "start": 1840,
+      "end": 1920,
+      "text": "a",
+      "confidence": 0.893094,
+      "word_is_final": true
+     },
+     {
+      "start": 1920,
+      "end": 2000,
+      "text": "day",
+      "confidence": 0.980828,
+      "word_is_final": true
+     },
+     {
+      "start": 2160,
+      "end": 2240,
+      "text": "are",
+      "confidence": 0.942309,
+      "word_is_final": true
+     },
+     {
+      "start": 2320,
+      "end": 2400,
+      "text": "you",
+      "confidence": 0.999647,
+      "word_is_final": true
+     },
+     {
+      "start": 2400,
+      "end": 3040,
+      "text": "going,",
+      "confidence": 0.820894,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3040,
+      "text": "let's",
+      "confidence": 0.989529,
+      "word_is_final": true
+     },
+     {
+      "start": 3040,
+      "end": 3120,
+      "text": "say",
+      "confidence": 0.952495,
+      "word_is_final": true
+     },
+     {
+      "start": 3520,
+      "end": 3600,
+      "text": "over",
+      "confidence": 0.338535,
+      "word_is_final": true
+     },
+     {
+      "start": 3680,
+      "end": 3760,
+      "text": "the",
+      "confidence": 0.994376,
+      "word_is_final": true
+     },
+     {
+      "start": 3760,
+      "end": 3760,
+      "text": "last",
+      "confidence": 0.999849,
+      "word_is_final": true
+     },
+     {
+      "start": 3760,
+      "end": 3840,
+      "text": "couple",
+      "confidence": 0.999865,
+      "word_is_final": true
+     },
+     {
+      "start": 3840,
+      "end": 3920,
+      "text": "of.",
+      "confidence": 0.996537,
       "word_is_final": true
      }
     ],
-    "utterance": "My name is Sonny.",
+    "utterance": "Okay, and how many times a day are you going, let's say over the last couple of",
+    "type": "Turn"
+   },
+   "expect": [
+    "final",
+    "endpoint"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 1,
+    "turn_is_formatted": true,
+    "end_of_turn": false,
+    "transcript": "",
+    "end_of_turn_confidence": 0.021905,
+    "words": [
+     {
+      "start": 3920,
+      "end": 4000,
+      "text": "Days",
+      "confidence": 0.972482,
+      "word_is_final": false
+     }
+    ],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "info"
+   ]
+  },
+  {
+   "recv": {
+    "turn_order": 1,
+    "turn_is_formatted": true,
+    "end_of_turn": true,
+    "transcript": "Days?",
+    "end_of_turn_confidence": 0.247356,
+    "words": [
+     {
+      "start": 3920,
+      "end": 4000,
+      "text": "Days?",
+      "confidence": 0.609919,
+      "word_is_final": true
+     }
+    ],
+    "utterance": "Days?",
     "type": "Turn"
    },
    "expect": [
@@ -108,14 +1444,29 @@
   },
   {
    "recv": {
+    "turn_order": 2,
+    "turn_is_formatted": true,
+    "end_of_turn": true,
+    "transcript": "",
+    "end_of_turn_confidence": 0.000125,
+    "words": [],
+    "utterance": "",
+    "type": "Turn"
+   },
+   "expect": [
+    "final",
+    "endpoint"
+   ]
+  },
+  {
+   "recv": {
     "type": "Termination",
-    "audio_duration_seconds": 13,
-    "session_duration_seconds": 14
+    "audio_duration_seconds": 6,
+    "session_duration_seconds": 6
    },
    "expect": [
     "info"
-   ],
-   "terminal": true
+   ]
   }
  ]
 }

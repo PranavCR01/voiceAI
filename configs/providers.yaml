@@ -171,7 +171,9 @@ configs:
     provider: assemblyai
     model_id: universal-streaming-english  # docs 2026-11-05: valid ids are universal-3-6-pro, universal-3-5-pro, universal-streaming-english/-multilingual
     mode: streaming
-    settings: {}
+    # format_turns: formatted finals (punctuation, digits) like Deepgram smart_format / Scribe; the
+    # final then waits for the formatted end-of-turn message (probe 2026-11-05)
+    settings: {format_turns: true}
     pricing:
       amount: 0.15
       unit: hour
@@ -179,7 +181,7 @@ configs:
       source: https://www.assemblyai.com/pricing
       as_of: 2026-11-05
     env_key: ASSEMBLYAI_API_KEY
-    verify: true  # checked against docs 2026-11-05; streaming.assemblyai.com not reachable for a live probe
+    verify: false  # docs + live probe 2026-11-05 (docs/RESEARCH.md)
     notes: Billed while the session is open, including while the agent talks. Keyterms +$0.04/hr.
 
   - config_id: elevenlabs_scribe_v2_rt_stream

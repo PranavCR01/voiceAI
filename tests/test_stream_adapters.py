@@ -42,21 +42,22 @@ def config(provider: str, model: str, **settings: Any) -> ProviderConfig:
     )
 
 
-def protocol_for(name: str, model: str | None = None) -> Any:
+def protocol_for(name: str, model: str | None = None, format_turns: bool = False) -> Any:
     if name.startswith("deepgram_flux"):
         return DeepgramStream(config("deepgram", "flux-general-en"), "K", {}, None, "pcm16")
     if name.startswith("deepgram_nova3"):
         return DeepgramStream(config("deepgram", "nova-3"), "K", {}, None, "pcm16")
     if name.startswith("assemblyai"):
+        settings = {"format_turns": True} if format_turns else {}
         return AssemblyAIStream(
-            config("assemblyai", model or "universal-3-6-pro"), "K", {}, None, "pcm16"
+            config("assemblyai", model or "universal-3-6-pro"), "K", settings, None, "pcm16"
         )
     return ElevenLabsStream(config("elevenlabs", "scribe_v2_realtime"), "K", {}, None, "pcm16")
 
 
 def replay_fixture(path: Path) -> list[tuple[list[Mapped], dict[str, Any]]]:
     doc = json.loads(path.read_text())
-    p = protocol_for(path.name, doc.get("model_id"))
+    p = protocol_for(path.name, doc.get("model_id"), doc.get("format_turns", False))
     p.reset()
     out = []
     for step in doc["steps"]:
@@ -99,7 +100,8 @@ def test_word_timings_are_converted_to_audio_ms() -> None:
     assert nova[0].fields["words"][0]["start_ms"] == pytest.approx(160)  # 0.16 s in the capture
     aai = replay_fixture(FIX / "assemblyai.natural.json")
     final = next(m for ms, _ in aai for m in ms if m.kind is EventKind.FINAL)
-    assert final.fields["words"][-1] == {"text": "Sonny.", "start_ms": 3016.0, "end_ms": 4155.0}
+    assert final.fields["text"].startswith("Okay, and how many")  # the formatted message
+    assert final.fields["words"][-1]["end_ms"] == 4000.0  # ms from stream start = audio time
 
 
 def test_flux_manual_end_of_turn_is_not_an_endpoint() -> None:
@@ -120,7 +122,7 @@ def test_scribe_replies_to_our_commits_are_not_endpoints() -> None:
     assert natural.count(EventKind.ENDPOINT) == 1  # its own VAD commit, before our closing commit
 
 
-def test_assemblyai_unformatted_models_finalize_on_the_first_end_of_turn() -> None:
+def test_assemblyai_unformatted_finalizes_on_the_first_end_of_turn() -> None:
     p = AssemblyAIStream(
         config("assemblyai", "universal-streaming-english"), "K", {}, None, "pcm16"
     )
@@ -233,3 +235,16 @@ def test_every_registry_streaming_config_builds() -> None:
             s, _ = split_settings(cfg.settings)
             p = build_protocol(cfg, "K", None)
             assert p.url().startswith("wss://") and p.encoding == s.encoding
+
+
+def test_assemblyai_forced_endpoint_can_split_the_last_word_into_a_new_turn() -> None:
+    """Live capture: ForceEndpoint finalizes what was decoded so far, so the last word arrives as
+    a second turn. The first final after the finalize lacks the speaker's last word; TTFS (final
+    containing the last word) is the honest forced-mode number, not finalize latency."""
+    finals = [
+        m.fields
+        for ms, _ in replay_fixture(FIX / "assemblyai.forced.json")
+        for m in ms
+        if m.kind is EventKind.FINAL and m.fields.get("text")
+    ]
+    assert finals[0]["text"].endswith("couple of.") and finals[1]["text"] == "Days?"
