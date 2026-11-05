@@ -2,6 +2,8 @@
 
 Every streaming adapter (#18) and the hand-written client (#19) records one `SessionTrace` per (config, utterance), and all latency metrics are computed from traces afterwards (`harness/metrics/latency.py`). Code: `trace.py`.
 
+`session.py` runs one session for any provider (#18): connect, pace the audio (`harness.audio.pace`), send the provider's finalize right after the chunk containing the true speech end in `forced` mode, send the close message after the trailing silence, and record every received message. A provider supplies a `StreamProtocol` (URL, headers, audio/finalize/close frames, and a pure `handle(message)` that maps one message to trace events), so the mapping is replay-tested on recorded messages without a network. `tests/test_stream_session.py` runs the whole session against a local echo server (the dry-run mode).
+
 ## File format
 `<run>/traces/<trace_filename(utt_id)>.jsonl`: line 1 is `SessionMeta`, each later line one `Event`, in time order.
 
