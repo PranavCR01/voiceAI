@@ -194,7 +194,7 @@ def _assemblyai(
 def test_assemblyai_upload_create_poll() -> None:
     adapter, seen, waits = _assemblyai(["queued", "processing", "completed"])
     tr = run(adapter.transcribe(CLIP, {"format_text": True}))
-    assert tr.text == "I take 500 mg of paracetamol."
+    assert tr.text.startswith("Okay. And how many times a day are you going")
     upload, create, *polls = seen
     assert upload.headers["authorization"] == "KEY" and upload.content[:4] == b"RIFF"
     assert json.loads(create.content) == {

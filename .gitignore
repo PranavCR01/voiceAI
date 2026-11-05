@@ -20,6 +20,11 @@ results_retest/**
 !results_retest/*/
 !results_retest/*/run.json
 !results_retest/*/results.parquet
+# Runs replaced by a re-run under the same config id (e.g. a changed boost list). See docs/DECISIONS.md 2026-11-05.
+results_superseded/**
+!results_superseded/*/
+!results_superseded/*/run.json
+!results_superseded/*/results.parquet
 
 # Python
 __pycache__/

@@ -99,6 +99,40 @@ configs:
       for this API). Writes dates as spoken ("the 2nd of November, 1992"), never digits. Keyterms add $0.05/hour (pricing page) / 20% (API reference); more than 100 keyterms bill
       each request for at least 20 s, which the adapter refuses.
 
+  - config_id: elevenlabs_scribe_v2_batch_keyterms_common
+    provider: elevenlabs
+    model_id: scribe_v2
+    mode: batch
+    settings: {language_code: en, temperature: 0, keyterms: profile}
+    pricing:
+      amount: 0.27  # $0.22/h + $0.05/h keyterms (pricing page)
+      unit: hour
+      billing_basis: audio_duration
+      source: https://elevenlabs.io/pricing/api
+      as_of: 2026-11-05
+    env_key: ELEVENLABS_API_KEY
+    verify: true
+    notes: >-
+      Boosts the profile's keyterm list (healthcare_intake: data/lexicons/openfda_rx_generics.txt,
+      100 terms, the most the adapter allows). Compare with deepgram_nova3_batch_keyterms_common.
+
+  - config_id: elevenlabs_scribe_v2_medical_batch
+    provider: elevenlabs
+    model_id: scribe_v2_medical
+    mode: batch
+    settings: {language_code: en, temperature: 0}
+    pricing:
+      amount: 0.22  # "same pricing as Scribe v2" (models page)
+      unit: hour
+      billing_basis: audio_duration
+      source: https://elevenlabs.io/docs/overview/models
+      as_of: 2026-11-05
+    env_key: ELEVENLABS_API_KEY
+    verify: true
+    notes: >-
+      Fine-tune of Scribe v2 for clinical vocabulary (vendor claim: 35% fewer errors on clinical
+      audio). Not boosted, so it compares directly with elevenlabs_scribe_v2_batch.
+
   # --- streaming (the v1 comparison set) ---------------------------------------------------
   - config_id: deepgram_nova3_stream
     provider: deepgram

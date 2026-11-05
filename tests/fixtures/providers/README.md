@@ -4,7 +4,7 @@
 
 **ElevenLabs: captured 2026-11-05** from the live API (PriMock57 `day1_consultation01:doctor:0008`, CC BY 4.0). Scrubbed: `transcription_id` zeroed; everything else verbatim.
 
-**AssemblyAI: doc-derived, not captured.** First written from recollection, then aligned with the API reference on 2026-11-05 (`speech_model_used`). Still hand-written, because `api.assemblyai.com` is blocked from cloud sessions. On the first live run (#13), replace each with a real captured response (remove API keys, request ids and account ids) and note the capture date here. Until then, the parser tests prove our parsing logic, not that the vendor's format is current.
+**AssemblyAI: `transcript_completed.json` captured 2026-11-05** from the live API (PriMock57 `day1_consultation01:doctor:0008`). Scrubbed: `id`, `project_id`, `token_id` and the signed `audio_url` replaced. The upload/queued/processing/error fixtures are still hand-written (minimal shapes from the API reference). On the first live run (#13), replace each with a real captured response (remove API keys, request ids and account ids) and note the capture date here. Until then, the parser tests prove our parsing logic, not that the vendor's format is current.
 
 | Provider | File | Endpoint |
 |---|---|---|
