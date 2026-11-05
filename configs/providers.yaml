@@ -92,10 +92,11 @@ configs:
       source: https://elevenlabs.io/pricing/api
       as_of: 2026-11-05
     env_key: ELEVENLABS_API_KEY
-    verify: true  # request shape checked against the API reference 2026-11-05; no live run yet
+    verify: true  # API reference + live run 2026-11-05; set false once the price basis is confirmed
     notes: >-
-      Subscription credits: 330 per minute of audio (elevenlabs.io/pricing, 2026-11-05).
-      Keyterms add $0.05/hour (pricing page) / 20% (API reference); more than 100 keyterms bill
+      Measured 2026-11-05 from response headers: 18 credits / $0.0036 per audio minute, rounded
+      up to a whole credit per request (the pricing page's "330 credits per minute" is wrong
+      for this API). Writes dates as spoken ("the 2nd of November, 1992"), never digits. Keyterms add $0.05/hour (pricing page) / 20% (API reference); more than 100 keyterms bill
       each request for at least 20 s, which the adapter refuses.
 
   # --- streaming (the v1 comparison set) ---------------------------------------------------

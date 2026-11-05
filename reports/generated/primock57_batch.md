@@ -1,9 +1,9 @@
 # Offline STT accuracy report
 
-- **Generated:** 2026-11-05 01:24 UTC
+- **Generated:** 2026-11-05 02:21 UTC
 - **Manifest:** `data/manifests/primock57.jsonl` (7108 utterances; excluded from scoring: inaudible 706, unintelligible 1147)
 - **Profile:** `configs/profiles/healthcare_intake.yaml`
-- **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v4/dmy,hyp-mdy`
+- **Normalizer (headline WER):** `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v4/dmy`, `whisper-normalizer==0.1.15/EnglishTextNormalizer+equiv-v4/dmy,hyp-mdy`
 - **Leaderboard-comparable WER:** `whisper-normalizer==0.1.15/EnglishTextNormalizer`
 - **Intervals:** 95% paired percentile bootstrap, 10000 resamples, seed 0, resampling whole speakers. Pairwise p-values Holm-adjusted within each table. "Tie" = difference interval includes 0. No winner is called with fewer than 10 speakers in a table.
 - **Failed requests** are scored as empty transcripts (every reference word deleted).
@@ -16,6 +16,7 @@
 | deepgram_nova3_batch | deepgram | `nova-3` | batch | `{"punctuate": true, "smart_format": true}` | mdy | deepgram-nova3-batch | 2026-11-04 | `207cdd3` |
 | deepgram_nova3_batch_keyterms | deepgram | `nova-3` | batch | `{"keyterms": "lexicon", "punctuate": true, "smart_format": true}` | mdy | deepgram-nova3-batch-keyterms | 2026-11-04 | `8f09f37` |
 | deepgram_nova3_batch_keyterms_common | deepgram | `nova-3` | batch | `{"keyterms": "profile", "punctuate": true, "smart_format": true}` | mdy | deepgram-nova3-batch-keyterms-common | 2026-11-04 | `1d54f4d` |
+| elevenlabs_scribe_v2_batch | elevenlabs | `scribe_v2` | batch | `{"language_code": "en", "temperature": 0}` | as reference | elevenlabs-scribe-v2-batch | 2026-11-05 | `beb7ab9` |
 
 ## Real audio
 
@@ -28,12 +29,16 @@
 | deepgram_nova3_batch | 7.4% [6.8, 8.1] | 10.2% | 12.2% | 5255 | 56795 | 0 | 1.1% [0.9, 1.4] (57/5105) |
 | deepgram_nova3_batch_keyterms | 7.4% [6.8, 8.1] | 10.2% | 12.2% | 5255 | 56795 | 0 | 1.2% [1.0, 1.6] (63/5105) |
 | deepgram_nova3_batch_keyterms_common | 7.4% [6.8, 8.1] | 10.2% | 12.2% | 5255 | 56795 | 0 | 1.2% [0.9, 1.5] (60/5105) |
+| elevenlabs_scribe_v2_batch | 5.7% [5.1, 6.2] | 8.4% | 10.2% | 5255 | 56795 | 0 | 0.3% [0.2, 0.5] (17/5105) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
 | deepgram_nova3_batch − deepgram_nova3_batch_keyterms | +0.0 pp [-0.1, +0.1] | 0.9677 | 1.0000 | tie |
 | deepgram_nova3_batch − deepgram_nova3_batch_keyterms_common | +0.0 pp [-0.1, +0.1] | 1.0000 | 1.0000 | tie |
+| deepgram_nova3_batch − elevenlabs_scribe_v2_batch | +1.8 pp [+1.4, +2.1] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
 | deepgram_nova3_batch_keyterms − deepgram_nova3_batch_keyterms_common | -0.0 pp [-0.1, +0.1] | 0.9509 | 1.0000 | tie |
+| deepgram_nova3_batch_keyterms − elevenlabs_scribe_v2_batch | +1.8 pp [+1.4, +2.1] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
+| deepgram_nova3_batch_keyterms_common − elevenlabs_scribe_v2_batch | +1.8 pp [+1.4, +2.1] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
 
 Entities (recall = every word of the entity correct; CER = character error rate on the entity; formatted = recalled and written as digits):
 
@@ -51,8 +56,12 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | deepgram_nova3_batch_keyterms_common | dosage | 93.8% [71.7, 98.9] | 15/16 | 0.9% | 0.0% [0.0, 19.4] |
 | deepgram_nova3_batch_keyterms_common | date_of_birth | 90.5% [71.1, 97.3] | 19/21 | 3.5% | 90.5% [71.1, 97.3] |
 | deepgram_nova3_batch_keyterms_common | phone | 50.0% [9.5, 90.5] | 1/2 | 26.7% | 0.0% [0.0, 65.8] |
+| elevenlabs_scribe_v2_batch | medication | 82.8% [76.3, 87.8] | 135/163 | 8.6% | - |
+| elevenlabs_scribe_v2_batch | dosage | 93.8% [71.7, 98.9] | 15/16 | 0.9% | 18.8% [6.6, 43.0] |
+| elevenlabs_scribe_v2_batch | date_of_birth | 85.7% [65.4, 95.0] | 18/21 | 6.6% | 52.4% [32.4, 71.7] |
+| elevenlabs_scribe_v2_batch | phone | 50.0% [9.5, 90.5] | 1/2 | 13.3% | 0.0% [0.0, 65.8] |
 
-Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 1, deepgram_nova3_batch_keyterms 9, deepgram_nova3_batch_keyterms_common 9.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 1, deepgram_nova3_batch_keyterms 9, deepgram_nova3_batch_keyterms_common 9, elevenlabs_scribe_v2_batch 3.
 
 ### doctor (real)
 
@@ -63,12 +72,16 @@ Keyterms written where the speaker didn't say them (each run's own boost list fr
 | deepgram_nova3_batch | 6.5% [5.7, 7.4] | 10.2% | 9.3% | 2615 | 33869 | 0 | 0.6% [0.4, 1.0] (16/2570) |
 | deepgram_nova3_batch_keyterms | 6.6% [5.8, 7.5] | 10.3% | 9.3% | 2615 | 33869 | 0 | 0.7% [0.4, 1.1] (18/2570) |
 | deepgram_nova3_batch_keyterms_common | 6.5% [5.7, 7.4] | 10.2% | 9.2% | 2615 | 33869 | 0 | 0.6% [0.4, 1.0] (16/2570) |
+| elevenlabs_scribe_v2_batch | 4.7% [4.1, 5.5] | 8.5% | 7.3% | 2615 | 33869 | 0 | 0.1% [0.0, 0.3] (3/2570) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
 | deepgram_nova3_batch − deepgram_nova3_batch_keyterms | -0.1 pp [-0.1, +0.0] | 0.2764 | 0.8291 | tie |
 | deepgram_nova3_batch − deepgram_nova3_batch_keyterms_common | -0.0 pp [-0.1, +0.1] | 0.9985 | 0.9985 | tie |
+| deepgram_nova3_batch − elevenlabs_scribe_v2_batch | +1.8 pp [+1.3, +2.3] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
 | deepgram_nova3_batch_keyterms − deepgram_nova3_batch_keyterms_common | +0.0 pp [-0.0, +0.1] | 0.3124 | 0.8291 | tie |
+| deepgram_nova3_batch_keyterms − elevenlabs_scribe_v2_batch | +1.8 pp [+1.3, +2.3] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
+| deepgram_nova3_batch_keyterms_common − elevenlabs_scribe_v2_batch | +1.8 pp [+1.3, +2.3] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
 
 Entities (recall = every word of the entity correct; CER = character error rate on the entity; formatted = recalled and written as digits):
 
@@ -86,8 +99,12 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | deepgram_nova3_batch_keyterms_common | dosage | 92.9% [68.5, 98.7] | 13/14 | 1.0% | 0.0% [0.0, 21.5] |
 | deepgram_nova3_batch_keyterms_common | date_of_birth | no instances | 0 | - | - |
 | deepgram_nova3_batch_keyterms_common | phone | no instances | 0 | - | - |
+| elevenlabs_scribe_v2_batch | medication | 88.3% [80.2, 93.3] | 83/94 | 7.0% | - |
+| elevenlabs_scribe_v2_batch | dosage | 92.9% [68.5, 98.7] | 13/14 | 1.0% | 7.1% [1.3, 31.5] |
+| elevenlabs_scribe_v2_batch | date_of_birth | no instances | 0 | - | - |
+| elevenlabs_scribe_v2_batch | phone | no instances | 0 | - | - |
 
-Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 1, deepgram_nova3_batch_keyterms 4, deepgram_nova3_batch_keyterms_common 4.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 1, deepgram_nova3_batch_keyterms 4, deepgram_nova3_batch_keyterms_common 4, elevenlabs_scribe_v2_batch 0.
 
 ### patient (real)
 
@@ -98,12 +115,16 @@ Keyterms written where the speaker didn't say them (each run's own boost list fr
 | deepgram_nova3_batch | 8.7% [7.7, 9.9] | 10.2% | 15.2% | 2640 | 22926 | 0 | 1.6% [1.2, 2.2] (41/2535) |
 | deepgram_nova3_batch_keyterms | 8.6% [7.7, 9.8] | 10.2% | 15.2% | 2640 | 22926 | 0 | 1.8% [1.3, 2.4] (45/2535) |
 | deepgram_nova3_batch_keyterms_common | 8.7% [7.7, 9.9] | 10.2% | 15.3% | 2640 | 22926 | 0 | 1.7% [1.3, 2.3] (44/2535) |
+| elevenlabs_scribe_v2_batch | 7.0% [6.2, 7.9] | 8.3% | 13.1% | 2640 | 22926 | 0 | 0.6% [0.3, 0.9] (14/2535) |
 
 | Pair (A − B) | WER difference [95% CI] | p | p (Holm) | Verdict |
 |---|---|---|---|---|
 | deepgram_nova3_batch − deepgram_nova3_batch_keyterms | +0.1 pp [-0.0, +0.2] | 0.1584 | 0.3180 | tie |
 | deepgram_nova3_batch − deepgram_nova3_batch_keyterms_common | +0.0 pp [-0.1, +0.1] | 0.9609 | 0.9609 | tie |
+| deepgram_nova3_batch − elevenlabs_scribe_v2_batch | +1.7 pp [+1.2, +2.3] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
 | deepgram_nova3_batch_keyterms − deepgram_nova3_batch_keyterms_common | -0.1 pp [-0.2, +0.0] | 0.1060 | 0.3180 | tie |
+| deepgram_nova3_batch_keyterms − elevenlabs_scribe_v2_batch | +1.7 pp [+1.1, +2.2] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
+| deepgram_nova3_batch_keyterms_common − elevenlabs_scribe_v2_batch | +1.7 pp [+1.2, +2.3] | 0.0002 | 0.0012 | elevenlabs_scribe_v2_batch better |
 
 Entities (recall = every word of the entity correct; CER = character error rate on the entity; formatted = recalled and written as digits):
 
@@ -121,8 +142,12 @@ Entities (recall = every word of the entity correct; CER = character error rate 
 | deepgram_nova3_batch_keyterms_common | dosage | 100.0% [34.2, 100.0] | 2/2 | 0.0% | 0.0% [0.0, 65.8] |
 | deepgram_nova3_batch_keyterms_common | date_of_birth | 90.5% [71.1, 97.3] | 19/21 | 3.5% | 90.5% [71.1, 97.3] |
 | deepgram_nova3_batch_keyterms_common | phone | 50.0% [9.5, 90.5] | 1/2 | 26.7% | 0.0% [0.0, 65.8] |
+| elevenlabs_scribe_v2_batch | medication | 75.4% [64.0, 84.0] | 52/69 | 10.9% | - |
+| elevenlabs_scribe_v2_batch | dosage | 100.0% [34.2, 100.0] | 2/2 | 0.0% | 100.0% [34.2, 100.0] |
+| elevenlabs_scribe_v2_batch | date_of_birth | 85.7% [65.4, 95.0] | 18/21 | 6.6% | 52.4% [32.4, 71.7] |
+| elevenlabs_scribe_v2_batch | phone | 50.0% [9.5, 90.5] | 1/2 | 13.3% | 0.0% [0.0, 65.8] |
 
-Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 0, deepgram_nova3_batch_keyterms 5, deepgram_nova3_batch_keyterms_common 5.
+Keyterms written where the speaker didn't say them (each run's own boost list from run.json; runs without boosting are counted against the profile's boost list as a baseline): deepgram_nova3_batch 0, deepgram_nova3_batch_keyterms 5, deepgram_nova3_batch_keyterms_common 5, elevenlabs_scribe_v2_batch 3.
 
 ## Worst utterances
 
@@ -172,3 +197,18 @@ Normalized alignment: `[ref→hyp]` substitution, `[-ref]` deletion, `[+hyp]` in
 | `primock57:day4_consultation05:patient:0015` | patient | 10/52 | yes so i have [+a] i have [+a] i do not know how do you say it properly in english i mean [+we] [+that] [+was] [without→from] [sounding→the] [good→google] like diarrhea for for yeah so it is lasting for like 3 days and yeah i i do not know i do not know what [could→would] because it [-i] |
 | `primock57:day5_consultation08:doctor:0090` | doctor | 10/16 | [-who] [-do] you [live→deal] with do you live [on→with] [your→me] [own→right] [or→now] [do→deal] [-you] [-live] with |
 | `primock57:day5_consultation10:patient:0032` | patient | 10/21 | i [was→would] [sick→say] [but→quite] [i→normal] [had→headaches] [-no] [-more] [-headache] [-it] [-is] just a bit of a pressure in between my eyes |
+
+### elevenlabs_scribe_v2_batch
+
+| Utterance | Subset | Errors / ref words | Alignment |
+|---|---|---|---|
+| `primock57:day1_consultation07:doctor:0096` | doctor | 19/17 | [+4] [+or] [45→5] days ago yeah okay are you aware of anything that might have set your symptoms off [+is] [+it] [+something] [+you] [+have] [+you] [+have] [+eaten] [+or] [+have] [+you] [+been] [+traveling] [+recently] [+abroad] [+or] |
+| `primock57:day4_consultation05:patient:0094` | patient | 10/67 | okay i did not yeah sorry i did [-not] no i was saying i did not have any fever recently i i was sweating a little bit [-the] last [4→for] [days→bed] but i i not sure if if i had [+a] bit of fever but very little or [-or] [-i] [-am] [-i] [-am] but i do not think so i do not think i do not know maybe |
+| `primock57:day5_consultation10:patient:0032` | patient | 10/21 | i [was→would] [sick→say] [but→quite] [i→normal] [had→headaches] [-no] [-more] [-headache] [-it] [-is] just a bit of a pressure in between my eyes |
+| `primock57:day1_consultation03:doctor:0128` | doctor | 9/31 | okay now [+there] [+are] a couple of things i want you to think about is you know if your symptoms are not getting [+any] better [+in] [+the] next [+2] [+to] [23→3] days or indeed [-they] are getting worse |
+| `primock57:day1_consultation10:patient:0031` | patient | 8/4 | no [+i] [+know] [+what] [+you] [+are] [no→about] [nausea→to] [vomiting→say] |
+| `primock57:day1_consultation10:patient:0129` | patient | 8/13 | either [+that] [back→train] [pain→bottom] [vomiting→thing] great okay yeah i will [watch→chat] [out→with] [for→liz] [-those] |
+| `primock57:day1_consultation11:patient:0129` | patient | 8/33 | [+on] [honest→a] i suppose not every week but maybe [-i] [-will] once or twice a month that yeah i will [+i] [+will] go out with my friends and [+we] [+will] drink a lot so that that is yeah |
+| `primock57:day2_consultation02:doctor:0070` | doctor | 8/51 | from now but it [may→will] take time for the form to come out to you and if you get the form [get→to] [the→do] [blood→that] [tests→test] done straight away by the time that we are expecting [+a] result back you know one or 2 days after that we [+we] are looking [+at] maybe 6 days |
+| `primock57:day2_consultation08:doctor:0088` | doctor | 8/13 | [i→so] [am→how] [sorry→old] [-to] [-hear] [-that] how old [was→is] he when that [happened→happens] |
+| `primock57:day3_consultation08:doctor:0062` | doctor | 8/19 | [+it] [+is] [cool→all] because there [is→was] nothing alarming yeah [no→normal] [-more] okay [that→absolutely] [-is] fine okay so that seems all right |

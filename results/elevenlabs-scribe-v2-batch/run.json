@@ -1,0 +1,15 @@
+{
+  "run_id": "elevenlabs-scribe-v2-batch",
+  "config_id": "elevenlabs_scribe_v2_batch",
+  "provider": "elevenlabs",
+  "model_id": "scribe_v2",
+  "mode": "batch",
+  "settings": {
+    "language_code": "en",
+    "temperature": 0
+  },
+  "created_at": "2026-11-05T02:06:24.310799Z",
+  "git_sha": "beb7ab983081f16986449d827a3f67ba0a004f45",
+  "manifest": "data/manifests/primock57.jsonl",
+  "keyterms": null
+}
