@@ -1,8 +1,9 @@
 """Streaming session traces: what every streaming adapter records, on one clock.
 
 A trace is one (config, utterance) session: metadata plus ordered events with `t_ns`, the
-monotonic-clock time since session start. Metrics (`harness/metrics/latency.py`) are computed
-afterwards from traces only, so they are testable without a live provider.
+high-resolution monotonic time (`time.perf_counter_ns`) since session start. Metrics
+(`harness/metrics/latency.py`) are computed afterwards from traces only, so they are testable
+without a live provider.
 
 On disk (`<run>/traces/<file>.jsonl`): the first line is the metadata, each later line one event.
 Schema reference: harness/streaming/README.md.
@@ -123,8 +124,8 @@ def read_trace(path: Path) -> SessionTrace:
 class Recorder:
     """Builds a trace during a live session. `t_ns` is relative to `start()`.
 
-    Pass `at_ns` (an absolute monotonic time, e.g. a pacer chunk's `sent_ns`) to record when
-    something actually happened rather than when it was logged.
+    Pass `at_ns` (an absolute `time.perf_counter_ns()` time, e.g. a pacer chunk's `sent_ns`) to
+    record when something actually happened rather than when it was logged.
     """
 
     def __init__(self, meta: SessionMeta) -> None:
@@ -133,13 +134,13 @@ class Recorder:
         self._events: list[Event] = []
 
     def start(self) -> None:
-        self._t0 = time.monotonic_ns()
+        self._t0 = time.perf_counter_ns()
         self.record(EventKind.CONNECT_START)
 
     def record(self, kind: EventKind, *, at_ns: int | None = None, **fields: object) -> Event:
         if self._t0 is None:
             raise RuntimeError("call start() first")
-        now = at_ns if at_ns is not None else time.monotonic_ns()
+        now = at_ns if at_ns is not None else time.perf_counter_ns()
         event = Event.model_validate({"kind": kind, "t_ns": max(0, now - self._t0), **fields})
         self._events.append(event)
         return event

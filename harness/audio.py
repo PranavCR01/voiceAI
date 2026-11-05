@@ -5,7 +5,8 @@ hears identical audio.
   segment in NumPy at the target rate. Whole files are decoded once and cached, so segment
   boundaries are sample-exact for every format (ffmpeg seeking is not, for MP3).
 - Encoders: PCM16 little-endian, G.711 µ-law at 8 kHz (what Twilio Media Streams carry), WAV.
-- `pace()`: yields fixed-size chunks at real-time pace on the monotonic clock. Chunk k is
+- `pace()`: yields fixed-size chunks at real-time pace on `time.perf_counter_ns` (monotonic and
+  high-resolution on every OS; `time.monotonic` ticks every ~15.6 ms on Windows). Chunk k is
   scheduled at t0 + k * chunk, so lateness never accumulates into drift.
 
 ffmpeg is invoked as an argument list (never through a shell).
@@ -299,10 +300,10 @@ async def pace(
     payload += bytes([silence]) * pad_bytes
     chunk_bytes = (bytes_per_s * chunk_ms // 1000) // width * width
     chunk_ns = chunk_ms * 1_000_000
-    t0 = time.monotonic_ns()
+    t0 = time.perf_counter_ns()
     for k, start in enumerate(range(0, len(payload), chunk_bytes)):
         due = t0 + k * chunk_ns
-        wait = due - time.monotonic_ns()
+        wait = due - time.perf_counter_ns()
         if wait > 0:
             await asyncio.sleep(wait / 1e9)
         yield Chunk(
@@ -310,5 +311,5 @@ async def pace(
             data=payload[start : start + chunk_bytes],
             audio_offset_ms=k * chunk_ms,
             scheduled_ns=due,
-            sent_ns=time.monotonic_ns(),
+            sent_ns=time.perf_counter_ns(),
         )

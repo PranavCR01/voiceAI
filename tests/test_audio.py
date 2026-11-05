@@ -212,9 +212,9 @@ async def _collect(clip: AudioClip, **kw: Any) -> list[Any]:
 @pytest.mark.timing
 def test_pace_one_second_in_twenty_ms_chunks() -> None:
     clip = AudioClip(tone(440, 1.0, 16000), 16000, "a:1", 16000)
-    start = time.monotonic()
+    start = time.perf_counter()
     chunks = asyncio.run(_collect(clip, chunk_ms=20))
-    elapsed = time.monotonic() - start
+    elapsed = time.perf_counter() - start
     assert len(chunks) == 50
     assert all(len(c.data) == 640 for c in chunks)  # 20 ms of 16 kHz PCM16
     assert b"".join(c.data for c in chunks) == to_pcm16_bytes(clip)

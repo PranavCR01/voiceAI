@@ -130,7 +130,7 @@ async def stream_session(
         try:
             while True:
                 msg = await ws.recv()
-                at = time.monotonic_ns()
+                at = time.perf_counter_ns()
                 raw = raw_of(msg)
                 mapped = protocol.handle(msg) or [Mapped(EventKind.INFO)]
                 for m in mapped:
@@ -156,7 +156,7 @@ async def stream_session(
             await ws.send(protocol.audio_frame(chunk.data))
             rec.record(
                 EventKind.AUDIO_SENT,
-                at_ns=time.monotonic_ns(),
+                at_ns=time.perf_counter_ns(),
                 chunk_index=chunk.index,
                 audio_offset_ms=chunk.audio_offset_ms,
             )

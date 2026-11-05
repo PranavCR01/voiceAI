@@ -119,10 +119,9 @@ def test_forced_finalize_goes_out_within_one_chunk_of_speech_end() -> None:
     [fin] = trace.of(EventKind.FINALIZE_SENT)
     assert fin.audio_offset_ms is not None and 150 <= fin.audio_offset_ms < 150 + 20
     # It follows the audio chunk that contains 150 ms, before the next chunk is sent.
-    chunk = max(
-        (e for e in trace.of(EventKind.AUDIO_SENT) if e.t_ns <= fin.t_ns),
-        key=lambda e: e.t_ns,
-    )
+    # By recording order, not time: two events can share a timestamp on a coarse clock.
+    at = trace.events.index(fin)
+    chunk = [e for e in trace.events[:at] if e.kind is EventKind.AUDIO_SENT][-1]
     assert chunk.audio_offset_ms == 140.0
     assert fin.raw == {"type": "Finalize"}
     final = trace.first(EventKind.FINAL, after_ns=fin.t_ns)
