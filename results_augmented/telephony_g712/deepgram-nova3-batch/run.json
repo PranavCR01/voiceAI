@@ -1,0 +1,15 @@
+{
+  "run_id": "deepgram-nova3-batch",
+  "config_id": "deepgram_nova3_batch",
+  "provider": "deepgram",
+  "model_id": "nova-3",
+  "mode": "batch",
+  "settings": {
+    "smart_format": true,
+    "punctuate": true
+  },
+  "created_at": "2026-11-05T08:37:50.677756Z",
+  "git_sha": "86d94f14e7b58b2b0da0b4409ddd80026d89b36b-dirty",
+  "manifest": "data/manifests/primock57.telephony_g712.jsonl",
+  "keyterms": null
+}
