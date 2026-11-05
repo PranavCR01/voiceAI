@@ -1,0 +1,16 @@
+{
+  "run_id": "assemblyai-batch",
+  "config_id": "assemblyai_batch",
+  "provider": "assemblyai",
+  "model_id": "universal-3-5-pro",
+  "mode": "batch",
+  "settings": {
+    "format_text": true,
+    "punctuate": true,
+    "language_code": "en"
+  },
+  "created_at": "2026-11-05T09:22:14.910376Z",
+  "git_sha": "f7aa43e3b89c9a95f4c48d455523c2e90b41ea40-dirty",
+  "manifest": "data/manifests/primock57.phone_noisy_snr5.jsonl",
+  "keyterms": null
+}
