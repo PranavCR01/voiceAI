@@ -1,0 +1,15 @@
+{
+  "run_id": "elevenlabs-scribe-v2-batch",
+  "config_id": "elevenlabs_scribe_v2_batch",
+  "provider": "elevenlabs",
+  "model_id": "scribe_v2",
+  "mode": "batch",
+  "settings": {
+    "language_code": "en",
+    "temperature": 0
+  },
+  "created_at": "2026-11-05T09:34:02.452694Z",
+  "git_sha": "0a4a9f7e8c9eafbb0e67dbc60e6f9d1ae1ba8026-dirty",
+  "manifest": "data/manifests/primock57.phone_noisy_snr5.jsonl",
+  "keyterms": null
+}
