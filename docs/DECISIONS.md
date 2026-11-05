@@ -2,6 +2,21 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-05 — PriMock57 on a simulated phone line (8 kHz mu-law): the ranking holds, the gaps narrow
+Three configs on `data/manifests/primock57.telephony_mulaw.jsonl` (recipe `telephony_mulaw`, seed 0; 5,255 utterances each, 0 failed), results in `results_augmented/telephony_mulaw/`, report `reports/generated/primock57_telephony_batch.md`. Degradation is paired per utterance against each config's clean run, speaker-clustered bootstrap (10,000 resamples):
+
+| Config | Clean WER | Phone WER | Degradation [95% CI] | Medication (clean → phone) | Empty on speech |
+|---|---|---|---|---|---|
+| Scribe v2 | 5.65% | 6.80% | +1.15 pp [+0.90, +1.42] | 135 → 131 | 17 → 23 |
+| AssemblyAI U-3.5 Pro | 6.56% | 7.27% | **+0.71 pp** [+0.55, +0.88] | 138 → 131 | 19 → 16 |
+| Deepgram Nova-3 | 7.42% | 8.56% | +1.14 pp [+0.91, +1.38] | 121 → 117 | 57 → 49 |
+
+- **Ranking unchanged, all pairs distinguishable:** Scribe 6.8% < AssemblyAI 7.3% (+0.5 pp [+0.1, +0.9], p = 0.019) < Deepgram 8.6%. Patient side: 8.3 / 9.1 / 10.3%.
+- **AssemblyAI degrades least** (+11% relative vs +20% Scribe, +15% Deepgram), so Scribe's lead over it halves (0.9 → 0.5 pp). Medication recall ties between Scribe and AssemblyAI on the phone line (131/163 each).
+- Scribe's degradation is well above its run-to-run noise (~0.1 pp WER between identical runs), so the +1.15 pp is a real effect, not repeat variance.
+- **Weakness, and why this is a floor, not a field estimate:** the simulation is studio-quality 16 kHz audio resampled to 8 kHz and mu-law coded. A real phone call also has a handset/network band-pass (~300–3,400 Hz, while ours keeps 0–4 kHz), AGC, echo cancellation, background noise and occasional packet loss. Real calls will degrade more; the noisy-phone recipes (`phone_noisy_snr10/5`) are the next step toward that.
+- Spend: ≈ $1.20 (AssemblyAI) + ~6–9k ElevenLabs credits + ≈ $1.40 (Deepgram). The augmentation itself took 22 min for 5,255 utterances (three ffmpeg processes per utterance, single-threaded); parallelising `harness.augment.run` is worth doing before running the SNR sweep.
+
 ## 2026-11-05 — Scribe v2 run-to-run noise floor: the keyterm gain is about half noise
 Retest of `elevenlabs_scribe_v2_batch` (same config, `results_retest/elevenlabs-scribe-v2-batch-retest`, 5,255 utterances, 0 failed, 14 empty on speech vs 17 in the first run).
 - **Scribe is ~7× less repeatable than Deepgram at `temperature: 0`.** Identical runs differ on **605 raw / 250 normalized** transcripts (11.5% / 4.8%). Deepgram's retest: 1.6% / 0.9%. WER 5.7% → 5.6%. Medication recall 135 → **138**/163, so ±3 entities flip between identical runs.
