@@ -255,7 +255,9 @@ def test_pace_rejects_bad_arguments() -> None:
 
 @pytest.mark.timing
 def test_precise_pacing_on_any_os() -> None:
-    """The Windows path (sleep, then spin) also paces correctly where it isn't the default."""
+    """The precise path (capped sleeps, then spin), forced on. On Windows it is also the default,
+    so this duplicates test_pace_does_not_drift there; on Linux it is the only real-clock run of
+    the spin path."""
     clip = AudioClip(tone(440, 1.0, 16000), 16000, "a:1", 16000)
     chunks = asyncio.run(_collect(clip, chunk_ms=20, precise=True))
     lateness = sorted(c.lateness_ms for c in chunks)
@@ -284,11 +286,37 @@ class FakeClock:
         if seconds == 0:
             self.now += 50_000  # one loop iteration while spinning
         else:
+            # An early wake-up (the timer firing before its time) happens once, then sleeps
+            # are honest: a real clock always moves forward while sleeping.
             self.now += int(seconds * 1e9) + self.oversleep_ns - self.undersleep_ns
+            self.undersleep_ns = 0
 
 
-def _wait(clock: FakeClock, due: int, margin: int) -> None:
-    asyncio.run(audio_mod.wait_until(due, spin_margin_ns=margin, clock=clock, sleep=clock.sleep))
+def _wait(clock: FakeClock, due: int, margin: int, max_sleep: int = 0) -> None:
+    asyncio.run(
+        audio_mod.wait_until(
+            due, spin_margin_ns=margin, max_sleep_ns=max_sleep, clock=clock, sleep=clock.sleep
+        )
+    )
+
+
+def test_wait_until_caps_each_sleep_below_one_loop_clock_tick() -> None:
+    """18 ms to the margin in steps of <= 4 ms: no single sleep spans a 15.6 ms Windows tick."""
+    clock = FakeClock(oversleep_ns=300_000)
+    due = clock.now + 20_000_000
+    _wait(clock, due, 2_000_000, max_sleep=4_000_000)
+    sleeps = [x for x in clock.sleeps if x > 0]
+    assert max(sleeps) <= 0.004 + 1e-12
+    assert len(sleeps) >= 4
+    assert sum(sleeps) < 0.018 + 1e-9  # never sleeps past the margin
+    assert due <= clock.now < due + 50_000
+
+
+def test_wait_until_capped_and_early_wakeup_still_reaches_the_deadline() -> None:
+    clock = FakeClock(undersleep_ns=3_000_000)
+    due = clock.now + 20_000_000
+    _wait(clock, due, 2_000_000, max_sleep=4_000_000)
+    assert due <= clock.now < due + 50_000
 
 
 def test_wait_until_without_margin_is_one_sleep() -> None:
@@ -307,12 +335,14 @@ def test_wait_until_sleeps_to_margin_then_spins_to_the_deadline() -> None:
     assert due <= clock.now < due + 50_000  # returns within one spin step of the deadline
 
 
-def test_wait_until_early_wakeup_spins_longer_never_returns_early() -> None:
+def test_wait_until_early_wakeup_sleeps_again_never_returns_early() -> None:
     clock = FakeClock(undersleep_ns=8_000_000)  # the timer fires 8 ms early
     due = clock.now + 20_000_000
     _wait(clock, due, 2_000_000)
     assert clock.now >= due
-    assert len(clock.sleeps) > 100  # ~10 ms of 50 µs spin steps
+    # After the early wake-up it sleeps again to the margin instead of spinning ~10 ms.
+    assert clock.sleeps[:2] == [pytest.approx(0.018), pytest.approx(0.008)]
+    assert all(x == 0 for x in clock.sleeps[2:]) and len(clock.sleeps) <= 2 + 41
 
 
 def test_wait_until_inside_margin_or_past_due_does_not_sleep() -> None:
@@ -364,17 +394,48 @@ def test_load_winmm_is_none_off_windows(monkeypatch: pytest.MonkeyPatch) -> None
     assert audio_mod._load_winmm() is None
 
 
+class FakeKernel32:
+    def __init__(self, result: int = 1) -> None:
+        self.calls: list[tuple[Any, int, tuple[int, int, int], int]] = []
+        self.result = result
+
+    def GetCurrentProcess(self) -> Any:  # noqa: N802
+        return "pseudo-handle"
+
+    def SetProcessInformation(self, h: Any, cls: int, info: Any, size: int, /) -> int:  # noqa: N802
+        st = info._obj  # ctypes.byref -> the structure
+        self.calls.append((h, cls, (st.Version, st.ControlMask, st.StateMask), size))
+        return self.result
+
+
+def test_opt_out_timer_throttling_sends_the_documented_struct() -> None:
+    k32 = FakeKernel32()
+    assert audio_mod.opt_out_timer_throttling(k32)
+    # ProcessPowerThrottling = 4; {version 1, control IGNORE_TIMER_RESOLUTION (0x4), state 0}
+    assert k32.calls == [("pseudo-handle", 4, (1, 0x4, 0), 12)]
+    assert not audio_mod.opt_out_timer_throttling(FakeKernel32(result=0))  # unsupported OS
+    assert not audio_mod.opt_out_timer_throttling(None)
+
+
+KERNEL32 = FakeKernel32()
+
+
 def _patch_windows(monkeypatch: pytest.MonkeyPatch, winmm: FakeWinMM) -> list[int]:
     """Pretend to be Windows: fake winmm, and record the spin margin each wait uses."""
     margins: list[int] = []
     real_wait = audio_mod.wait_until
 
-    async def recording_wait(due_ns: int, *, spin_margin_ns: int = 0) -> None:
+    async def recording_wait(
+        due_ns: int, *, spin_margin_ns: int = 0, max_sleep_ns: int = 0
+    ) -> None:
         margins.append(spin_margin_ns)
-        await real_wait(due_ns, spin_margin_ns=spin_margin_ns)
+        caps.append(max_sleep_ns)
+        await real_wait(due_ns, spin_margin_ns=spin_margin_ns, max_sleep_ns=max_sleep_ns)
 
+    caps: list[int] = []
     monkeypatch.setattr(audio_mod, "_IS_WINDOWS", True)
     monkeypatch.setattr(audio_mod, "_load_winmm", lambda: winmm)
+    monkeypatch.setattr(audio_mod, "_load_kernel32", lambda: KERNEL32)
     monkeypatch.setattr(audio_mod, "wait_until", recording_wait)
     return margins
 
@@ -395,6 +456,7 @@ def test_pace_on_windows_holds_1ms_timer_while_pacing(monkeypatch: pytest.Monkey
     assert all(calls == [("begin", 1)] for calls in seen)  # active for every chunk
     assert winmm.calls == [("begin", 1), ("end", 1)]  # released when pacing ends
     assert margins == [audio_mod.SPIN_MARGIN_NS] * 5
+    assert KERNEL32.calls and KERNEL32.calls[-1][2] == (1, 0x4, 0)  # throttling opt-out sent
 
 
 def test_pace_on_windows_releases_timer_when_consumer_stops(
@@ -423,3 +485,12 @@ def test_pace_off_windows_keeps_plain_sleeps(monkeypatch: pytest.MonkeyPatch) ->
     asyncio.run(_collect(clip, chunk_ms=20))
     assert winmm.calls == []
     assert margins == [0, 0, 0]
+
+
+def test_pacing_check_stats_and_variants() -> None:
+    from harness.pacing_check import VARIANTS, stats
+
+    s = stats([float(x) for x in range(10)])
+    assert (s["n"], s["p10"], s["p50"], s["p90"], s["max"]) == (10, 1.0, 5.0, 9.0, 9.0)
+    assert s["over_5ms"] == 0.4
+    assert VARIANTS[0] == "shipped"

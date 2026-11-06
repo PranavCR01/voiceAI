@@ -7,10 +7,12 @@ hears identical audio.
 - Encoders: PCM16 little-endian, G.711 µ-law at 8 kHz (what Twilio Media Streams carry), WAV.
 - `pace()`: yields fixed-size chunks at real-time pace on `time.perf_counter_ns` (monotonic and
   high-resolution on every OS; `time.monotonic` ticks every ~15.6 ms on Windows). Chunk k is
-  scheduled at t0 + k * chunk, so lateness never accumulates into drift. On Windows the default
-  timer tick (~15.6 ms) makes asyncio sleeps wake several ms late, so while pacing it raises the
-  timer resolution to 1 ms (`timeBeginPeriod`) and sleeps until ~2 ms before each deadline, then
-  spin-waits on the clock (yielding to the event loop) until the deadline (docs/DECISIONS.md).
+  scheduled at t0 + k * chunk, so lateness never accumulates into drift. On Windows (Python 3.12)
+  both the system timer and asyncio's loop clock (`GetTickCount64`) tick every ~15.6 ms, so while
+  pacing it raises the timer resolution to 1 ms (`timeBeginPeriod`, opting the process out of
+  timer-resolution power throttling), sleeps in steps of at most 4 ms (shorter than one loop-clock
+  tick, so a timer is always judged due when its wait ends) until ~2 ms before each deadline, then
+  spin-waits on the clock, yielding to the event loop (docs/DECISIONS.md, 2026-11-05/06).
 
 ffmpeg is invoked as an argument list (never through a shell).
 """
@@ -289,7 +291,18 @@ def encode_for_stream(clip: AudioClip, encoding: Encoding) -> tuple[bytes, int, 
 # Windows only: sleep until this long before a deadline, then spin on the clock. Covers the
 # ~1 ms wake-up jitter left after timeBeginPeriod(1); elsewhere asyncio sleeps are precise enough.
 SPIN_MARGIN_NS = 2_000_000
+# Windows only: no single asyncio sleep longer than this. asyncio judges a timer due against its
+# own clock plus that clock's resolution (base_events._run_once); on Python 3.12 / Windows that
+# clock ticks every ~15.6 ms, so a sleep longer than one tick can be judged not yet due when its
+# wait ends and is waited on again, up to a tick late. A sleep shorter than one tick always fires.
+MAX_SLEEP_NS = 4_000_000
+# Windows 11 may ignore timeBeginPeriod for a throttled (e.g. background) process unless the
+# process opts out via SetProcessInformation(ProcessPowerThrottling).
+OPT_OUT_TIMER_THROTTLING = True
 _IS_WINDOWS = sys.platform == "win32"
+_PROCESS_POWER_THROTTLING = 4  # PROCESS_INFORMATION_CLASS ProcessPowerThrottling
+_THROTTLING_VERSION = 1  # PROCESS_POWER_THROTTLING_CURRENT_VERSION
+_IGNORE_TIMER_RESOLUTION = 0x4  # PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION
 
 
 class _WinMM(Protocol):
@@ -307,6 +320,52 @@ def _load_winmm() -> _WinMM | None:
     except OSError:
         return None
     return cast(_WinMM, winmm)
+
+
+class _Kernel32(Protocol):
+    def GetCurrentProcess(self) -> Any: ...  # noqa: N802
+    def SetProcessInformation(self, h: Any, cls: int, info: Any, size: int, /) -> int: ...  # noqa: N802
+
+
+def _load_kernel32() -> _Kernel32 | None:
+    if not _IS_WINDOWS:
+        return None
+    import ctypes
+
+    try:
+        k32: Any = getattr(ctypes, "WinDLL")("kernel32")  # noqa: B009 - absent off Windows
+        k32.SetProcessInformation  # noqa: B018 - Windows 8+; probe that it exists
+    except (OSError, AttributeError):
+        return None
+    return cast(_Kernel32, k32)
+
+
+def opt_out_timer_throttling(kernel32: _Kernel32 | None) -> bool:
+    """Ask Windows to always honour this process's timer-resolution request (best effort).
+
+    Sets PROCESS_POWER_THROTTLING_STATE{version 1, control IGNORE_TIMER_RESOLUTION, state 0}:
+    "never ignore the timer resolution for this process". False when unsupported (before
+    Windows 11 the call fails; older Windows never throttled the resolution anyway).
+    """
+    if kernel32 is None:
+        return False
+    import ctypes
+
+    class _State(ctypes.Structure):
+        _fields_ = [  # noqa: RUF012 - ctypes declares fields as a class attribute
+            ("Version", ctypes.c_uint32),
+            ("ControlMask", ctypes.c_uint32),
+            ("StateMask", ctypes.c_uint32),
+        ]
+
+    state = _State(_THROTTLING_VERSION, _IGNORE_TIMER_RESOLUTION, 0)
+    ok = kernel32.SetProcessInformation(
+        kernel32.GetCurrentProcess(),
+        _PROCESS_POWER_THROTTLING,
+        ctypes.byref(state),
+        ctypes.sizeof(state),
+    )
+    return bool(ok)
 
 
 @contextlib.contextmanager
@@ -328,6 +387,7 @@ async def wait_until(
     due_ns: int,
     *,
     spin_margin_ns: int = 0,
+    max_sleep_ns: int = 0,
     clock: Callable[[], int] = time.perf_counter_ns,
     sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
 ) -> None:
@@ -335,15 +395,17 @@ async def wait_until(
 
     `spin_margin_ns` = 0: one sleep for the remaining time. > 0: sleep until that long before the
     deadline, then spin, yielding to the event loop (`sleep(0)`) so concurrent tasks (the
-    receiver) keep running. An early wake-up only means a longer spin.
+    receiver) keep running. An early wake-up only means a longer spin. `max_sleep_ns` > 0 splits
+    the sleep into steps of at most that long (see MAX_SLEEP_NS).
     """
-    remaining = due_ns - clock()
     if spin_margin_ns <= 0:
+        remaining = due_ns - clock()
         if remaining > 0:
             await sleep(remaining / 1e9)
         return
-    if remaining > spin_margin_ns:
-        await sleep((remaining - spin_margin_ns) / 1e9)
+    while (remaining := due_ns - clock() - spin_margin_ns) > 0:
+        step = min(remaining, max_sleep_ns) if max_sleep_ns > 0 else remaining
+        await sleep(step / 1e9)
     while clock() < due_ns:
         await sleep(0)
 
@@ -359,7 +421,8 @@ async def pace(
     """Yield the clip (plus `pad_ms` of trailing silence) in `chunk_ms` chunks at real time.
 
     Deadlines are absolute (t0 + k * chunk_ms), so a late chunk does not delay the next ones.
-    `precise` (default: on Windows only) = 1 ms timer resolution + sleep-then-spin waits.
+    `precise` (default: on Windows only) = 1 ms timer resolution (with the throttling opt-out),
+    sleeps of at most MAX_SLEEP_NS, then a spin for the last SPIN_MARGIN_NS.
     """
     if chunk_ms <= 0 or pad_ms < 0:
         raise ValueError("chunk_ms must be > 0 and pad_ms >= 0")
@@ -371,11 +434,14 @@ async def pace(
     chunk_bytes = (bytes_per_s * chunk_ms // 1000) // width * width
     chunk_ns = chunk_ms * 1_000_000
     margin = SPIN_MARGIN_NS if precise else 0
+    max_sleep = MAX_SLEEP_NS if precise else 0
+    if precise and OPT_OUT_TIMER_THROTTLING:
+        opt_out_timer_throttling(_load_kernel32())
     with timer_resolution_1ms(_load_winmm() if precise else None):
         t0 = time.perf_counter_ns()
         for k, start in enumerate(range(0, len(payload), chunk_bytes)):
             due = t0 + k * chunk_ns
-            await wait_until(due, spin_margin_ns=margin)
+            await wait_until(due, spin_margin_ns=margin, max_sleep_ns=max_sleep)
             yield Chunk(
                 index=k,
                 data=payload[start : start + chunk_bytes],
