@@ -97,6 +97,7 @@ async def run_sweep(
     sha: str | None = None,
     rtt_ms: float | None = None,
     sample: SampleSpec | None = None,
+    max_sessions_per_minute: int | None = None,
 ) -> list[RunSummary]:
     summaries = []
     for run_id, cfg in sweep_points(base, sweep):
@@ -115,6 +116,7 @@ async def run_sweep(
                 sha=sha,
                 rtt_ms=rtt_ms,
                 sample=sample,
+                max_sessions_per_minute=max_sessions_per_minute,
             )
         )
     return summaries
@@ -236,6 +238,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     r.add_argument("--registry", type=Path, default=Path("configs/providers.yaml"))
     r.add_argument("--limit", type=int)
     add_sample_args(r)
+    r.add_argument("--max-sessions-per-minute", type=int, help="see stream_runner")
     s = sub.add_parser("summarize")
     s.add_argument("--results", type=Path, required=True)
     s.add_argument("--manifest", type=Path, required=True)
@@ -273,6 +276,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             limit=args.limit,
             rtt_ms=rtt_probe_ms(protocol.url()),
             sample=sample_spec(args),
+            max_sessions_per_minute=args.max_sessions_per_minute,
         )
     )
     for summ in summaries:

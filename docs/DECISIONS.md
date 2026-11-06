@@ -2,6 +2,14 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-06 — AssemblyAI streaming hit its new-session rate limit; provider errors now fail rows
+- **What happened:** the first full AssemblyAI natural run (owner's machine, 285 sessions) finished in 3m24s and reported "283 ok, 2 failed", but only 14 sessions had text. 268 traces held `{"type":"Error","error_code":1008,"error":"Unauthorized Connection: Too many concurrent sessions"}`, received ~13 ms after connecting. Sessions succeeded in bursts of five. The run is discarded (kept locally, never committed).
+- **Cause:** AssemblyAI limits *new sessions per minute*, not open sessions: free accounts 5/min, paid 200/min, and closing a session does not free room within the minute (https://www.assemblyai.com/docs/streaming/rate-limits, read 2026-11-06). The runner opens about 11 sessions/min. The bursts of five mean the account is on the free tier. The 1-utterance and 5-utterance probes never reached the limit.
+- **Fix 1: a session with a provider `error` event is a failed row** (`ProviderError: <message>`, trace kept, `--retry-failed` retries it). Before, it was an "ok" row with an empty transcript, so a broken run looked like a bad model. This applies to every provider: their `error` mappings are all real errors (Deepgram `Error`, ElevenLabs error types including quota, AssemblyAI `Error`).
+- **Fix 2: rate limits.** `is_rate_limit` (AssemblyAI: the exact text above, as its docs advise; other 1008 closes such as a bad key stay failures) makes the runner wait 61 s and retry the same utterance, up to 3 times. A rejected session never streamed audio, so this is not re-rolling a result. `--max-sessions-per-minute N` (stream runner and sweep) spaces session opens ahead of time. With `5` an AssemblyAI run takes ~57 min instead of ~25. The waits fall between sessions, so latency is unaffected. Not recorded in `run.json`, because it changes nothing that is measured.
+- **Run provenance:** the four Deepgram runs used `da05dae`, and the AssemblyAI runs will record this later commit. The pacer and the session code are unchanged between the two, only the runner's error handling and spacing, so the runs remain comparable.
+- **Not verified yet:** whether any of the four Deepgram runs contain error events that the old code counted as "ok" (Flux natural/forced each had 16 empty on speech). The owner's machine checks this before committing.
+
 ## 2026-11-06 — Windows pacer, third attempt: wait in a pacing thread, not on asyncio timers
 - **The second attempt's explanation is falsified.** `pacing_check` on the owner's machine (Windows 11 26200, Python 3.12.13, loop clock `GetTickCount64` at 15.625 ms), 450 chunks per variant, lateness in ms:
 

@@ -10,6 +10,9 @@ Protocol checked against assemblyai.com/docs on 2026-11-05 (docs/RESEARCH.md). M
 - `SpeechStarted` -> `vad_event`; `Error` -> `error`; `Termination` (always last) ends the session.
 - Forced finalize: `{"type": "ForceEndpoint"}`; close: `{"type": "Terminate"}`.
 - Billing is on session (WebSocket-open) duration, not audio: the registry's billing_basis says so.
+- Rate limit: new sessions per minute (free accounts 5, paid 200; docs 2026-11-06). Exceeding it
+  returns an `Error` "Too many concurrent sessions" and close 1008 before any audio is
+  transcribed; `is_rate_limit` lets the runner wait for the next minute and retry that session.
 """
 
 from __future__ import annotations
@@ -44,6 +47,7 @@ SETTINGS = frozenset(
         "keyterms",
     }
 )
+RATE_LIMIT_TEXT = "Too many concurrent sessions"
 MAX_KEYTERMS = 100  # documented streaming limit; each term <= 50 chars
 
 
@@ -150,6 +154,11 @@ class AssemblyAIStream:
         if kind == "Error":
             return [Mapped(EventKind.ERROR)]
         return []
+
+    def is_rate_limit(self, error: str) -> bool:
+        """True for the per-minute new-session limit (retry next minute). Other 1008 closes
+        (bad key, no funds) are real failures."""
+        return RATE_LIMIT_TEXT in error
 
     def is_terminal(self, message: Message) -> bool:
         return _json(message).get("type") in ("Termination", "Error")

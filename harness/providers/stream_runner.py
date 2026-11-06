@@ -14,6 +14,13 @@ Session settings live in the registry entry next to the provider's own settings 
 before the adapter sees them: `chunk_ms` (20), `finalization` (`natural` | `forced`),
 `trailing_silence_ms` (1500), `encoding` (`pcm16` | `mulaw`).
 
+A session whose trace holds a provider `error` event is a failed row (the trace is kept), never
+an "ok" row with an empty transcript. A provider rate limit on opening sessions
+(`protocol.is_rate_limit`) waits `rate_limit_wait_s` and retries that utterance, up to
+`rate_limit_retries` times: the rejected session streamed nothing, so this is not re-rolling a
+result. `--max-sessions-per-minute N` spaces session opens for accounts with a per-minute cap
+(AssemblyAI free tier: 5); waiting happens between sessions and doesn't affect latency.
+
 `--subset patient --per-speaker 5 --seed 0` runs a seeded per-speaker sample instead of the whole
 manifest (harness/datasets/sample.py); the spec and a hash of the chosen ids go in `run.json`.
 API keys are read from the environment, then from `.env` (harness/env.py).
@@ -23,11 +30,12 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import os
 import socket
 import statistics
 import time
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -52,7 +60,14 @@ from harness.providers.runner import (
 )
 from harness.results import RUN_META, ResultRow, read_run, write_run
 from harness.streaming.session import Connect, StreamProtocol, stream_session, websockets_connect
-from harness.streaming.trace import FinalizationMode, SessionMeta, trace_filename, write_trace
+from harness.streaming.trace import (
+    EventKind,
+    FinalizationMode,
+    SessionMeta,
+    SessionTrace,
+    trace_filename,
+    write_trace,
+)
 from harness.vad import SpeechSpan, read_speech, sidecar_path
 from recommender.profile import load_profile
 
@@ -107,6 +122,48 @@ def split_settings(
     if s.chunk_ms <= 0 or s.trailing_silence_ms < 0:
         raise ValueError("chunk_ms must be > 0 and trailing_silence_ms >= 0")
     return s, provider
+
+
+Sleep = Callable[[float], Awaitable[None]]
+
+
+class SessionRateLimiter:
+    """At most `per_minute` session opens in any 60 s window (None: unlimited)."""
+
+    def __init__(
+        self,
+        per_minute: int | None,
+        *,
+        clock: Callable[[], float] = time.monotonic,
+        sleep: Sleep = asyncio.sleep,
+    ) -> None:
+        if per_minute is not None and per_minute <= 0:
+            raise ValueError("max sessions per minute must be > 0")
+        self.per_minute = per_minute
+        self.clock = clock
+        self.sleep = sleep
+        self.opens: list[float] = []
+
+    async def acquire(self) -> None:
+        if self.per_minute is None:
+            return
+        now = self.clock()
+        self.opens = [t for t in self.opens if now - t < 60.0]
+        if len(self.opens) >= self.per_minute:
+            await self.sleep(60.0 - (now - self.opens[0]) + 0.5)
+            now = self.clock()
+            self.opens = [t for t in self.opens if now - t < 60.0]
+        self.opens.append(now)
+
+
+def provider_error(trace: SessionTrace) -> str | None:
+    """The first provider error in the trace, as text (None when there is none)."""
+    errors = trace.of(EventKind.ERROR)
+    if not errors:
+        return None
+    raw = errors[0].raw
+    text = raw if isinstance(raw, str) else json.dumps(raw, sort_keys=True)
+    return text[:500]
 
 
 def rtt_probe_ms(url: str, attempts: int = 5, timeout_s: float = 5.0) -> float | None:
@@ -164,6 +221,11 @@ async def run_streaming(
     keyterms: list[str] | None = None,
     rtt_ms: float | None = None,
     sample: SampleSpec | None = None,
+    max_sessions_per_minute: int | None = None,
+    rate_limit_retries: int = 3,
+    rate_limit_wait_s: float = 61.0,
+    sleep: Sleep = asyncio.sleep,
+    clock: Callable[[], float] = time.monotonic,
 ) -> RunSummary:
     if config.mode is not Mode.STREAMING:
         raise ValueError(f"{config.config_id} is a {config.mode} config; use the batch runner")
@@ -202,31 +264,50 @@ async def run_streaming(
     (run_dir / "traces").mkdir(parents=True, exist_ok=True)
     write_run(results_dir, meta, rows.values())
 
+    limiter = SessionRateLimiter(max_sessions_per_minute, clock=clock, sleep=sleep)
+    is_rate_limit: Callable[[str], bool] = getattr(protocol, "is_rate_limit", lambda e: False)
     done: list[ResultRow] = []
     for n, utt in enumerate(todo, 1):
-        started = datetime.now(UTC)
         span = spans.get(utt.utt_id)
-        try:
-            if s.finalization == "forced" and (span is None or span.speech_end_ms is None):
-                raise ValueError("no VAD speech end (#15) for forced finalization")
-            trace = await stream_session(
-                protocol,
-                await asyncio.to_thread(load, utt),
-                session_meta(config.config_id, utt, s, span, rtt_ms),
-                connect=connect,
-                pad_ms=s.trailing_silence_ms,
-            )
-        except Exception as e:  # noqa: BLE001 - recorded per utterance, the run goes on
+        for attempt in range(rate_limit_retries + 1):
+            started = datetime.now(UTC)
+            trace: SessionTrace | None = None
+            error: str | None = None
+            try:
+                if s.finalization == "forced" and (span is None or span.speech_end_ms is None):
+                    raise ValueError("no VAD speech end (#15) for forced finalization")
+                await limiter.acquire()
+                trace = await stream_session(
+                    protocol,
+                    await asyncio.to_thread(load, utt),
+                    session_meta(config.config_id, utt, s, span, rtt_ms),
+                    connect=connect,
+                    pad_ms=s.trailing_silence_ms,
+                )
+            except Exception as e:  # noqa: BLE001 - recorded per utterance, the run goes on
+                error = f"{type(e).__name__}: {e}"
+            else:
+                perr = provider_error(trace)
+                error = None if perr is None else f"ProviderError: {perr}"
+                if perr is not None and is_rate_limit(perr) and attempt < rate_limit_retries:
+                    print(f"{utt.utt_id}: provider rate limit, retrying in {rate_limit_wait_s} s")
+                    await sleep(rate_limit_wait_s)
+                    continue
+            break
+        name = trace_filename(utt.utt_id)
+        if trace is not None:
+            write_trace(run_dir / "traces" / name, trace)
+        if error is not None:
             row = ResultRow(
                 utt_id=utt.utt_id,
                 hyp_text="",
+                raw_response_path=f"traces/{name}" if trace is not None else None,
                 started_at=started,
                 finished_at=datetime.now(UTC),
-                error=f"{type(e).__name__}: {e}",
+                error=error,
             )
         else:
-            name = trace_filename(utt.utt_id)
-            write_trace(run_dir / "traces" / name, trace)
+            assert trace is not None
             text = trace.text()
             row = ResultRow(
                 utt_id=utt.utt_id,
@@ -306,6 +387,11 @@ def main(argv: Sequence[str] | None = None) -> None:
         choices=["natural", "forced"],
         help="override the config's finalization; the default run id gets a -<mode> suffix",
     )
+    ap.add_argument(
+        "--max-sessions-per-minute",
+        type=int,
+        help="space session opens for a per-minute account cap (AssemblyAI free tier: 5)",
+    )
     add_sample_args(ap)
     args = ap.parse_args(argv)
 
@@ -342,6 +428,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             keyterms=keyterms,
             rtt_ms=None if args.no_rtt else rtt_probe_ms(protocol.url()),
             sample=sample_spec(args),
+            max_sessions_per_minute=args.max_sessions_per_minute,
         )
     )
     print(

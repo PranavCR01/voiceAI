@@ -197,3 +197,141 @@ def test_cli_sample_args() -> None:
     assert sample_spec(ap.parse_args([])) is None
     spec = sample_spec(ap.parse_args(["--subset", "patient", "--per-speaker", "5"]))
     assert spec == SampleSpec(subset="patient", per_speaker=5, seed=0)
+
+
+# --- provider errors and rate limits in the stream runner ---------------------------------------
+
+
+def _err_trace(meta: Any, raw: Any) -> Any:
+    from harness.streaming.trace import Event, EventKind, SessionTrace
+
+    return SessionTrace(meta=meta, events=(Event(kind=EventKind.ERROR, t_ns=1, raw=raw),))
+
+
+RATE = {"type": "Error", "error": "Unauthorized Connection: Too many concurrent sessions"}
+
+
+class RateLimitedProtocol:
+    def is_rate_limit(self, error: str) -> bool:
+        return "Too many concurrent sessions" in error
+
+
+def _run(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, outcomes: list[str], **kw: Any) -> Any:
+    """Run one utterance; `outcomes` lists what each session attempt returns: ok/rate/error."""
+    import asyncio
+
+    from harness.providers import stream_runner
+    from harness.providers.registry import ProviderConfig
+    from harness.streaming.trace import Event, EventKind, SessionTrace
+
+    attempts = iter(outcomes)
+    sleeps: list[float] = []
+
+    async def fake_session(protocol: Any, clip: Any, meta: Any, **_: Any) -> SessionTrace:
+        kind = next(attempts)
+        if kind == "rate":
+            return _err_trace(meta, RATE)
+        if kind == "error":
+            return _err_trace(meta, {"type": "Error", "error": "Invalid API key"})
+        ev = (Event(kind=EventKind.FINAL, t_ns=1, text="x"),)
+        return SessionTrace(meta=meta, events=ev)
+
+    async def fake_sleep(s: float) -> None:
+        sleeps.append(s)
+
+    monkeypatch.setattr(stream_runner, "stream_session", fake_session)
+    cfg = ProviderConfig.model_validate(
+        {
+            "config_id": "echo_stream", "provider": "echo", "model_id": "m", "mode": "streaming",
+            "env_key": "X",
+            "pricing": {"amount": 1, "unit": "hour", "billing_basis": "audio_duration",
+                        "source": "t", "as_of": "2026-11-05"},
+        }
+    )  # fmt: skip
+    summary = asyncio.run(
+        stream_runner.run_streaming(
+            cfg,
+            RateLimitedProtocol(),  # type: ignore[arg-type]
+            [utt("a", 0)],
+            load=lambda u: None,  # type: ignore[arg-type,return-value]
+            spans={},
+            results_dir=tmp_path,
+            manifest_label="t",
+            sha="abcdef0",
+            sleep=fake_sleep,
+            **kw,
+        )
+    )
+    from harness.results import read_run
+
+    return summary, read_run(tmp_path / "echo-stream").rows[0], sleeps
+
+
+def test_provider_error_is_a_failed_row_with_its_trace(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    summary, row, sleeps = _run(tmp_path, monkeypatch, ["error"])
+    assert (summary.succeeded, summary.failed) == (0, 1)
+    assert row.error is not None and "Invalid API key" in row.error
+    assert row.error.startswith("ProviderError:") and row.hyp_text == ""
+    assert row.raw_response_path == "traces/d__a__0000.jsonl"
+    assert (tmp_path / "echo-stream" / row.raw_response_path).exists()
+    assert sleeps == []  # not a rate limit: no retry
+
+
+def test_rate_limit_waits_and_retries_the_same_utterance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    summary, row, sleeps = _run(tmp_path, monkeypatch, ["rate", "rate", "ok"])
+    assert (summary.succeeded, summary.failed) == (1, 0)
+    assert row.error is None and row.hyp_text == "x"
+    assert sleeps == [61.0, 61.0]
+
+
+def test_rate_limit_retries_are_bounded(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    summary, row, sleeps = _run(
+        tmp_path, monkeypatch, ["rate", "rate", "rate"], rate_limit_retries=2
+    )
+    assert (summary.succeeded, summary.failed) == (0, 1)
+    assert "Too many concurrent sessions" in (row.error or "")
+    assert sleeps == [61.0, 61.0]
+
+
+def test_session_rate_limiter_spaces_opens() -> None:
+    import asyncio
+
+    from harness.providers.stream_runner import SessionRateLimiter
+
+    now = [0.0]
+    sleeps: list[float] = []
+
+    async def fake_sleep(s: float) -> None:
+        sleeps.append(s)
+        now[0] += s
+
+    lim = SessionRateLimiter(5, clock=lambda: now[0], sleep=fake_sleep)
+
+    async def open_n(n: int, gap: float) -> None:
+        for _ in range(n):
+            await lim.acquire()
+            now[0] += gap  # the session itself
+
+    asyncio.run(open_n(5, 6.0))
+    assert sleeps == []  # 5 opens in 30 s: within the cap
+    asyncio.run(open_n(1, 6.0))
+    assert sleeps == [pytest.approx(60.0 - 30.0 + 0.5)]  # 6th waits for the first to age out
+    assert SessionRateLimiter(None).per_minute is None
+    with pytest.raises(ValueError):
+        SessionRateLimiter(0)
+
+
+def test_assemblyai_recognizes_its_rate_limit_only() -> None:
+    import json
+
+    from harness.providers.assemblyai_stream import AssemblyAIStream
+    from harness.providers.registry import load_registry
+
+    cfg = load_registry(Path("configs/providers.yaml")).get("assemblyai_universal_stream")
+    p = AssemblyAIStream(cfg, "k", {"format_turns": True}, None, "pcm16")
+    assert p.is_rate_limit(json.dumps(RATE))
+    assert not p.is_rate_limit(json.dumps({"type": "Error", "error": "Invalid API key"}))
