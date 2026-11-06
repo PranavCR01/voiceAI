@@ -2,6 +2,22 @@
 
 Newest first. Each entry: date, decision, reason, what it replaced (if anything).
 
+## 2026-11-06 — Windows pacer, third attempt: wait in a pacing thread, not on asyncio timers
+- **The second attempt's explanation is falsified.** `pacing_check` on the owner's machine (Windows 11 26200, Python 3.12.13, loop clock `GetTickCount64` at 15.625 ms), 450 chunks per variant, lateness in ms:
+
+  | variant | p10 | p50 | p90 | max | > 5 ms |
+  |---|---|---|---|---|---|
+  | capped + opt-out (2nd attempt) | 0.01 | 2.39 | 11.59 | 17.40 | 38% |
+  | uncapped (1st attempt) | 0.01 | 2.77 | 12.46 | 15.43 | 40% |
+  | capped, no opt-out | 0.01 | 2.70 | 11.94 | 16.35 | 41% |
+  | plain | 1.93 | 8.81 | 14.88 | 19.84 | 71% |
+
+  The cap and the opt-out changed nothing measurable. The timing tests still failed, median 5.4–6.4 ms. What remains established: even sleeps of at most 4 ms on the asyncio loop sometimes come back ~12 ms late. So the lateness is in asyncio's Windows timer wait itself (a `GetQueuedCompletionStatus` timeout in whole ms, scheduled against the coarse loop clock), not in how the sleeps are sliced. Why the earlier isolated 2 ms probe overshot only 1.45 ms is not explained.
+- **Fix:** on Windows the precise waits now run in a dedicated pacing thread. `time.sleep` (a high-resolution waitable timer since Python 3.11, independent of asyncio) sleeps until 2 ms before the deadline, then a spin with `sleep(0)` releases the GIL so the receiver isn't starved. The loop is woken through `run_in_executor`, which is an I/O completion, not a timer. The cost is one thread wake-up per chunk, ~0.1–0.2 ms on Linux. The 1 ms timer and the opt-out are kept: they are harmless, and `time.sleep` may benefit from them.
+- `pacing_check` gained `loop-capped` / `loop-uncapped` (the earlier attempts, via `PRECISE_WAIT = "loop"`), raw probes of `asyncio.sleep(0.004)` and `time.sleep(0.004)`, and a header showing whether `timeBeginPeriod` and the opt-out returned success. If `probe-time` is also late on the owner's machine, the thread design can't work either, and the cause is the OS scheduling the process, not Python.
+- **Open:** in the same session `pacing_check` measured p50 2.4 ms while pytest measured 5.4–6.4 ms for the same code. One explanation is that the lateness mode varies per process with ~40% of chunks near the 5 ms threshold, so small shifts flip the median. This is not shown yet; the next run repeats `pacing_check` to see the variance between processes. The 5 ms median threshold is unchanged, as instructed.
+- Replaces the loop-based waits of the two entries below as the Windows default. They stay selectable for comparison.
+
 ## 2026-11-06 — Windows pacer, second attempt: cap each sleep below one loop-clock tick
 - **The first fix (2026-11-05) failed the timing test on the owner's machine:** median lateness 5.7–6.8 ms against the 5 ms bar. The distribution was bimodal over 3 s: p10 0.02 ms, p50 5.1, p90 11.5, max 14.8, with nothing early. Without the fix: p50 7.5, max 17.4. `timeBeginPeriod(1)` was accepted, and an isolated 2 ms `asyncio.sleep` overshot by only 1.45 ms median.
 - **Cause (from the asyncio source, not yet confirmed on Windows):** `base_events._run_once` treats a timer as due when `when < loop.time() + clock_resolution`. On Python 3.12 / Windows `loop.time()` is `GetTickCount64`, which ticks every ~15.6 ms; 3.13 moved `monotonic` to QPC. A sleep shorter than one tick (`when = C + s`, with `s` < 15.6 ms) is always due once its wait ends, which is why the 2 ms probe looked fine. The pacer's ~18 ms sleeps are only due if the coarse clock has ticked by then. When it hasn't, the loop waits again for up to one more tick, so some chunks are perfect and others land 0–15 ms late, as observed.

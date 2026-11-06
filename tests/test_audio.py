@@ -1,5 +1,6 @@
 import asyncio
 import subprocess
+import threading
 import time
 import wave
 from pathlib import Path
@@ -420,24 +421,28 @@ def test_opt_out_timer_throttling_sends_the_documented_struct() -> None:
 KERNEL32 = FakeKernel32()
 
 
-def _patch_windows(monkeypatch: pytest.MonkeyPatch, winmm: FakeWinMM) -> list[int]:
-    """Pretend to be Windows: fake winmm, and record the spin margin each wait uses."""
-    margins: list[int] = []
-    real_wait = audio_mod.wait_until
+def _patch_windows(monkeypatch: pytest.MonkeyPatch, winmm: FakeWinMM) -> list[tuple[str, int, int]]:
+    """Pretend to be Windows: fake winmm/kernel32, and record every wait as (where it ran:
+    "loop" or the pacing thread's name, spin margin, max sleep)."""
+    waits: list[tuple[str, int, int]] = []
+    real_wait, real_block = audio_mod.wait_until, audio_mod.block_until
 
     async def recording_wait(
         due_ns: int, *, spin_margin_ns: int = 0, max_sleep_ns: int = 0
     ) -> None:
-        margins.append(spin_margin_ns)
-        caps.append(max_sleep_ns)
+        waits.append(("loop", spin_margin_ns, max_sleep_ns))
         await real_wait(due_ns, spin_margin_ns=spin_margin_ns, max_sleep_ns=max_sleep_ns)
 
-    caps: list[int] = []
+    def recording_block(due_ns: int, *, spin_margin_ns: int) -> None:
+        waits.append((threading.current_thread().name.split("_")[0], spin_margin_ns, 0))
+        real_block(due_ns, spin_margin_ns=spin_margin_ns)
+
     monkeypatch.setattr(audio_mod, "_IS_WINDOWS", True)
     monkeypatch.setattr(audio_mod, "_load_winmm", lambda: winmm)
     monkeypatch.setattr(audio_mod, "_load_kernel32", lambda: KERNEL32)
     monkeypatch.setattr(audio_mod, "wait_until", recording_wait)
-    return margins
+    monkeypatch.setattr(audio_mod, "block_until", recording_block)
+    return waits
 
 
 def test_pace_on_windows_holds_1ms_timer_while_pacing(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -455,7 +460,8 @@ def test_pace_on_windows_holds_1ms_timer_while_pacing(monkeypatch: pytest.Monkey
     assert len(seen) == 5
     assert all(calls == [("begin", 1)] for calls in seen)  # active for every chunk
     assert winmm.calls == [("begin", 1), ("end", 1)]  # released when pacing ends
-    assert margins == [audio_mod.SPIN_MARGIN_NS] * 5
+    # Every wait ran in the pacing thread, sleeping then spinning the last SPIN_MARGIN_NS.
+    assert margins == [("pace", audio_mod.SPIN_MARGIN_NS, 0)] * 5
     assert KERNEL32.calls and KERNEL32.calls[-1][2] == (1, 0x4, 0)  # throttling opt-out sent
 
 
@@ -484,7 +490,7 @@ def test_pace_off_windows_keeps_plain_sleeps(monkeypatch: pytest.MonkeyPatch) ->
     clip = AudioClip(tone(440, 0.06, 16000), 16000, "a:1", 16000)
     asyncio.run(_collect(clip, chunk_ms=20))
     assert winmm.calls == []
-    assert margins == [0, 0, 0]
+    assert margins == [("loop", 0, 0)] * 3
 
 
 def test_pacing_check_stats_and_variants() -> None:
@@ -494,3 +500,47 @@ def test_pacing_check_stats_and_variants() -> None:
     assert (s["n"], s["p10"], s["p50"], s["p90"], s["max"]) == (10, 1.0, 5.0, 9.0, 9.0)
     assert s["over_5ms"] == 0.4
     assert VARIANTS[0] == "shipped"
+
+
+def test_pace_on_windows_loop_mode_uses_capped_loop_sleeps(monkeypatch: pytest.MonkeyPatch) -> None:
+    waits = _patch_windows(monkeypatch, FakeWinMM())
+    monkeypatch.setattr(audio_mod, "PRECISE_WAIT", "loop")
+    clip = AudioClip(tone(440, 0.06, 16000), 16000, "a:1", 16000)
+    asyncio.run(_collect(clip, chunk_ms=20))
+    assert waits == [("loop", audio_mod.SPIN_MARGIN_NS, audio_mod.MAX_SLEEP_NS)] * 3
+
+
+class SyncFakeClock(FakeClock):
+    def sleep_sync(self, seconds: float) -> None:
+        asyncio.run(self.sleep(seconds))
+
+
+def test_block_until_sleeps_to_margin_then_spins_and_resleeps_after_early_wakeup() -> None:
+    clock = SyncFakeClock(undersleep_ns=3_000_000)
+    due = clock.now + 20_000_000
+    audio_mod.block_until(due, spin_margin_ns=2_000_000, clock=clock, sleep=clock.sleep_sync)
+    assert clock.sleeps[:2] == [pytest.approx(0.018), pytest.approx(0.003)]
+    assert all(x == 0 for x in clock.sleeps[2:])
+    assert due <= clock.now < due + 50_000
+    late = SyncFakeClock()
+    audio_mod.block_until(late.now - 1, spin_margin_ns=2_000_000, clock=late, sleep=late.sleep_sync)
+    assert late.sleeps == []
+
+
+def test_pacing_thread_is_released_when_consumer_stops(monkeypatch: pytest.MonkeyPatch) -> None:
+    _patch_windows(monkeypatch, FakeWinMM())
+    clip = AudioClip(tone(440, 0.2, 16000), 16000, "a:1", 16000)
+
+    async def run() -> None:
+        gen = pace(clip, chunk_ms=20)
+        async for c in gen:
+            if c.index == 1:
+                break
+        await gen.aclose()
+
+    asyncio.run(run())
+    for _ in range(50):
+        if not any(t.name.startswith("pace") for t in threading.enumerate()):
+            break
+        time.sleep(0.01)
+    assert not any(t.name.startswith("pace") for t in threading.enumerate())

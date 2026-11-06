@@ -7,12 +7,11 @@ hears identical audio.
 - Encoders: PCM16 little-endian, G.711 µ-law at 8 kHz (what Twilio Media Streams carry), WAV.
 - `pace()`: yields fixed-size chunks at real-time pace on `time.perf_counter_ns` (monotonic and
   high-resolution on every OS; `time.monotonic` ticks every ~15.6 ms on Windows). Chunk k is
-  scheduled at t0 + k * chunk, so lateness never accumulates into drift. On Windows (Python 3.12)
-  both the system timer and asyncio's loop clock (`GetTickCount64`) tick every ~15.6 ms, so while
-  pacing it raises the timer resolution to 1 ms (`timeBeginPeriod`, opting the process out of
-  timer-resolution power throttling), sleeps in steps of at most 4 ms (shorter than one loop-clock
-  tick, so a timer is always judged due when its wait ends) until ~2 ms before each deadline, then
-  spin-waits on the clock, yielding to the event loop (docs/DECISIONS.md, 2026-11-05/06).
+  scheduled at t0 + k * chunk, so lateness never accumulates into drift. On Windows asyncio's
+  timers wake chunks up to ~15 ms late even at 1 ms timer resolution, so there the waiting
+  happens in a pacing thread with `time.sleep` (a high-resolution waitable timer since Python
+  3.11) until ~2 ms before each deadline, then a spin; the loop is woken by the thread, not by its
+  timers (docs/DECISIONS.md, 2026-11-05/06). Timer resolution stays raised to 1 ms meanwhile.
 
 ffmpeg is invoked as an argument list (never through a shell).
 """
@@ -29,6 +28,7 @@ import time
 import warnings
 import wave
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -296,6 +296,10 @@ SPIN_MARGIN_NS = 2_000_000
 # clock ticks every ~15.6 ms, so a sleep longer than one tick can be judged not yet due when its
 # wait ends and is waited on again, up to a tick late. A sleep shorter than one tick always fires.
 MAX_SLEEP_NS = 4_000_000
+# How precise pacing waits: "thread" (time.sleep in a pacing thread; the default since the
+# 2026-11-06 Windows measurements showed asyncio timers late however they are sliced) or "loop"
+# (capped asyncio sleeps then a spin on the loop; kept for harness.pacing_check comparisons).
+PRECISE_WAIT: Literal["thread", "loop"] = "thread"
 # Windows 11 may ignore timeBeginPeriod for a throttled (e.g. background) process unless the
 # process opts out via SetProcessInformation(ProcessPowerThrottling).
 OPT_OUT_TIMER_THROTTLING = True
@@ -410,6 +414,22 @@ async def wait_until(
         await sleep(0)
 
 
+def block_until(
+    due_ns: int,
+    *,
+    spin_margin_ns: int,
+    clock: Callable[[], int] = time.perf_counter_ns,
+    sleep: Callable[[float], object] = time.sleep,
+) -> None:
+    """Blocking version of `wait_until`, for the pacing thread: sleep until `spin_margin_ns`
+    before the deadline (re-sleeping after an early wake-up), then spin with `sleep(0)`, which
+    releases the GIL so the event loop thread (the receiver) is never starved."""
+    while (remaining := due_ns - clock() - spin_margin_ns) > 0:
+        sleep(remaining / 1e9)
+    while clock() < due_ns:
+        sleep(0)
+
+
 async def pace(
     clip: AudioClip,
     *,
@@ -421,8 +441,9 @@ async def pace(
     """Yield the clip (plus `pad_ms` of trailing silence) in `chunk_ms` chunks at real time.
 
     Deadlines are absolute (t0 + k * chunk_ms), so a late chunk does not delay the next ones.
-    `precise` (default: on Windows only) = 1 ms timer resolution (with the throttling opt-out),
-    sleeps of at most MAX_SLEEP_NS, then a spin for the last SPIN_MARGIN_NS.
+    `precise` (default: on Windows only) = 1 ms timer resolution (with the throttling opt-out)
+    and waits per PRECISE_WAIT: in a pacing thread (`block_until`), or on the loop with sleeps of
+    at most MAX_SLEEP_NS; both spin for the last SPIN_MARGIN_NS.
     """
     if chunk_ms <= 0 or pad_ms < 0:
         raise ValueError("chunk_ms must be > 0 and pad_ms >= 0")
@@ -437,11 +458,20 @@ async def pace(
     max_sleep = MAX_SLEEP_NS if precise else 0
     if precise and OPT_OUT_TIMER_THROTTLING:
         opt_out_timer_throttling(_load_kernel32())
-    with timer_resolution_1ms(_load_winmm() if precise else None):
+    pacer = (
+        ThreadPoolExecutor(max_workers=1, thread_name_prefix="pace")
+        if precise and PRECISE_WAIT == "thread"
+        else None
+    )
+    loop = asyncio.get_running_loop()
+    with timer_resolution_1ms(_load_winmm() if precise else None), _shutdown(pacer):
         t0 = time.perf_counter_ns()
         for k, start in enumerate(range(0, len(payload), chunk_bytes)):
             due = t0 + k * chunk_ns
-            await wait_until(due, spin_margin_ns=margin, max_sleep_ns=max_sleep)
+            if pacer is not None:
+                await loop.run_in_executor(pacer, _block, due, margin)
+            else:
+                await wait_until(due, spin_margin_ns=margin, max_sleep_ns=max_sleep)
             yield Chunk(
                 index=k,
                 data=payload[start : start + chunk_bytes],
@@ -449,3 +479,16 @@ async def pace(
                 scheduled_ns=due,
                 sent_ns=time.perf_counter_ns(),
             )
+
+
+def _block(due_ns: int, margin_ns: int) -> None:
+    block_until(due_ns, spin_margin_ns=margin_ns)
+
+
+@contextlib.contextmanager
+def _shutdown(pacer: ThreadPoolExecutor | None) -> Iterator[None]:
+    try:
+        yield
+    finally:
+        if pacer is not None:
+            pacer.shutdown(wait=False)

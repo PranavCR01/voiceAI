@@ -4,14 +4,17 @@
 
 Each variant runs in a fresh Python process (the Windows throttling opt-out is process-wide):
 
-- `shipped`: what `pace()` does by default on this OS
-- `no-cap`: precise, but one sleep to the spin margin (the 2026-11-05 Windows fix)
-- `no-optout`: precise and capped, without the power-throttling opt-out
-- `plain`: a single sleep per chunk, no timer resolution change (the Linux default)
+- `shipped`: what `pace()` does by default on this OS (on Windows: waits in a pacing thread)
+- `loop-capped`: precise, waits on the asyncio loop in sleeps <= 4 ms (the 2026-11-06 attempt)
+- `loop-uncapped`: precise, one asyncio sleep to the spin margin (the 2026-11-05 attempt)
+- `no-optout`: shipped without the power-throttling opt-out
+- `plain`: a single asyncio sleep per chunk, no timer resolution change (the Linux default)
+- `probe-asyncio`, `probe-time`: raw overshoot of `asyncio.sleep(0.004)` and `time.sleep(0.004)`
+  (1 ms timer resolution on), to show which sleep mechanism is late
 
-Prints p10/p50/p90/max/mean lateness (ms) and the share of chunks later than 5 ms, plus the
-loop-clock resolution that explains most Windows behaviour (docs/DECISIONS.md). Diagnostic only:
-nothing is written and no network is used.
+Prints p10/p50/p90/max/mean lateness or overshoot (ms) and the share above 5 ms, plus the loop
+clock and whether the 1 ms timer and the throttling opt-out took effect (docs/DECISIONS.md).
+Diagnostic only: nothing is written and no network is used.
 """
 
 from __future__ import annotations
@@ -30,13 +33,42 @@ import numpy as np
 
 from harness import audio
 
-VARIANTS = ("shipped", "no-cap", "no-optout", "plain")
+VARIANTS = (
+    "shipped", "loop-capped", "loop-uncapped", "no-optout", "plain", "probe-asyncio", "probe-time",
+)  # fmt: skip
+
+
+def probe(kind: str, seconds: float, step_s: float = 0.004) -> list[float]:
+    """Overshoot (ms) of repeated `step_s` sleeps for `seconds`, with the 1 ms timer on."""
+    out: list[float] = []
+
+    async def asleep() -> None:
+        end = time.perf_counter() + seconds
+        while time.perf_counter() < end:
+            t = time.perf_counter_ns()
+            await asyncio.sleep(step_s)
+            out.append((time.perf_counter_ns() - t) / 1e6 - step_s * 1000)
+
+    with audio.timer_resolution_1ms(audio._load_winmm()):
+        if kind == "probe-asyncio":
+            asyncio.run(asleep())
+        else:
+            end = time.perf_counter() + seconds
+            while time.perf_counter() < end:
+                t = time.perf_counter_ns()
+                time.sleep(step_s)
+                out.append((time.perf_counter_ns() - t) / 1e6 - step_s * 1000)
+    return out
 
 
 def measure(variant: str, seconds: float) -> list[float]:
     precise: bool | None = None
-    if variant == "no-cap":
-        audio.MAX_SLEEP_NS, precise = 0, True
+    if variant.startswith("probe-"):
+        return probe(variant, seconds)
+    if variant == "loop-capped":
+        audio.PRECISE_WAIT, precise = "loop", True
+    elif variant == "loop-uncapped":
+        audio.PRECISE_WAIT, audio.MAX_SLEEP_NS, precise = "loop", 0, True
     elif variant == "no-optout":
         audio.OPT_OUT_TIMER_THROTTLING, precise = False, True
     elif variant == "plain":
@@ -82,12 +114,18 @@ def main(argv: Sequence[str] | None = None) -> None:
         return
 
     mono = time.get_clock_info("monotonic")
+    sleep_clock = time.get_clock_info("perf_counter")
+    with audio.timer_resolution_1ms(audio._load_winmm()) as timer_1ms:
+        pass
+    opted_out = audio.opt_out_timer_throttling(audio._load_kernel32())
     print(
         f"python {platform.python_version()} on {platform.platform()}; "
         f"loop clock {mono.implementation} resolution {mono.resolution * 1000:.3f} ms; "
-        f"precise by default: {audio._IS_WINDOWS}"
+        f"perf_counter {sleep_clock.implementation}; precise by default: {audio._IS_WINDOWS}; "
+        f"timeBeginPeriod(1) ok: {timer_1ms}; throttling opt-out ok: {opted_out}; "
+        f"precise wait: {audio.PRECISE_WAIT}"
     )
-    print(f"{'variant':<10} {'n':>5} {'p10':>7} {'p50':>7} {'p90':>7} {'max':>7} {'mean':>7} >5ms")
+    print(f"{'variant':<14} {'n':>5} {'p10':>7} {'p50':>7} {'p90':>7} {'max':>7} {'mean':>7} >5ms")
     for v in VARIANTS:
         out = subprocess.run(
             [sys.executable, "-m", "harness.pacing_check", "--variant", v,
@@ -96,7 +134,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         ).stdout  # fmt: skip
         r = json.loads(out.strip().splitlines()[-1])
         print(
-            f"{v:<10} {r['n']:>5} {r['p10']:>7.2f} {r['p50']:>7.2f} {r['p90']:>7.2f} "
+            f"{v:<14} {r['n']:>5} {r['p10']:>7.2f} {r['p50']:>7.2f} {r['p90']:>7.2f} "
             f"{r['max']:>7.2f} {r['mean']:>7.2f} {100 * r['over_5ms']:>4.0f}%"
         )
 
